@@ -1,5 +1,8 @@
 # Terminal login
 
+For reusable colors, typography, geometry, component states, responsive behavior,
+and animation guidance, see the [terminal design system](DESIGN_SYSTEM.md).
+
 The React entry point displays the standalone terminal design in a same-origin
 frame. The design remains independently viewable at `/IOU-Terminal-Login.html`.
 Connected mode uses `?connected=1`; the parent verifies both the message origin
