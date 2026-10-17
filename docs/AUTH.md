@@ -2,8 +2,10 @@
 
 Implemented: Google OAuth via Supabase, PKCE callback/session handling, logout,
 FastAPI bearer-token verification, and a private profile API. Level 1 now adds a
-[backend friends/loans ledger](LEDGER.md), extended by [Level 2](HISTORY_PROOF.md);
-email/password UI, account deletion, and reminders are not implemented.
+[backend friends/loans ledger](LEDGER.md), extended by [Level 2](HISTORY_PROOF.md).
+The [terminal login](TERMINAL_LOGIN.md) supports Google and existing Supabase
+email/password accounts. Password registration, account deletion, and reminders
+are not implemented.
 
 ## Environment
 

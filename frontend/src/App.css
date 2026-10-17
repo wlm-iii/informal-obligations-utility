@@ -40,3 +40,5 @@ button:disabled {
 [role="alert"] {
 	color: #d95555;
 }
+
+.session-error {position:fixed;bottom:12px;left:16px;z-index:2;max-width:80vw;padding:12px;background:#1c1b1a;border:1px solid #d14d41;border-radius:6px}
