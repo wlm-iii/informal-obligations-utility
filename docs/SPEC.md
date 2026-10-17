@@ -3,9 +3,11 @@
 **Informal Obligations Utility** · Draft v0.1 · Decisions below are provisional.
 
 This primarily describes intended behavior. Google sign-in/private profiles and
-Level 1's zero-charge backend lending ledger are implemented; see [auth setup](AUTH.md),
-[ledger contracts](LEDGER.md), and the [backend roadmap](BACKEND_ROADMAP.md).
-Interest, fees, scores, reminders, and frontend lending screens remain future work.
+the zero-charge backend ledger, audited corrections/voids, private proof workflows,
+and signed cursors are implemented; see [auth setup](AUTH.md), [ledger contracts](LEDGER.md),
+[Level 2 safety/setup](HISTORY_PROOF.md), and the [backend roadmap](BACKEND_ROADMAP.md).
+Hosted provider setup/acceptance, interest, fees, scores, reminders, and frontend
+lending screens remain future work.
 The ledger contracts specify the narrower behavior that actually ships today.
 
 ## Product and audience
@@ -144,9 +146,11 @@ ranked publicly. The scoring rule is a product choice to revisit, not financial 
   guaranteed; provider acceptance and database failures require reconciliation.
 - Serverless deployment needs an external scheduler; a web process alone is not one.
 
-## API outline (not implemented)
+## Provisional full-product API outline
 
 Browser URLs use `/api`; local FastAPI route paths omit that mount prefix.
+This is a product sketch, not the shipped route list: see ledger/Level 2 contracts
+for implemented routes. In particular, arbitrary loan PATCH is not supported.
 
 ```text
 GET/POST        /api/friends
@@ -204,7 +208,8 @@ parallelize frontend/backend safely. Do not let both branches invent the same mo
 
 ## Stretch / non-goals
 
-Stretch: item photos, template choices, charts, CSV export, mobile polish.
+Item/proof photos now have a Level 2 backend workflow (hosted setup still required).
+Stretch: template choices, charts, CSV export, mobile polish.
 Not MVP: payment collection, bank links, actual credit reporting, debt collection,
 public shame leaderboards, multi-currency conversion, compound interest, Redis/Celery,
 or borrowers needing accounts just to receive a reminder.

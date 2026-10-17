@@ -10,11 +10,11 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy import Select, and_, case, func, literal, or_, select, union_all
+from sqlalchemy import Select, and_, case, func, or_, select
 from sqlalchemy.orm import Session
 
 from iou.auth import Identity
-from iou.ledger.models import Friend, Loan, LoanEvent, MutationReceipt
+from iou.ledger.models import Audit, Friend, Loan, LoanEvent, MutationReceipt
 from iou.ledger.schemas import (
     EventRead,
     FriendCreate,
@@ -58,14 +58,17 @@ def loan_query(owner: UUID) -> Select:
                 "returned_at"
             ),
         )
-        .where(LoanEvent.owner_id == owner)
+        .where(LoanEvent.owner_id == owner, LoanEvent.reversed_at.is_(None))
         .group_by(LoanEvent.loan_id)
         .subquery()
     )
     paid = func.coalesce(totals.c.paid_cents, 0)
-    complete = or_(
-        and_(Loan.kind == "money", paid >= Loan.principal_cents),
-        and_(Loan.kind == "item", totals.c.returned_at.is_not(None)),
+    complete = and_(
+        Audit.id.is_(None),
+        or_(
+            and_(Loan.kind == "money", paid >= Loan.principal_cents),
+            and_(Loan.kind == "item", totals.c.returned_at.is_not(None)),
+        ),
     )
     return (
         select(
@@ -74,8 +77,14 @@ def loan_query(owner: UUID) -> Select:
             totals.c.last_payment,
             totals.c.returned_at,
             complete.label("is_complete"),
+            Audit.id.is_not(None).label("is_voided"),
+            Audit.recorded_at.label("voided_at"),
+            Audit.reason.label("void_reason"),
         )
         .outerjoin(totals, totals.c.loan_id == Loan.id)
+        .outerjoin(
+            Audit, and_(Audit.loan_id == Loan.id, Audit.owner_id == owner, Audit.action == "void")
+        )
         .where(Loan.owner_id == owner)
     )
 
@@ -85,6 +94,7 @@ def loan_read(row, at: datetime) -> LoanRead:
     money = loan.kind == "money"
     paid = int(row.paid_cents) if money else None
     complete = bool(row.is_complete)
+    voided = bool(row.is_voided)
     completed_at = (row.last_payment if money else row.returned_at) if complete else None
     return LoanRead(
         id=loan.id,
@@ -100,11 +110,13 @@ def loan_read(row, at: datetime) -> LoanRead:
         principal_cents=loan.principal_cents,
         currency=loan.currency,
         repaid_cents=paid,
-        outstanding_cents=loan.principal_cents - paid if money else None,
+        outstanding_cents=(0 if voided else loan.principal_cents - paid) if money else None,
         returned_at=row.returned_at,
         completed_at=completed_at,
-        status="completed" if complete else "open",
-        overdue=not complete and at >= utc(loan.overdue_at),
+        status="voided" if voided else "completed" if complete else "open",
+        overdue=not complete and not voided and at >= utc(loan.overdue_at),
+        voided_at=row.voided_at,
+        void_reason=row.void_reason,
     )
 
 
@@ -242,13 +254,15 @@ def settle(
     loan_id: UUID,
     body: RepaymentCreate | SettlementInput,
     action: str,
+    *,
+    replaces_event_id: UUID | None = None,
 ) -> SettlementRead:
     loan = loan_for_owner(session, owner, loan_id)
     required_kind = "money" if action == "repayment" else "item"
     if loan.kind != required_kind:
         raise HTTPException(409, "This action is not valid for this loan kind.")
-    if loan.status == "completed":
-        raise HTTPException(409, "This loan is already completed.")
+    if loan.status != "open":
+        raise HTTPException(409, "This loan is completed or voided.")
     amount = body.amount_cents if isinstance(body, RepaymentCreate) else None
     if amount is not None and amount > loan.outstanding_cents:
         raise HTTPException(409, "Repayment exceeds the outstanding principal.")
@@ -262,6 +276,7 @@ def settle(
         loan_id=loan_id,
         loan_kind=loan.kind,
         action=action,
+        replaces_event_id=replaces_event_id,
         amount_cents=amount,
         note=body.note,
         effective_at=effective,
@@ -276,70 +291,14 @@ def settle(
 
 
 def history(
-    session: Session, owner: UUID, friend_id: UUID, limit: int, offset: int
+    session: Session,
+    owner: UUID,
+    friend_id: UUID,
+    limit: int,
+    offset: int,
+    mode: str = "offset",
+    cursor: str | None = None,
 ) -> Page[HistoryEntry]:
-    friend_for_owner(session, owner, friend_id)
-    lending = select(
-        Loan.id.label("id"),
-        Loan.id.label("loan_id"),
-        literal("lent").label("action"),
-        Loan.principal_cents.label("amount_cents"),
-        Loan.notes.label("note"),
-        Loan.lent_at.label("effective_at"),
-        Loan.created_at.label("recorded_at"),
-    ).where(Loan.owner_id == owner, Loan.friend_id == friend_id)
-    settlements = (
-        select(
-            LoanEvent.id,
-            LoanEvent.loan_id,
-            LoanEvent.action,
-            LoanEvent.amount_cents,
-            LoanEvent.note,
-            LoanEvent.effective_at,
-            LoanEvent.recorded_at,
-        )
-        .join(Loan, and_(Loan.id == LoanEvent.loan_id, Loan.owner_id == LoanEvent.owner_id))
-        .where(
-            LoanEvent.owner_id == owner,
-            Loan.friend_id == friend_id,
-        )
-    )
-    timeline = union_all(lending, settlements).subquery()
-    rows = session.execute(
-        select(timeline)
-        .order_by(
-            timeline.c.effective_at.desc(),
-            timeline.c.recorded_at.desc(),
-            timeline.c.id.desc(),
-        )
-        .offset(offset)
-        .limit(limit + 1)
-    ).all()
-    selected = rows[:limit]
-    loan_ids = {row.loan_id for row in selected}
-    at = now_utc()
-    loans = (
-        {
-            row[0].id: loan_read(row, at)
-            for row in session.execute(loan_query(owner).where(Loan.id.in_(loan_ids)))
-        }
-        if loan_ids
-        else {}
-    )
-    return Page[HistoryEntry](
-        items=[
-            HistoryEntry(
-                id=row.id,
-                action=row.action,
-                amount_cents=row.amount_cents,
-                note=row.note,
-                effective_at=row.effective_at,
-                recorded_at=row.recorded_at,
-                loan=loans[row.loan_id],
-            )
-            for row in selected
-        ],
-        limit=limit,
-        offset=offset,
-        has_more=len(rows) > limit,
-    )
+    from iou.ledger.history import history as read_history
+
+    return read_history(session, owner, friend_id, limit, offset, mode, cursor)

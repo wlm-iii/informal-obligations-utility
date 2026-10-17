@@ -4,6 +4,7 @@ from alembic import context
 
 from iou.config import get_settings
 from iou.database import Base, get_engine
+from iou.evidence import models as evidence_models  # noqa: F401 -- register evidence metadata
 from iou.ledger import models  # noqa: F401 -- register ledger migration metadata
 from iou.profiles import Profile  # noqa: F401 -- register migration metadata
 
