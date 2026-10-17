@@ -195,6 +195,7 @@ def task(name, message=None):
         task("test")
         run(sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests")
         run("npm", "test", cwd=ROOT / "frontend")
+        run("npm", "run", "test:login", cwd=ROOT / "frontend")
         run("npm", "run", "build", cwd=ROOT / "frontend")
 
 

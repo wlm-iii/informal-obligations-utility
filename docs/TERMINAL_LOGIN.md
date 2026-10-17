@@ -19,7 +19,8 @@ Explore demo remains a separate local, fictional workspace. It does not sync
 records with the backend. The animated graph is decorative and updates once per
 second; it pauses for reduced motion, hidden documents, and its pause control.
 
-Run `npm test`, `npm run test:login`, `npm run lint`, and `npm run build` from `frontend`. Standalone
+Run `npm test`, `npm run test:login`, `npm run lint`, and `npm run build` from `frontend`.
+The cross-platform `scripts/dev.py check` task also includes these login checks. Standalone
 dependency-free checks can also run from the repository root:
 
 ```

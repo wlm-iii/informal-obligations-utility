@@ -160,6 +160,7 @@ def loans(
     query = service.loan_query(user.id)
     complete = query.selected_columns.is_complete
     voided = query.selected_columns.is_voided
+    borrowing = query.selected_columns.is_borrowing_open
     if friend_id is not None:
         service.friend_for_owner(session, user.id, friend_id)
         query = query.where(Loan.friend_id == friend_id)
@@ -173,9 +174,9 @@ def loans(
         query = query.where(voided)
     if overdue is not None:
         query = query.where(
-            or_(complete, voided, Loan.overdue_at > at)
+            or_(~borrowing, Loan.overdue_at > at)
             if not overdue
-            else (~complete & (Loan.overdue_at <= at))
+            else (borrowing & (Loan.overdue_at <= at))
         )
     page = pages.paginate(
         session,
