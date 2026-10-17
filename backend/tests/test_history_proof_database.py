@@ -119,7 +119,7 @@ def test_downgrade_refuses_to_erase_recorded_audit(pg):
     with pg.engine.connect() as connection:
         assert (
             connection.scalar(text("SELECT version_num FROM alembic_version"))
-            == "0005_charges_scores"
+            == "0006_event_action_width"
         )
     assert pg.client.get(f"/loans/{loan['id']}").json()["outstanding_cents"] == 5000
 

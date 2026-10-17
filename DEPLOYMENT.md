@@ -8,7 +8,10 @@ not prove either hosted platform works.
 Google authentication, private profiles, and the backend lending ledger are
 implemented, including Level 2 corrections/private evidence workflows; frontend
 lending screens, email delivery, and a scheduler are not. Level 3 periodic charges,
-waivers, and fictional scores are backend-only and require their release migration. Complete [auth setup and acceptance](docs/AUTH.md),
+waivers, and fictional scores are backend-only and require their release migration.
+Level 4 adds private dashboard APIs; see [metric and release guidance](docs/DASHBOARD.md).
+Apply `0006_event_action_width` for PostgreSQL item fee-payment compatibility.
+Complete [auth setup and acceptance](docs/AUTH.md),
 hosted owner-isolation checks, privacy controls, and rate limits before any real-data
 public release. Use fake data for demos.
 

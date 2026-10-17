@@ -1,4 +1,4 @@
-"""IOU API: owner-private profiles, lending, audited corrections, and proof images."""
+"""IOU API: private lending, proof, optional charges, and dashboard projections."""
 
 import random
 from typing import Annotated
@@ -6,17 +6,19 @@ from typing import Annotated
 from fastapi import FastAPI, Query
 
 from iou.config import get_settings
+from iou.dashboard.router import router as dashboard_router
 from iou.evidence.router import router as evidence_router
 from iou.ledger.charge_router import router as charge_router
 from iou.ledger.correction_router import router as correction_router
 from iou.ledger.router import router as ledger_router
 from iou.profiles import router as profiles_router
 
-app = FastAPI(title="Informal Obligations Utility", version="0.5.0")
+app = FastAPI(title="Informal Obligations Utility", version="0.6.0")
 app.include_router(profiles_router)
 app.include_router(ledger_router)
 app.include_router(correction_router)
 app.include_router(charge_router)
+app.include_router(dashboard_router)
 app.include_router(evidence_router)
 
 # Validate configuration early, without connecting to PostgreSQL or sending email.

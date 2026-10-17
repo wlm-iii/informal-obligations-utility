@@ -179,7 +179,7 @@ class LoanEvent(Base):
     owner_id: Mapped[UUID]
     loan_id: Mapped[UUID]
     loan_kind: Mapped[str] = mapped_column(String(10))
-    action: Mapped[str] = mapped_column(String(10))
+    action: Mapped[str] = mapped_column(String(16))
     # Projection only: the financial fields stay intact; an immutable audit records the reversal.
     reversed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     replaces_event_id: Mapped[UUID | None]

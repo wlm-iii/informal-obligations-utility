@@ -3,9 +3,11 @@
 **Informal Obligations Utility** · Draft v0.1 · Decisions below are provisional.
 
 This primarily describes intended behavior. Google sign-in/private profiles and
-the zero-charge backend ledger, audited corrections/voids, private proof workflows,
-signed cursors, periodic charges, waivers, and fictional scores are implemented;
+the backend ledger, audited corrections/voids, private proof workflows,
+signed cursors, periodic charges, waivers, fictional scores, and dashboard APIs
+are implemented;
 see [auth setup](AUTH.md), [ledger contracts](LEDGER.md), [Level 3](CHARGES_SCORES.md),
+[dashboard metrics](DASHBOARD.md),
 [Level 2 safety/setup](HISTORY_PROOF.md), and the [backend roadmap](BACKEND_ROADMAP.md).
 Hosted provider setup/acceptance, reminders, and frontend lending/score screens
 remain separate work.
@@ -143,6 +145,10 @@ GET/POST        /api/friends
 GET/PATCH       /api/friends/{id}
 GET             /api/friends/{id}/history
 GET             /api/friends/{id}/score
+GET             /api/dashboard/summary
+GET             /api/dashboard/obligations
+GET             /api/dashboard/rankings
+GET             /api/dashboard/trends
 GET/POST        /api/loans
 GET/PATCH       /api/loans/{id}
 POST            /api/loans/{id}/repayments

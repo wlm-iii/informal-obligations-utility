@@ -8,6 +8,7 @@ frontend still has account UI only. Follow [auth setup](AUTH.md) to configure lo
 and hosted PostgreSQL, [ledger contracts](LEDGER.md) for lending, and
 [Level 2 setup](HISTORY_PROOF.md) for audited corrections, private proof, and cursors.
 [Level 3](CHARGES_SCORES.md) covers optional periodic charges, waivers, and scores.
+[Level 4](DASHBOARD.md) defines dashboard metrics, rankings, and chart date filters.
 
 ## Default setup (without Nix)
 
@@ -168,6 +169,9 @@ The initial `0001_baseline` is empty; `0002_profiles` creates private
 events, and retry receipts; `0004_history_proof` adds audit/evidence storage and
 reversal metadata; `0005_charges_scores` backfills zero-charge legacy terms and
 principal-only allocations, adds optional periodic terms, and tracks settlement.
+`0006_event_action_width` widens the action column for Level 3 item fee payments;
+its rollback is guarded against truncating financial history. Dashboard APIs have
+no additional schema requirements.
 Downgrades are guarded once new feature data exists. These
 migrations revoke browser-role access. Alembic autogeneration
 only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
