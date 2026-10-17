@@ -34,7 +34,7 @@ function ProfileForm({ profile, onSaved }) {
 				<span className="section-number">01 /</span>
 				<div>
 					<h2>Personal details</h2>
-					<p>Manage your personal details.</p>
+
 				</div>
 			</div>
 			<label htmlFor="profile-email">
@@ -55,7 +55,7 @@ function ProfileForm({ profile, onSaved }) {
 				maxLength={100}
 			/>
 			<div className="form-footer">
-				<span>Your details stay private.</span>
+
 				<button className="primary-button" disabled={busy} type="submit">
 					{busy ? "Saving…" : "Save profile"}
 					<span aria-hidden="true"> ↗</span>
@@ -108,21 +108,15 @@ function Account({ session }) {
 					{profile?.display_name || "Your account"}
 					<span className="name-dot">.</span>
 				</h1>
-				<p className="sidebar-description">Your friendship finance account.</p>
+
 				<span className="member-badge">● Personal account</span>
 				<div className="sidebar-divider" />
 				<a className="profile-nav active" href="#details" aria-current="page">
 					<span>01</span> Profile <span>↗</span>
 				</a>
 				<a className="profile-nav" href="#statistics">
-					<span>02</span> Statistics <span>?</span>
+					<span>02</span> Statistics <span aria-hidden="true">&rarr;</span>
 				</a>
-				<div className="sidebar-note">
-					<span>PRIVATE WORKSPACE</span>
-					<p>
-						Your profile is visible only to you. No bank connection. No money movement.
-					</p>
-				</div>
 			</aside>
 			<div className="profile-content">
 				<header className="page-heading">
@@ -131,9 +125,9 @@ function Account({ session }) {
 						<h2>
 							Account <span className="title-accent">settings.</span>
 						</h2>
-						<p>Your identity. Same receipts.</p>
+
 					</div>
-					<span className="edition">● PRIVATE ACCESS</span>
+
 				</header>
 				<section className="details-panel" id="details" aria-label="Personal details">
 					{!profile && !error && <p role="status">Loading your profile…</p>}
@@ -150,10 +144,6 @@ function Account({ session }) {
 					)}
 				</section>
 				<section className="signout-panel">
-					<div>
-						<h3>All settled for now?</h3>
-						<p>You can pick up right where you left off.</p>
-					</div>
 					<button disabled={signingOut} onClick={signOut}>
 						{signingOut ? "Signing out…" : "Sign out"}
 					</button>
@@ -206,9 +196,7 @@ function App() {
 			</section>
 			<footer className="site-footer">
 				<span>IOU / FRIENDSHIP FINANCE</span>
-				<span>
-					Made for the people you count on. <span aria-hidden="true">↗</span>
-				</span>
+
 			</footer>
 		</main>
 	);
