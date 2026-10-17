@@ -6,9 +6,10 @@ A hackathon app for tracking money and items friends borrow, recording repayment
 and returns, calculating optional fees/interest, sending playful reminders, and
 assigning clearly fictional credit scores.
 
-**Status:** Level 0 Google sign-in and private profiles are implemented. Hosted
-login/deployment still require acceptance testing. Friends, loans, reminders, and
-scores are not implemented. Use fake data for demos. See [auth setup](docs/AUTH.md).
+**Status:** Google sign-in/profiles and the Level 1 backend ledger are implemented:
+private friends, money/item loans, repayments/returns, and history. The frontend
+still has account UI only; lending screens, reminders, and scores are not implemented.
+Use fake demo data. See [auth setup](docs/AUTH.md) and [ledger API](docs/LEDGER.md).
 
 ## Stack
 
@@ -90,6 +91,7 @@ Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.m
 
 - [Backend feature roadmap](docs/BACKEND_ROADMAP.md)
 - [Google sign-in and private profiles](docs/AUTH.md)
+- [Level 1 ledger API and migration](docs/LEDGER.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)

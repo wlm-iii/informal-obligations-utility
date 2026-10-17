@@ -2,10 +2,11 @@
 
 **Informal Obligations Utility** · Draft v0.1 · Decisions below are provisional.
 
-This primarily describes intended behavior, not shipped features. Level 0 now
-implements Google sign-in and private owner profiles; see [auth setup](AUTH.md)
-and the [backend roadmap](BACKEND_ROADMAP.md). Lending, scores, and reminders below
-remain provisional.
+This primarily describes intended behavior. Google sign-in/private profiles and
+Level 1's zero-charge backend lending ledger are implemented; see [auth setup](AUTH.md),
+[ledger contracts](LEDGER.md), and the [backend roadmap](BACKEND_ROADMAP.md).
+Interest, fees, scores, reminders, and frontend lending screens remain future work.
+The ledger contracts specify the narrower behavior that actually ships today.
 
 ## Product and audience
 

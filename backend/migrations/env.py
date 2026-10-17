@@ -4,6 +4,7 @@ from alembic import context
 
 from iou.config import get_settings
 from iou.database import Base, get_engine
+from iou.ledger import models  # noqa: F401 -- register ledger migration metadata
 from iou.profiles import Profile  # noqa: F401 -- register migration metadata
 
 # Import future model modules here so autogenerate sees their tables.

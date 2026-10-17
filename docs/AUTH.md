@@ -1,8 +1,9 @@
 # Level 0 — Google sign-in and private profiles
 
 Implemented: Google OAuth via Supabase, PKCE callback/session handling, logout,
-FastAPI bearer-token verification, and a private profile API. Friends, loans,
-email/password UI, account deletion, and reminders are not implemented.
+FastAPI bearer-token verification, and a private profile API. Level 1 now adds a
+[backend friends/loans ledger](LEDGER.md); email/password UI, account deletion,
+and reminders are not implemented.
 
 ## Environment
 
