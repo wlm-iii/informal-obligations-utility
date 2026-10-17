@@ -7,7 +7,6 @@ import { profileRequest } from "./services/api";
 
 function ProfileForm({ profile, onSaved }) {
 	const [name, setName] = useState(profile.display_name);
-	const [timezone, setTimezone] = useState(profile.timezone);
 	const [busy, setBusy] = useState(false);
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
@@ -18,7 +17,7 @@ function ProfileForm({ profile, onSaved }) {
 		setError("");
 		setMessage("");
 		try {
-			const updated = await profileRequest("PATCH", { display_name: name, timezone });
+			const updated = await profileRequest("PATCH", { display_name: name });
 			onSaved(updated);
 			setMessage("Profile saved.");
 		} catch (error) {
@@ -34,7 +33,7 @@ function ProfileForm({ profile, onSaved }) {
 				<span className="section-number">01 /</span>
 				<div>
 					<h2>Personal details</h2>
-					<p>Manage your name and local timezone.</p>
+					<p>Manage your personal details.</p>
 				</div>
 			</div>
 			<label htmlFor="profile-email">
@@ -54,18 +53,6 @@ function ProfileForm({ profile, onSaved }) {
 				required
 				maxLength={100}
 			/>
-			<label htmlFor="timezone">Timezone</label>
-			<input
-				id="timezone"
-				value={timezone}
-				onChange={(e) => setTimezone(e.target.value)}
-				required
-				maxLength={100}
-				aria-describedby="timezone-help"
-			/>
-			<small id="timezone-help">
-				Use an IANA timezone, such as America/Los_Angeles or UTC.
-			</small>
 			<div className="form-footer">
 				<span>Your details stay private.</span>
 				<button className="primary-button" disabled={busy} type="submit">
@@ -129,9 +116,6 @@ function Account({ session }) {
 				<a className="profile-nav active" href="#details" aria-current="page">
 					<span>01</span> Profile <span>↗</span>
 				</a>
-				<a className="profile-nav" href="#activity">
-					<span>02</span> Activity <span>↓</span>
-				</a>
 				<div className="sidebar-note">
 					<span>PRIVATE WORKSPACE</span>
 					<p>
@@ -146,7 +130,7 @@ function Account({ session }) {
 						<h2>
 							Account <span className="title-accent">settings.</span>
 						</h2>
-						<p>Your identity. Your timezone. Same receipts.</p>
+						<p>Your identity. Same receipts.</p>
 					</div>
 					<span className="edition">● PRIVATE ACCESS</span>
 				</header>
@@ -163,33 +147,6 @@ function Account({ session }) {
 							</button>
 						</>
 					)}
-				</section>
-				<section
-					className="activity-panel"
-					id="activity"
-					aria-labelledby="activity-title"
-				>
-					<div className="section-heading">
-						<span className="section-number">02 /</span>
-						<div>
-							<h2 id="activity-title">Your activity</h2>
-							<p>Friends and borrowing history.</p>
-						</div>
-						<span className="coming-soon">COMING SOON</span>
-					</div>
-					<div className="empty-state">
-						<span className="empty-icon" aria-hidden="true">
-							↔
-						</span>
-						<div>
-							<h3>No history available yet.</h3>
-							<p>
-								Friends and borrowing history are coming next.
-								<br />
-								Your records will appear here when connected.
-							</p>
-						</div>
-					</div>
 				</section>
 				<section className="signout-panel">
 					<div>

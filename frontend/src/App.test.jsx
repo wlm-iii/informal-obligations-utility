@@ -55,7 +55,8 @@ describe("Level 0 account flow", () => {
 		expect(email).toHaveValue(profile.email);
 		expect(email).toHaveAttribute("readonly");
 		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Person");
-		expect(screen.getByRole("link", { name: /Activity/ })).toHaveAttribute("href", "#activity");
+		expect(screen.queryByRole("link", { name: /Activity/ })).not.toBeInTheDocument();
+		expect(screen.queryByLabelText("Timezone")).not.toBeInTheDocument();
 	});
 	it("signs in with a password and loads the backend profile with the access token", async () => {
 		auth.signInWithPassword.mockImplementation(async () => {
@@ -109,11 +110,10 @@ describe("Level 0 account flow", () => {
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
 		render(<App />);
 		fireEvent.change(await screen.findByLabelText("Display name"), { target: { value: "New Name" } });
-		fireEvent.change(screen.getByLabelText("Timezone"), { target: { value: "America/Los_Angeles" } });
 		fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
 		expect(await screen.findByText("Profile saved.")).toBeInTheDocument();
 		expect(fetch).toHaveBeenCalledWith("/api/me", expect.objectContaining({
-			method: "PATCH", body: JSON.stringify({ display_name: "New Name", timezone: "America/Los_Angeles" }),
+			method: "PATCH", body: JSON.stringify({ display_name: "New Name" }),
 		}));
 		fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
 		expect(await screen.findByTitle("IOU sign in")).toBeInTheDocument();
