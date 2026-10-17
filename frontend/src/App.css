@@ -6,107 +6,107 @@
 	padding: 0 7%;
 	margin: auto;
 }
-.topbar {
+.account-shell .topbar {
 	height: 105px;
 	display: flex;
 	align-items: center;
 	gap: 14px;
-	border-bottom: 1px solid #343331;
+	border-bottom: 1px solid var(--separator);
 }
-.wordmark {
+.account-shell .wordmark {
 	display: flex;
 	align-items: center;
 	gap: 13px;
 	text-decoration: none;
 }
-.monogram {
+.account-shell .monogram {
 	display: grid;
 	place-items: center;
 	width: 43px;
 	height: 43px;
-	background: var(--surface);
+	background: var(--brand-gradient);
 	border: 1px solid var(--line);
 	border-radius: 5px;
-	color: var(--yellow);
+	color: var(--primary-ink);
 	font-size: 12px;
 	font-weight: 700;
 }
-.brand-name {
+.account-shell .brand-name {
 	font-size: 21px;
 	font-weight: 700;
 	letter-spacing: -0.7px;
-	color: #e6e4d9;
+	color: var(--bright);
 }
-.brand-caption {
+.account-shell .brand-caption {
 	font-size: 12px;
-	color: #b7b5ac;
+	color: var(--supporting);
 }
-.topbar-label {
+.account-shell .topbar-label {
 	margin-left: auto;
 	font-size: 10px;
 	letter-spacing: 0.6px;
 	color: var(--muted);
 }
-.profile-layout {
+.account-shell .profile-layout {
 	display: grid;
 	grid-template-columns: 230px minmax(0, 1fr);
 	gap: 56px;
 	padding: 48px 0 40px;
 	min-height: calc(100svh - 183px);
 }
-.profile-sidebar {
+.account-shell .profile-sidebar {
 	padding-top: 4px;
 }
-.avatar {
+.account-shell .avatar {
 	width: 64px;
 	height: 64px;
 	display: grid;
 	place-items: center;
-	background: #3a2d04;
-	border: 1px solid #664d01;
+	background: var(--avatar-bg);
+	border: 1px solid var(--avatar-line);
 	border-radius: 5px;
-	color: #eccb60;
+	color: var(--avatar-ink);
 	font-size: 25px;
 	font-weight: 700;
 	margin-bottom: 24px;
 }
-.eyebrow {
+.account-shell .eyebrow {
 	font-size: 10px;
 	letter-spacing: 1px;
 	color: var(--muted);
 	margin: 0 0 10px;
 }
-.profile-sidebar h1 {
-	color: #e6e4d9;
+.account-shell .profile-sidebar h1 {
+	color: var(--bright);
 	font-size: 26px;
 	line-height: 1.2;
 	letter-spacing: -0.5px;
 	margin: 0 0 12px;
 	overflow-wrap: anywhere;
 }
-.name-dot {
+.account-shell .name-dot {
 	display: none;
 }
-.sidebar-description {
+.account-shell .sidebar-description {
 	font-size: 13px;
-	color: #b7b5ac;
+	color: var(--supporting);
 	max-width: 190px;
 	margin: 0 0 20px;
 }
-.member-badge {
+.account-shell .member-badge {
 	display: inline-block;
 	font-size: 11px;
 	border: 1px solid var(--line);
 	padding: 4px 8px;
 	border-radius: 4px;
-	color: #b7b5ac;
+	color: var(--supporting);
 	background: var(--panel);
 }
-.sidebar-divider {
+.account-shell .sidebar-divider {
 	border-top: 1px solid var(--line);
 	margin: 28px 0 16px;
 }
-.profile-nav {
+.account-shell .profile-nav {
 	display: flex;
 	gap: 14px;
 	align-items: center;
@@ -117,141 +117,141 @@
 	border-radius: 5px;
 	min-height: 44px;
 	margin-bottom: 8px;
-	color: #b7b5ac;
+	color: var(--supporting);
 }
-.profile-nav span {
+.account-shell .profile-nav span {
 	font-size: 11px;
 	color: var(--muted);
 }
-.profile-nav span:last-child {
+.account-shell .profile-nav span:last-child {
 	margin-left: auto;
 }
-.profile-nav.active {
+.account-shell .profile-nav.active {
 	background: var(--surface);
 	border-color: var(--line);
-	color: #dfb431;
+	color: var(--yellow-detail);
 }
-.profile-nav.active span {
-	color: #dfb431;
+.account-shell .profile-nav.active span {
+	color: var(--yellow-detail);
 }
-.profile-nav:hover {
+.account-shell .profile-nav:hover {
 	background: var(--surface);
 }
-.sidebar-note {
+.account-shell .sidebar-note {
 	margin-top: 48px;
 	padding-top: 20px;
 	border-top: 1px solid var(--line);
 	color: var(--muted);
 }
-.sidebar-note > span {
+.account-shell .sidebar-note > span {
 	font-size: 10px;
 	letter-spacing: 0.7px;
 }
-.sidebar-note p {
+.account-shell .sidebar-note p {
 	font-size: 12px;
 	line-height: 1.8;
 }
-.page-heading {
+.account-shell .page-heading {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: 20px;
 	margin-bottom: 28px;
 }
-.page-heading h2 {
+.account-shell .page-heading h2 {
 	margin: 0 0 12px;
 	font-size: 36px;
 	line-height: 1.1;
 	font-weight: 700;
 	letter-spacing: -1px;
-	color: #e6e4d9;
+	color: var(--bright);
 }
-.title-accent {
-	color: var(--yellow);
+.account-shell .title-accent {
+	color: var(--green);
 }
-.page-heading > div > p:last-child {
+.account-shell .page-heading > div > p:last-child {
 	font-size: 14px;
-	color: #b7b5ac;
+	color: var(--supporting);
 	margin: 0;
 }
-.edition {
+.account-shell .edition {
 	font-size: 9px;
 	letter-spacing: 0.7px;
-	color: #b7b5ac;
+	color: var(--supporting);
 	white-space: nowrap;
 	margin-top: 4px;
 }
-.details-panel,
-.activity-panel {
+.account-shell .details-panel,
+.account-shell .activity-panel {
 	background: var(--panel);
 	border: 1px solid var(--line);
 	border-radius: 9px;
 	padding: 28px;
 }
-.section-heading {
+.account-shell .section-heading {
 	display: flex;
 	align-items: flex-start;
 	gap: 12px;
 	margin-bottom: 24px;
 }
-.section-number {
+.account-shell .section-number {
 	font-size: 11px;
-	color: #dfb431;
+	color: var(--yellow-detail);
 	padding-top: 3px;
 }
-.section-heading h2 {
+.account-shell .section-heading h2 {
 	margin: 0 0 6px;
 	font-size: 17px;
-	color: #e6e4d9;
+	color: var(--bright);
 	font-weight: 700;
 }
-.section-heading p {
+.account-shell .section-heading p {
 	font-size: 13px;
 	margin: 0;
 	color: var(--muted);
 }
-.profile-form {
+.account-shell .profile-form {
 	display: grid;
 	gap: 9px;
 }
-.profile-form .section-heading {
+.account-shell .profile-form .section-heading {
 	padding-bottom: 22px;
 	border-bottom: 1px solid var(--line);
 	margin-bottom: 4px;
 }
-.profile-form label {
+.account-shell .profile-form label {
 	font-size: 12px;
 	margin-top: 12px;
 	display: flex;
 	justify-content: space-between;
 	gap: 12px;
 }
-.field-note {
+.account-shell .field-note {
 	font-size: 10px;
 	color: var(--muted);
 }
-.profile-form input {
+.account-shell .profile-form input {
 	width: 100%;
 	min-width: 0;
 	min-height: 47px;
 	padding: 13px 14px;
 	font-size: 14px;
 	background: var(--bg);
-	color: #e6e4d9;
+	color: var(--bright);
 	border: 1px solid var(--line);
 	border-radius: 6px;
 }
-.profile-form input:hover {
-	border-color: #575653;
+.account-shell .profile-form input:hover {
+	border-color: var(--strong-line);
 }
-.profile-form input[readonly] {
+.account-shell .profile-form input[readonly] {
 	color: var(--muted);
 }
-.profile-form small {
+.account-shell .profile-form small {
 	font-size: 11px;
 	color: var(--muted);
 }
-.form-footer {
+.account-shell .form-footer {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -260,58 +260,58 @@
 	padding-top: 22px;
 	border-top: 1px solid var(--line);
 }
-.form-footer > span {
+.account-shell .form-footer > span {
 	font-size: 11px;
 	color: var(--muted);
 }
-button {
+.account-shell button {
 	min-height: 44px;
 	font-size: 13px;
 	padding: 10px 18px;
 	background: var(--surface);
-	border: 1px solid #575653;
+	border: 1px solid var(--strong-line);
 	border-radius: 6px;
-	color: #e6e4d9;
+	color: var(--bright);
 }
-button:hover {
-	background: #343331;
+.account-shell button:hover {
+	background: var(--separator);
 }
-.primary-button {
+.account-shell .primary-button {
 	font-size: 14px;
 	font-weight: 700;
-	background: var(--green);
+	background: var(--primary-gradient);
 	border-color: var(--green);
-	color: var(--bg);
+	color: var(--primary-ink);
 }
-.primary-button:hover {
-	background: #a0af54;
+.account-shell .primary-button:hover {
+	background: var(--green-hover);
 }
-.primary-button span {
+.account-shell .primary-button span {
 	margin-left: 12px;
 }
-.activity-panel {
+.account-shell .activity-panel {
 	margin-top: 20px;
 	padding: 24px 28px;
 }
-.coming-soon {
+.account-shell .coming-soon {
 	margin-left: auto;
 	font-size: 9px;
 	letter-spacing: 0.5px;
 	padding: 3px 7px;
-	border: 1px solid #664d01;
+	border: 1px solid var(--avatar-line);
 	border-radius: 4px;
-	background: #241e08;
-	color: #eccb60;
+	background: var(--warning-bg);
+	color: var(--avatar-ink);
 	white-space: nowrap;
 }
-.empty-state {
+.account-shell .empty-state {
 	display: flex;
 	gap: 18px;
 	border-top: 1px solid var(--line);
 	padding-top: 20px;
 	align-items: center;
 }
-.empty-icon {
+.account-shell .empty-icon {
 	display: grid;
 	place-items: center;
 	width: 44px;
@@ -323,38 +323,38 @@ button:hover {
 	font-size: 22px;
 	flex-shrink: 0;
 }
-.empty-state h3,
-.signout-panel h3 {
+.account-shell .empty-state h3,
+.account-shell .signout-panel h3 {
 	font-size: 14px;
 	font-weight: 400;
-	color: #cecdc3;
+	color: var(--ink);
 	margin: 0 0 6px;
 }
-.empty-state p,
-.signout-panel p {
+.account-shell .empty-state p,
+.account-shell .signout-panel p {
 	font-size: 12px;
 	color: var(--muted);
 	margin: 0;
 	line-height: 1.7;
 }
-.signout-panel {
+.account-shell .signout-panel {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	gap: 20px;
 	padding: 24px 0;
 }
-.signout-panel button {
-	color: #e8705f;
-	border-color: #6c201c;
-	background: #261312;
+.account-shell .signout-panel button {
+	color: var(--error-ink);
+	border-color: var(--error-line);
+	background: var(--error-bg);
 }
-.signout-panel button:hover {
-	background: #3e1715;
+.account-shell .signout-panel button:hover {
+	background: var(--error-hover);
 }
-.site-footer {
+.account-shell .site-footer {
 	min-height: 78px;
-	border-top: 1px solid #343331;
+	border-top: 1px solid var(--separator);
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -362,19 +362,19 @@ button:hover {
 	color: var(--muted);
 	font-size: 10px;
 }
-.site-footer span span {
-	color: #dfb431;
+.account-shell .site-footer span span {
+	color: var(--yellow-detail);
 	margin-left: 10px;
 }
-[role="alert"] {
-	color: #e8705f;
+.account-shell [role="alert"] {
+	color: var(--error-ink);
 	font-size: 13px;
 }
-[role="status"] {
+.account-shell [role="status"] {
 	font-size: 13px;
-	color: #cecdc3;
+	color: var(--ink);
 }
-.session-error {
+.account-shell .session-error {
 	position: fixed;
 	bottom: 12px;
 	left: 16px;
@@ -395,134 +395,134 @@ button:hover {
 	.account-shell {
 		padding: 0 6%;
 	}
-	.profile-layout {
+	.account-shell .profile-layout {
 		grid-template-columns: 190px minmax(0, 1fr);
 		gap: 32px;
 	}
-	.edition {
+	.account-shell .edition {
 		display: none;
 	}
-	.page-heading h2 {
+	.account-shell .page-heading h2 {
 		font-size: 32px;
 	}
-	.topbar-label {
+	.account-shell .topbar-label {
 		font-size: 9px;
 	}
 }
 @media (max-width: 740px) {
-	.topbar {
+	.account-shell .topbar {
 		height: 88px;
 	}
-	.brand-caption,
-	.topbar-label {
+	.account-shell .brand-caption,
+	.account-shell .topbar-label {
 		display: none;
 	}
-	.profile-layout {
+	.account-shell .profile-layout {
 		grid-template-columns: 1fr;
 		gap: 28px;
 		padding: 32px 0;
 	}
-	.profile-sidebar {
+	.account-shell .profile-sidebar {
 		display: grid;
 		grid-template-columns: 64px minmax(0, 1fr);
 		column-gap: 18px;
 	}
-	.avatar {
+	.account-shell .avatar {
 		grid-row: 1/4;
 		margin: 0;
 	}
-	.profile-sidebar .eyebrow {
+	.account-shell .profile-sidebar .eyebrow {
 		margin: 0;
 		font-size: 9px;
 	}
-	.profile-sidebar h1 {
+	.account-shell .profile-sidebar h1 {
 		font-size: 24px;
 		margin: 4px 0;
 	}
-	.sidebar-description {
+	.account-shell .sidebar-description {
 		margin: 0;
 		max-width: none;
 		font-size: 12px;
 	}
-	.member-badge {
+	.account-shell .member-badge {
 		grid-column: 2;
 		justify-self: start;
 		margin-top: 12px;
 	}
-	.sidebar-divider,
-	.sidebar-note {
+	.account-shell .sidebar-divider,
+	.account-shell .sidebar-note {
 		display: none;
 	}
-	.profile-nav {
+	.account-shell .profile-nav {
 		margin-top: 20px;
 		margin-bottom: 0;
 	}
-	.profile-nav.active {
+	.account-shell .profile-nav.active {
 		grid-column: 1;
 	}
-	.profile-nav:last-of-type {
+	.account-shell .profile-nav:last-of-type {
 		grid-column: 2;
 	}
-	.details-panel,
-	.activity-panel {
+	.account-shell .details-panel,
+	.account-shell .activity-panel {
 		padding: 24px;
 	}
-	.form-footer {
+	.account-shell .form-footer {
 		flex-wrap: wrap;
 	}
-	.page-heading h2 {
+	.account-shell .page-heading h2 {
 		font-size: 32px;
 	}
-	.site-footer {
+	.account-shell .site-footer {
 		flex-wrap: wrap;
 		gap: 8px;
 		padding: 20px 0;
 		font-size: 9px;
 	}
-	.coming-soon {
+	.account-shell .coming-soon {
 		font-size: 8px;
 	}
-	.section-heading {
+	.account-shell .section-heading {
 		gap: 10px;
 	}
 }
 @media (max-width: 430px) {
-	.topbar {
+	.account-shell .topbar {
 		height: 77px;
 	}
-	.page-heading h2 {
+	.account-shell .page-heading h2 {
 		font-size: 30px;
 	}
-	.details-panel,
-	.activity-panel {
+	.account-shell .details-panel,
+	.account-shell .activity-panel {
 		padding: 20px;
 	}
-	.section-heading p {
+	.account-shell .section-heading p {
 		font-size: 12px;
 	}
-	.field-note {
+	.account-shell .field-note {
 		font-size: 9px;
 	}
-	.form-footer {
+	.account-shell .form-footer {
 		align-items: stretch;
 		flex-direction: column;
 		gap: 14px;
 	}
-	.coming-soon {
+	.account-shell .coming-soon {
 		margin-left: 0;
 	}
-	.activity-panel .section-heading {
+	.account-shell .activity-panel .section-heading {
 		flex-wrap: wrap;
 	}
-	.signout-panel p {
+	.account-shell .signout-panel p {
 		max-width: 190px;
 	}
 }
 @media (prefers-reduced-motion: reduce) {
-	html {
+	.account-shell html {
 		scroll-behavior: auto;
 	}
-	* {
+	.account-shell * {
 		transition: none !important;
 	}
 }

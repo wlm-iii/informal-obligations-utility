@@ -249,8 +249,8 @@ export default function Statistics({ initialData = null }) {
 								>
 									<defs>
 										<linearGradient id="repayment-fill" x1="0" y1="0" x2="0" y2="1">
-											<stop stopColor="#879a39" stopOpacity=".18" />
-											<stop offset="1" stopColor="#879a39" stopOpacity=".01" />
+											<stop stopColor="var(--green)" stopOpacity=".18" />
+											<stop offset="1" stopColor="var(--green)" stopOpacity=".01" />
 										</linearGradient>
 									</defs>
 									{[0, 1, 2, 3, 4].map((i) => (
@@ -260,7 +260,7 @@ export default function Statistics({ initialData = null }) {
 												x2="880"
 												y1={270 - i * 55}
 												y2={270 - i * 55}
-												stroke="#403e3c"
+												stroke="var(--line)"
 												strokeDasharray="3 6"
 											/>
 											<text x="55" y={274 - i * 55} textAnchor="end">
@@ -275,7 +275,7 @@ export default function Statistics({ initialData = null }) {
 									<path
 										d={line}
 										fill="none"
-										stroke="#879a39"
+										stroke="var(--green)"
 										strokeWidth="2.5"
 										strokeLinejoin="round"
 									/>
@@ -285,8 +285,8 @@ export default function Statistics({ initialData = null }) {
 											cx={points[i + 1][0]}
 											cy={points[i + 1][1]}
 											r="4"
-											fill="#100f0f"
-											stroke="#a0af54"
+											fill="var(--bg)"
+											stroke="var(--green-hover)"
 											strokeWidth="2"
 										>
 											<title>

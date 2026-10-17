@@ -47,7 +47,7 @@
 .borrower-identity select {
 	font-size: 21px;
 	font-weight: 700;
-	color: #e6e4d9;
+	color: var(--bright);
 	background: transparent;
 	border: 0;
 	padding: 0 22px 0 0;
@@ -77,13 +77,13 @@
 	color: var(--muted);
 }
 .score-placeholder > span:first-child {
-	color: #dfb431;
+	color: var(--yellow-detail);
 	letter-spacing: 1px;
 }
 .score-placeholder strong {
 	font-size: 26px;
 	font-weight: 400;
-	color: #e6e4d9;
+	color: var(--bright);
 	line-height: 1.2;
 }
 .score-placeholder small {
@@ -115,14 +115,14 @@
 .stats-metrics strong {
 	font-size: 30px;
 	letter-spacing: -0.6px;
-	color: #e6e4d9;
+	color: var(--bright);
 	font-weight: 400;
 }
 .stats-metrics strong.positive {
-	color: #a0af54;
+	color: var(--green-hover);
 }
 .stats-metrics strong.negative {
-	color: #e8705f;
+	color: var(--error-ink);
 }
 .stats-metrics small {
 	font-size: 11px;
@@ -144,7 +144,7 @@
 }
 .chart-heading h3 {
 	font-size: 18px;
-	color: #e6e4d9;
+	color: var(--bright);
 	margin: 0;
 	font-weight: 400;
 }
@@ -155,7 +155,7 @@
 }
 .chart-heading .eyebrow {
 	font-size: 9px;
-	color: #dfb431;
+	color: var(--yellow-detail);
 	margin-bottom: 8px;
 }
 .range-controls {
@@ -178,10 +178,10 @@
 }
 .range-controls button[aria-pressed="true"] {
 	background: var(--surface);
-	color: #dfb431;
+	color: var(--yellow-detail);
 }
 .range-controls button:hover {
-	color: #e6e4d9;
+	color: var(--bright);
 }
 .graph-key {
 	display: flex;
@@ -194,13 +194,13 @@
 .graph-key > span {
 	width: 7px;
 	height: 7px;
-	background: #879a39;
+	background: var(--green);
 	display: inline-block;
 	border-radius: 50%;
 }
 .graph-key strong {
 	margin-left: auto;
-	color: #a0af54;
+	color: var(--green-hover);
 	font-size: 16px;
 	font-weight: 400;
 }
@@ -214,7 +214,7 @@
 .payment-chart text {
 	font-family: var(--mono);
 	font-size: 11px;
-	fill: #9f9d96;
+	fill: var(--muted);
 }
 .chart-footnote {
 	display: flex;
@@ -227,7 +227,7 @@
 	color: var(--muted);
 }
 .chart-footnote span:first-child {
-	color: #b7b5ac;
+	color: var(--supporting);
 }
 .payment-table-panel .chart-heading {
 	margin-bottom: 22px;
@@ -256,7 +256,7 @@
 }
 .payment-table-panel td {
 	padding: 15px 0;
-	border-bottom: 1px solid #343331;
+	border-bottom: 1px solid var(--separator);
 }
 .payment-table-panel tbody tr:last-child td {
 	border-bottom: 0;
@@ -271,10 +271,10 @@
 	text-align: right;
 }
 .payment-badge {
-	color: #a0af54;
+	color: var(--green-hover);
 	font-size: 10px;
-	background: #1a1e0c;
-	border: 1px solid #403e3c;
+	background: var(--positive-bg);
+	border: 1px solid var(--line);
 	border-radius: 4px;
 	padding: 4px 7px;
 	white-space: nowrap;

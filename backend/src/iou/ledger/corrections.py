@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from iou.ledger import service
+from iou.ledger import finance, service
 from iou.ledger.models import Audit, LoanEvent
 from iou.ledger.schemas import (
     AuditRead,
@@ -66,6 +66,7 @@ def reverse_or_correct(
             replaces_event_id=original.id,
         )
         replacement = session.get(LoanEvent, settlement.event.id)
+    finance.synchronize(session, owner, loan_id, now)
     audit = Audit(
         id=uuid4(),
         owner_id=owner,

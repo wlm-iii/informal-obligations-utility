@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { StrictMode } from "react";
 
@@ -14,16 +14,13 @@ const session = { access_token: "test-access-token", user: { id: "user-1" } };
 const profile = { id: "user-1", email: "person@example.com", display_name: "Person", timezone: "UTC" };
 let onAuthChange;
 async function requestLogin(action = "google", credentials = {}) {
-	const frame = await screen.findByTitle("IOU sign in");
-	// Session restoration can render the frame before passive effects attach.
-	await act(async () => {});
-	const reply = vi.spyOn(frame.contentWindow, "postMessage");
-	fireEvent(window, new MessageEvent("message", {
-		origin: window.location.origin,
-		source: frame.contentWindow,
-		data: { type: "iou:login", action, ...credentials },
-	}));
-	return reply;
+	if (action === "google") {
+		fireEvent.click(await screen.findByRole("button", { name: "Continue with Google" }));
+	} else {
+		fireEvent.change(await screen.findByLabelText("Email"), { target: { value: credentials.email } });
+		fireEvent.change(screen.getByLabelText("Password"), { target: { value: credentials.password } });
+		fireEvent.click(screen.getByRole("button", { name: /^Sign in/ }));
+	}
 }
 
 beforeEach(() => {
@@ -71,10 +68,10 @@ describe("Level 0 account flow", () => {
 		expect(fetch).toHaveBeenCalledWith("/api/me", expect.objectContaining({ headers: { Authorization: "Bearer test-access-token" } }));
 	});
 
-	it("ignores requests from another origin or window", async () => {
+	it("does not authenticate in response to window messages", async () => {
 		render(<App />);
-		const frame = await screen.findByTitle("IOU sign in");
-		fireEvent(window, new MessageEvent("message", { origin: "https://other.example", source: frame.contentWindow, data: { type: "iou:login", action: "google" } }));
+		await screen.findByRole("button", { name: "Continue with Google" });
+		fireEvent(window, new MessageEvent("message", { origin: "https://other.example", source: window, data: { type: "iou:login", action: "google" } }));
 		fireEvent(window, new MessageEvent("message", { origin: window.location.origin, source: window, data: { type: "iou:login", action: "google" } }));
 		expect(auth.signInWithOAuth).not.toHaveBeenCalled();
 	});
@@ -89,8 +86,8 @@ describe("Level 0 account flow", () => {
 	it("shows a safe error when OAuth cannot start", async () => {
 		auth.signInWithOAuth.mockResolvedValue({ error: new Error("provider detail") });
 		render(<App />);
-		const reply = await requestLogin();
-		await waitFor(() => expect(reply).toHaveBeenCalledWith({ type: "iou:login-result", error: "Unable to start Google sign-in. Please try again." }, window.location.origin));
+		await requestLogin();
+		expect(await screen.findByRole("alert")).toHaveTextContent("Unable to start Google sign-in");
 		expect(screen.queryByText("provider detail")).not.toBeInTheDocument();
 	});
 
@@ -116,7 +113,7 @@ describe("Level 0 account flow", () => {
 			method: "PATCH", body: JSON.stringify({ display_name: "New Name" }),
 		}));
 		fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
-		expect(await screen.findByTitle("IOU sign in")).toBeInTheDocument();
+		expect(await screen.findByRole("button", { name: "Continue with Google" })).toBeInTheDocument();
 		expect(screen.queryByLabelText("Display name")).not.toBeInTheDocument();
 	});
 

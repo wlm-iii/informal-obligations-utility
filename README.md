@@ -8,10 +8,14 @@ assigning clearly fictional credit scores.
 
 **Status:** The backend supports Google sign-in/profiles, private lending, audited
 corrections/voids, private proof-image workflows, and signed cursor pagination.
-The frontend still has account UI only. Hosted Storage requires setup/acceptance;
-lending screens, reminders, and scores are not implemented. Use fake demo data.
-See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md), and
-[Level 2 setup and safety](docs/HISTORY_PROOF.md).
+The backend also supports optional periodic interest/late fees, charge waivers,
+explained fictional reliability scores, and private dashboard APIs for summaries,
+obligations, rankings, and trends. The frontend has terminal login/account UI only. Hosted setup/acceptance, lending screens, and reminders remain separate.
+Use fake demo data.
+See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md),
+[Level 2 setup and safety](docs/HISTORY_PROOF.md),
+[Level 3 charges and scores](docs/CHARGES_SCORES.md), and
+[Level 4 dashboard metrics](docs/DASHBOARD.md).
 
 ## Stack
 
@@ -93,8 +97,11 @@ Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.m
 
 - [Backend feature roadmap](docs/BACKEND_ROADMAP.md)
 - [Google sign-in and private profiles](docs/AUTH.md)
+- [Terminal design system: colors, fonts, components, and page styling](docs/DESIGN_SYSTEM.md)
 - [Level 1 ledger API and migration](docs/LEDGER.md)
 - [Level 2 corrections, proof images, and cursors](docs/HISTORY_PROOF.md)
+- [Level 3 periodic charges, waivers, and fictional scores](docs/CHARGES_SCORES.md)
+- [Level 4 dashboard APIs and metric definitions](docs/DASHBOARD.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)

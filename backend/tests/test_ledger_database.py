@@ -282,6 +282,9 @@ def test_database_rejects_invalid_events_and_duplicate_returns(pg):
         "loan_kind": "money",
         "action": "repayment",
         "amount_cents": 100,
+        "principal_applied_cents": 100,
+        "interest_applied_cents": 0,
+        "fees_applied_cents": 0,
         "effective_at": now,
         "recorded_at": now,
     }
@@ -312,6 +315,9 @@ def test_database_rejects_invalid_events_and_duplicate_returns(pg):
                     "loan_kind": "item",
                     "action": "return",
                     "amount_cents": None,
+                    "principal_applied_cents": None,
+                    "interest_applied_cents": None,
+                    "fees_applied_cents": None,
                 }
             )
         )

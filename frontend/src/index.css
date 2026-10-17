@@ -1,61 +1,19 @@
-@import "./fonts.css";
-:root {
-	color-scheme: dark;
-	--bg: #100f0f;
-	--panel: #1c1b1a;
-	--surface: #282726;
-	--line: #403e3c;
-	--ink: #cecdc3;
-	--muted: #9f9d96;
-	--green: #879a39;
-	--red: #d14d41;
-	--yellow: #d0a215;
-	--mono: "IOU Iosevka", "Iosevka", Consolas, monospace;
-	font-family: var(--mono);
-	background: var(--bg);
-	color: var(--ink);
-	line-height: 1.6;
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-}
-* {
-	box-sizing: border-box;
-}
-body {
-	margin: 0;
-	min-width: 320px;
-	font-feature-settings:
-		"calt" 1,
-		"liga" 1;
-}
-button,
-input,
-textarea,
-select {
-	font-family: var(--mono);
-}
-button {
-	cursor: pointer;
-}
-a {
-	color: inherit;
-}
-button:disabled {
-	opacity: 0.6;
-	cursor: wait;
-}
-button:focus-visible,
-a:focus-visible {
-	outline: 2px solid var(--yellow);
-	outline-offset: 4px;
-}
-input:focus-visible {
-	outline: none;
-	border-color: var(--green);
-	box-shadow: 0 0 0 2px #879a391a;
-}
-::selection {
-	background: #503d02;
-	color: #fffcf0;
-}
+@import "./styles/tokens.css";
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body { margin: 0; min-width: 320px; min-height: 100svh; background: var(--bg); color: var(--ink); font: 14px var(--mono); font-feature-settings: 'calt' 1, 'liga' 1; -webkit-font-smoothing: antialiased; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
+label { display: block; font-size: 12px; color: var(--ink); margin-bottom: 9px; }
+input, textarea, select { width: 100%; min-width: 0; min-height: 47px; background: var(--bg); color: var(--bright); border: 1px solid var(--line); border-radius: var(--radius-control); padding: 13px 14px; transition: border-color .15s; }
+input::placeholder, textarea::placeholder { color: var(--muted); font-size: 12px; }
+input:hover, select:hover, textarea:hover { border-color: #a2c5a9; }
+input:focus, textarea:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 2px #19835717; }
+h1, h2, h3 { color: var(--bright); }
+.inline-error { padding: 11px 12px; margin: 0 0 16px; background: #ffe7e1; border: 1px solid #f5c6ba; color: #a93436; border-radius: 5px; font-size: 12px; line-height: 1.7; }
+.loading-screen { padding: 40px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }

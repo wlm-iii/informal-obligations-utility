@@ -17,7 +17,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from iou.database import Base
 
@@ -61,6 +61,20 @@ class Loan(Base):
             name="ck_loan_terms",
         ),
         CheckConstraint("kind IN ('money', 'item')", name="ck_loan_kind"),
+        CheckConstraint(
+            "interest_rate_bps BETWEEN 0 AND 10000 AND grace_days BETWEEN 0 AND 365 "
+            "AND interest_period IN ('daily','weekly','biweekly','monthly','quarterly','yearly') "
+            f"AND late_fee_cents BETWEEN 0 AND {MAX_CENTS} "
+            f"AND charge_cap_cents BETWEEN 0 AND {MAX_CENTS} "
+            "AND (kind = 'money' OR interest_rate_bps = 0)",
+            name="ck_charge_terms",
+        ),
+        CheckConstraint(
+            "calculation_version = 1 OR (calculation_version = 0 AND interest_rate_bps = 0 "
+            "AND late_fee_cents = 0 AND charge_cap_cents = 0 AND grace_days = 0)",
+            name="ck_calculation_version",
+        ),
+        CheckConstraint("settled_at IS NULL OR settled_at >= lent_at", name="ck_settled_time"),
         CheckConstraint("length(trim(description)) BETWEEN 1 AND 500", name="ck_loan_description"),
         CheckConstraint("overdue_at > lent_at", name="ck_loan_due_boundary"),
         Index("ix_loans_owner_friend_created", "owner_id", "friend_id", "created_at", "id"),
@@ -81,6 +95,22 @@ class Loan(Base):
     timezone: Mapped[str] = mapped_column(String(100))
     overdue_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    interest_rate_bps: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    interest_period: Mapped[str] = mapped_column(
+        String(12), default="weekly", server_default="weekly"
+    )
+    late_fee_cents: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    charge_cap_cents: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    grace_days: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    calculation_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    fee_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    settled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    events: Mapped[list["LoanEvent"]] = relationship(
+        "LoanEvent",
+        primaryjoin="Loan.id == foreign(LoanEvent.loan_id)",
+        viewonly=True,
+        lazy="raise",
+    )
 
 
 class LoanEvent(Base):
@@ -103,10 +133,36 @@ class LoanEvent(Base):
             name="fk_replacement_original",
         ),
         CheckConstraint(
-            f"(action = 'repayment' AND loan_kind = 'money' AND amount_cents IS NOT NULL "
-            f"AND amount_cents BETWEEN 1 AND {MAX_CENTS}) "
-            "OR (action = 'return' AND loan_kind = 'item' AND amount_cents IS NULL)",
+            "((action = 'repayment' AND loan_kind = 'money') OR "
+            "(action = 'fee_payment' AND loan_kind = 'item')) "
+            f"AND amount_cents BETWEEN 1 AND {MAX_CENTS} AND amount_cents IS NOT NULL "
+            "AND component IS NULL AND reason IS NULL OR "
+            "(action = 'return' AND loan_kind = 'item' AND amount_cents IS NULL "
+            "AND component IS NULL AND reason IS NULL) OR "
+            "(action = 'waiver' AND amount_cents IS NOT NULL "
+            f"AND amount_cents BETWEEN 1 AND {MAX_CENTS} "
+            "AND component IN ('interest','fees') AND component IS NOT NULL AND reason IS NOT NULL "
+            "AND length(trim(reason)) BETWEEN 1 AND 1000)",
             name="ck_event_terms",
+        ),
+        CheckConstraint(
+            "(action = 'return' AND principal_applied_cents IS NULL "
+            "AND interest_applied_cents IS NULL AND fees_applied_cents IS NULL) OR "
+            "(action != 'return' AND principal_applied_cents IS NOT NULL "
+            "AND interest_applied_cents IS NOT NULL AND fees_applied_cents IS NOT NULL "
+            "AND principal_applied_cents >= 0 AND interest_applied_cents >= 0 "
+            "AND fees_applied_cents >= 0 AND principal_applied_cents "
+            "+ interest_applied_cents + fees_applied_cents = amount_cents)",
+            name="ck_event_allocation",
+        ),
+        CheckConstraint("allocation_order >= 0", name="ck_allocation_order"),
+        Index(
+            "uq_active_allocation_order",
+            "loan_id",
+            "allocation_order",
+            unique=True,
+            postgresql_where=text("allocation_order > 0 AND reversed_at IS NULL"),
+            sqlite_where=text("allocation_order > 0 AND reversed_at IS NULL"),
         ),
         Index("ix_events_owner_loan_time", "owner_id", "loan_id", "effective_at", "id"),
         Index(
@@ -123,11 +179,17 @@ class LoanEvent(Base):
     owner_id: Mapped[UUID]
     loan_id: Mapped[UUID]
     loan_kind: Mapped[str] = mapped_column(String(10))
-    action: Mapped[str] = mapped_column(String(10))
+    action: Mapped[str] = mapped_column(String(16))
     # Projection only: the financial fields stay intact; an immutable audit records the reversal.
     reversed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     replaces_event_id: Mapped[UUID | None]
     amount_cents: Mapped[int | None] = mapped_column(BigInteger)
+    allocation_order: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    component: Mapped[str | None] = mapped_column(String(8))
+    reason: Mapped[str | None] = mapped_column(String(1000))
+    principal_applied_cents: Mapped[int | None] = mapped_column(BigInteger)
+    interest_applied_cents: Mapped[int | None] = mapped_column(BigInteger)
+    fees_applied_cents: Mapped[int | None] = mapped_column(BigInteger)
     note: Mapped[str | None] = mapped_column(String(2000))
     effective_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     recorded_at: Mapped[datetime] = mapped_column(
