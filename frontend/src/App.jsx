@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import TerminalLogin from "./components/TerminalLogin";
 import { supabase } from "./services/supabase";
 import { useSession } from "./services/useSession";
 import { profileRequest } from "./services/api";
@@ -87,39 +88,17 @@ function Account({ session }) {
 
 function App() {
 	const { session, loading, error: sessionError } = useSession();
-	const [error, setError] = useState("");
-	const [busy, setBusy] = useState(false);
-
-	async function signIn() {
-		setBusy(true);
-		setError("");
-		try {
-			const { error } = await supabase.auth.signInWithOAuth({
-				provider: "google",
-				options: { redirectTo: `${window.location.origin}/auth/callback` },
-			});
-			if (error) throw error;
-		} catch {
-			setError("Unable to start Google sign-in. Please try again.");
-			setBusy(false);
-		}
+	if (!loading && !session) {
+		return <><TerminalLogin />{sessionError && <p className="session-error" role="alert">{sessionError}</p>}</>;
 	}
-
 	return (
 		<main>
 			<p className="eyebrow">Informal Obligations Utility</p>
 			<h1>IOU</h1>
-			<p>Your friends forget. We don’t.</p>
-			<p>A private ledger for borrowed money, missing hoodies, and fictional credit scores.</p>
 			<section className="card" aria-label="Account">
-				{!supabase ? <p role="alert">Google sign-in is not configured. Set the frontend Supabase environment variables and restart Vite.</p>
-					: loading ? <p role="status">Restoring your session…</p>
-						: session ? <Account key={session.user.id} session={session} />
-							: <><h2>Welcome to IOU</h2><p>Sign in to keep your ledger private.</p><button disabled={busy} onClick={signIn}>{busy ? "Redirecting…" : "Continue with Google"}</button></>}
-				{(error || sessionError) && <p role="alert">{error || sessionError}</p>}
+				{loading ? <p role="status">Restoring your session.</p> : session ? <Account key={session.user.id} session={session} /> : null}
 			</section>
 		</main>
 	);
 }
-
 export default App;

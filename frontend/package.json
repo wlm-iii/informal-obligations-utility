@@ -8,6 +8,7 @@
 		"build": "vite build",
 		"lint": "eslint .",
 		"test": "vitest run",
+		"test:login": "node ../scripts/tests/test-login-background.cjs && node ../scripts/tests/test-login-auth.cjs",
 		"preview": "vite preview"
 	},
 	"dependencies": {
