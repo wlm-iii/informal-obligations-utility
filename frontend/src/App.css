@@ -16,3 +16,27 @@
 	border: 1px solid #888;
 	border-radius: 12px;
 }
+
+.profile-form {
+	display: grid;
+	gap: 0.75rem;
+	text-align: left;
+	margin-bottom: 1.5rem;
+}
+
+.profile-form input {
+	font: inherit;
+	padding: 0.65rem;
+	border: 1px solid #888;
+	border-radius: 6px;
+	min-width: 0;
+}
+
+button:disabled {
+	opacity: 0.6;
+	cursor: wait;
+}
+
+[role="alert"] {
+	color: #d95555;
+}

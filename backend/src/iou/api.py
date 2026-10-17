@@ -6,8 +6,10 @@ from typing import Annotated
 from fastapi import FastAPI, Query
 
 from iou.config import get_settings
+from iou.profiles import router as profiles_router
 
-app = FastAPI(title="Informal Obligations Utility", version="0.1.0")
+app = FastAPI(title="Informal Obligations Utility", version="0.2.0")
+app.include_router(profiles_router)
 
 # Validate configuration early, without connecting to PostgreSQL or sending email.
 get_settings()

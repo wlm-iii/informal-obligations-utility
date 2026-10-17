@@ -11,6 +11,9 @@ COPY frontend/vite.config.js frontend/eslint.config.js /code/
 COPY frontend/index.html .
 COPY frontend/public/ public/
 COPY frontend/src/ src/
+# Public browser configuration only; never pass server secrets as build arguments.
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
 RUN npm run build
 
 

@@ -6,3 +6,6 @@ sqlalchemy>=2.0,<2.1
 psycopg[binary]>=3.2,<4
 alembic>=1.13,<2
 pydantic-settings>=2.6,<3
+PyJWT[crypto]>=2.10,<3
+# IANA timezone validation on Windows as well as Unix.
+tzdata>=2025.1

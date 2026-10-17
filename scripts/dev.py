@@ -194,6 +194,7 @@ def task(name, message=None):
         task("lint")
         task("test")
         run(sys.executable, "-m", "unittest", "discover", "-s", "scripts/tests")
+        run("npm", "test", cwd=ROOT / "frontend")
         run("npm", "run", "build", cwd=ROOT / "frontend")
 
 

@@ -1,0 +1,65 @@
+# Backend roadmap
+
+Proposed delivery levels agreed during planning. A level is complete only after
+its acceptance checks pass; implementation alone does not verify hosted behavior.
+
+Architecture: FastAPI owns domain rules and authorization; Supabase provides Auth,
+PostgreSQL, and later private image storage; Vercel hosts the frontend. Backend
+hosting and scheduler remain deployment decisions. Friends are private ledger
+contacts, not necessarily registered users or a shared social graph.
+
+## Level 0 — Accounts and private access
+
+Implemented: Google sign-in via Supabase, PKCE/session/logout UI, backend JWT
+verification, private profiles with names/timezones, migrations and ownership tests.
+See [auth setup and acceptance checklist](AUTH.md). Hosted migration and real browser
+Google login must be verified for each environment before marking this level complete.
+Email/password UI is deferred; we do not manage passwords ourselves.
+
+## Level 1 — Friends and basic borrowing
+
+Friend create/edit/list/archive; optional email and notes; money/item obligations
+with lent/due times; partial/full repayments and item returns; per-friend history.
+Interest and fees start at zero. Done when a user can lend $50 and a hoodie, record
+a partial payment, and complete both obligations without exposing another user's data.
+
+## Level 2 — Trustworthy history and proof
+
+Effective vs recorded timestamps; append-preserving corrections/voids; transactional
+updates; idempotent retries; pagination; private proof images on loans/events with
+size/type checks and temporary viewing URLs. Done when duplicate requests cannot
+change balances twice, corrections remain visible, and images are owner-only.
+
+## Level 3 — Charges and fictional reliability
+
+Opt-in simple interest, one-time fees, grace periods/caps, deterministic allocation,
+rounding/backdating/waivers, and clear charge breakdowns. Versioned fictional score
+with explanations and insufficient-history state. Confirm the provisional formulas
+in [SPEC.md](SPEC.md) first. Done when balances/scores reconcile to tested events.
+
+## Level 4 — Dashboard APIs
+
+Principal/charges separated; overdue/upcoming obligations; private friend rankings;
+repayment/lending trends and date filters. Item counts are not cash owed. Done when
+all chart/ranking metrics have documented definitions and reconcile with the ledger.
+
+## Level 5 — Manually approved reminders
+
+Editable template previews, email-provider integration, permission confirmation,
+unsubscribe, shared rate limits, delivery records, duplicate protection and final
+status rechecks. Gemini drafting is optional, minimal-context, preview-only, with a
+template fallback. No autonomous sending or Gmail access required. Done when opted-out
+contacts and duplicate sends are blocked and every send requires explicit approval.
+
+## Level 6 — Automation and operations
+
+External scheduler, durable jobs, quiet hours, retries/reconciliation, stop conditions,
+monitoring, retention/deletion workflows, backup restoration and performance tuning.
+Done when repeat job runs cannot duplicate reminders and failures are recoverable.
+
+For a short demo prioritize Levels 0–2, then a simple score/dashboard. Template-based
+manual reminders may precede advanced charges/charts if they are the main demo hook.
+Production safety work is a launch gate, not something to postpone until Level 6.
+
+Deferred: actual payments, banking, public rankings, shared friend networks, compound
+interest, and autonomous AI messages. All credit scores are fictional and private.
