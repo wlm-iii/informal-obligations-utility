@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import ReturnTracker from "./components/ReturnTracker";
 import { supabase } from "./services/supabase";
 import { useSession } from "./services/useSession";
 import { profileRequest } from "./services/api";
@@ -80,7 +81,7 @@ function Account({ session }) {
 			{profile && <ProfileForm key={profile.id} profile={profile} onSaved={setProfile} />}
 			{error && <><p role="alert">{error}</p><button onClick={() => setRetry((value) => value + 1)}>Retry profile</button></>}
 			<button disabled={signingOut} onClick={signOut}>{signingOut ? "Signing out…" : "Sign out"}</button>
-			<p>Friends and borrowing history are coming next.</p>
+			{profile && <ReturnTracker />}
 		</>
 	);
 }

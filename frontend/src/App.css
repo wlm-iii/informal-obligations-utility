@@ -40,3 +40,8 @@ button:disabled {
 [role="alert"] {
 	color: #d95555;
 }
+#root{max-width:1040px}
+.card{border-color:#343331;border-radius:5px;background:#1C1B1A}
+.profile-form input{border-color:#403E3C;border-radius:5px;background:#100F0F;color:#CECDC3}
+[role="alert"]{color:#D14D41}
+@media(max-width:650px){#root{padding:1rem}}

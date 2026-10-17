@@ -67,3 +67,10 @@ button:focus-visible {
 		background-color: #f9f9f9;
 	}
 }
+/* Flexoki dark shell: the return tracker remains dark in every system theme. */
+:root{color-scheme:dark;color:#CECDC3;background:#100F0F}
+body{display:block;min-height:100vh;background:#100F0F}
+a{color:#879A39}a:hover{color:#A0AF54}
+button{background:#282726;color:#CECDC3;border:1px solid #403E3C;border-radius:5px}
+button:hover{border-color:#879A39}
+button:focus-visible{outline:2px solid #879A39;outline-offset:3px}
