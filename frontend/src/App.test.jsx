@@ -56,6 +56,7 @@ describe("Level 0 account flow", () => {
 		window.history.replaceState({}, "", "/auth/callback?code=one-time-code");
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
 		render(<StrictMode><App /></StrictMode>);
+		fireEvent.click(await screen.findByRole("button", { name: /Your account|Person/ }));
 		expect(await screen.findByLabelText("Display name")).toHaveValue("Person");
 		expect(window.location.pathname).toBe("/");
 		expect(window.location.search).toBe("");
@@ -67,6 +68,7 @@ describe("Level 0 account flow", () => {
 	it("updates the profile and signs out", async () => {
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
 		render(<App />);
+		fireEvent.click(await screen.findByRole("button", { name: /Your account|Person/ }));
 		fireEvent.change(await screen.findByLabelText("Display name"), { target: { value: "New Name" } });
 		fireEvent.change(screen.getByLabelText("Timezone"), { target: { value: "America/Los_Angeles" } });
 		fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
@@ -83,7 +85,7 @@ describe("Level 0 account flow", () => {
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
 		fetch.mockResolvedValue({ ok: false, status: 401 });
 		render(<App />);
-		expect(await screen.findByRole("alert")).toHaveTextContent("session is no longer valid");
+		expect(await screen.findByText("Your session is no longer valid. Please sign in again.")).toBeInTheDocument();
 		expect(screen.queryByLabelText("Display name")).not.toBeInTheDocument();
 	});
 
@@ -103,26 +105,32 @@ describe("Level 0 account flow", () => {
 
 	it("can retry loading a profile after a backend outage", async () => {
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
-		fetch.mockResolvedValueOnce({ ok: false, status: 503 });
+		fetch.mockImplementation(async url => ({ ok: true, status: 200, json: async () => url === "/api/me" ? profile : { items: [], has_more: false } }));
+  const defaultFetch = fetch.getMockImplementation();
+  let profileFailed = false;
+  fetch.mockImplementation(async url => {
+   if (url === "/api/me" && !profileFailed) { profileFailed = true; return { ok: false, status: 503 }; }
+   return defaultFetch(url);
+  });
 		render(<App />);
+		fireEvent.click(await screen.findByRole("button", { name: /Your account|Person/ }));
 		fireEvent.click(await screen.findByRole("button", { name: "Retry profile" }));
 		await waitFor(() => expect(screen.getByLabelText("Display name")).toHaveValue("Person"));
 	});
 });
 
-it("uses one sidebar to switch between the live overview and sample leaderboards", async () => {
+it("lands on the debt ledger after Google login and switches through the main tabs", async () => {
  auth.getSession.mockResolvedValue({ data: { session }, error: null });
- fetch.mockImplementation(async url => ({ ok: true, status: 200, json: async () => url.startsWith("/api/loans") ? { items: [], has_more: false } : profile }));
+ fetch.mockImplementation(async url => ({ ok: true, status: 200, json: async () => url === "/api/me" ? profile : { items: [], has_more: false } }));
  render(<App />);
- expect(await screen.findByRole("heading", { name: "Still lent out vs. returned to you" })).toBeInTheDocument();
+ expect(await screen.findByRole("heading", { name: /The debt ledger/ })).toBeInTheDocument();
  const nav = screen.getByRole("navigation", { name: "Main navigation" });
- expect(within(nav).getByRole("link", { name: "IOU /" })).toBeInTheDocument();
- expect(within(nav).getByRole("button", { name: "Overview" })).toHaveAttribute("aria-current", "page");
- fireEvent.click(within(nav).getByRole("button", { name: "Hall of Fame" }));
- expect(screen.getByRole("heading", { name: "THE LEADERBOARDS." })).toBeInTheDocument();
- expect(within(nav).getByRole("button", { name: "Hall of Fame" })).toHaveAttribute("aria-current", "page");
- expect(within(nav).getByRole("button", { name: "Overview" })).not.toHaveAttribute("aria-current");
- fireEvent.click(within(nav).getByRole("button", { name: "Overview" }));
+ expect(screen.getByRole("button", { name: "IOU dashboard" })).toBeInTheDocument();
+ expect(within(nav).getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
+ fireEvent.click(within(nav).getByRole("button", { name: "Progress" }));
  expect(await screen.findByRole("heading", { name: "Still lent out vs. returned to you" })).toBeInTheDocument();
- expect(screen.queryByRole("heading", { name: "THE LEADERBOARDS." })).not.toBeInTheDocument();
+ fireEvent.click(within(nav).getByRole("button", { name: "Ranks" }));
+ expect(screen.getByRole("heading", { name: "THE LEADERBOARDS." })).toBeInTheDocument();
+ fireEvent.click(within(nav).getByRole("button", { name: "History" }));
+ expect(screen.getByRole("heading", { name: "Borrowed. Returned. Remembered." })).toBeInTheDocument();
 });

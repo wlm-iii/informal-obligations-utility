@@ -4,13 +4,13 @@ import "./ReturnTracker.css";
 
 
 
-export default function ReturnTracker() {
+export default function ReturnTracker({ previewLoans }) {
  const [summary, setSummary] = useState(null);
  const [error, setError] = useState("");
  const [revision, setRevision] = useState(0);
  useEffect(() => {
   const controller = new AbortController();
-  loadLoans(controller.signal).then(loans => {
+  (previewLoans ? Promise.resolve(previewLoans) : loadLoans(controller.signal)).then(loans => {
    if (!controller.signal.aborted) { setSummary(summarizeLoans(loans)); setError(""); }
   }).catch(error => {
    if (!controller.signal.aborted) { setSummary(null); setError(error.message); }
@@ -18,7 +18,7 @@ export default function ReturnTracker() {
   const refresh = () => { setSummary(null); setRevision(value => value + 1); };
   window.addEventListener("focus", refresh);
   return () => { controller.abort(); window.removeEventListener("focus", refresh); };
- }, [revision]);
+ }, [revision, previewLoans]);
  function refresh() { setSummary(null); setError(""); setRevision(value => value + 1); }
  if (!summary) return <section className="return-overview" aria-label="Return tracker"><p role="status">{error || "Loading your lending overview…"}</p>{error && <button onClick={refresh}>Retry lending data</button>}</section>;
  const total = summary.outstanding + summary.returned;

@@ -56,3 +56,28 @@ Leaderboard records are clearly labeled illustrative samples, with no backend sc
 ## Verification
 
 Component tests cover both ranking orders, the pinned first entry, artwork association, input immutability, tie breaking, and navigation between the authenticated overview and sample halls. Existing authentication and ledger tests remain in place. Use `py -3.12 scripts/dev.py check` for the standard lint, unit/API, tooling, frontend test, and build checks. Database integration tests are separate.
+
+
+## Home dashboard framework
+
+After Google sign-in, `Dashboard.jsx` opens the private debt ledger. A 4:3 CSS grid frame contains the top IOU wordmark (green O), add-friend button, friend sidebar, and independently scrolling content. The frame keeps its ratio at narrower widths while rows reflow.
+
+Dashboard is the default view; Progress renders the existing authenticated item-return chart; Ranks renders the sample halls; History lists current and completed borrowing records in the owner's ledger. Clicking a friend or counterparty name opens their contact details, notes, open/completed counts, outstanding balance, and borrowing history. Account editing and sign-out remain available through the top account button.
+
+`dashboard.js` authenticates friend requests, disables caching, reads every page, includes archived friend names for historical records, and sends an idempotency key when adding a friend. Backend records currently represent money/items lent by the owner to a friend, not liabilities the owner owes someone else. History reflects that supported model. No credit score is invented for a live friend profile.
+
+Nudge opens a native modal dialog with Sweet bestie, Direct, and Playful tones, editable reminder text, and clipboard copying with a manual-copy fallback. Item reminders request an item return; money reminders use outstanding USD cents. Nothing is transmitted to friends automatically. Dialog focus returns to the triggering control when closed.
+
+`npm run build:preview` builds `dashboard-preview.html` into `dist-preview` with labeled sample records. Preview-only friend additions remain in memory; the signed-in app uses the backend. The preview shares the actual React dashboard components, CSS, Iosevka fonts, and Flexoki artwork assets. Main production builds retain the normal Google sign-in entry point.
+
+### Surrounding text adjustment
+
+Header account text and friend-sidebar names, counts, and footer text are enlarged. The top tagline is removed. Progress and Ranks content and tab typography remain unchanged.
+
+### Account profile consistency
+
+The own-account page uses the same identity header, avatar, stats cards, and borrowing-history layout as friend profiles. It summarizes the full private ledger and retains account settings and sign-out below history. The sample preview user is Anca; live users retain their actual account names.
+
+### Account summary totals
+
+The own-account summary shows active friend count, money outstanding, money repaid (including partial repayments), items still out, and items returned. Money is summed in integer USD cents; each item loan counts as one item. Borrowing history remains below these cards. These are totals from the owner’s lending ledger, not personal asset ownership or unsupported borrower-side debts.
