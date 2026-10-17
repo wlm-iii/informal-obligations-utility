@@ -53,6 +53,7 @@ class Loan(Base):
             name="fk_loan_friend_owner",
         ),
         UniqueConstraint("id", "owner_id", "kind", name="uq_loans_id_owner_kind"),
+        UniqueConstraint("id", "owner_id", name="uq_loans_id_owner"),
         CheckConstraint(
             f"(kind = 'money' AND principal_cents IS NOT NULL AND currency IS NOT NULL "
             f"AND principal_cents BETWEEN 1 AND {MAX_CENTS} AND currency = 'USD') "
@@ -90,6 +91,17 @@ class LoanEvent(Base):
             [f"{SCHEMA}.loans.id", f"{SCHEMA}.loans.owner_id", f"{SCHEMA}.loans.kind"],
             name="fk_event_loan_owner_kind",
         ),
+        UniqueConstraint("id", "owner_id", "loan_id", name="uq_events_id_owner_loan"),
+        UniqueConstraint("replaces_event_id", name="uq_event_replacement"),
+        ForeignKeyConstraint(
+            ["replaces_event_id", "owner_id", "loan_id"],
+            [
+                f"{SCHEMA}.loan_events.id",
+                f"{SCHEMA}.loan_events.owner_id",
+                f"{SCHEMA}.loan_events.loan_id",
+            ],
+            name="fk_replacement_original",
+        ),
         CheckConstraint(
             f"(action = 'repayment' AND loan_kind = 'money' AND amount_cents IS NOT NULL "
             f"AND amount_cents BETWEEN 1 AND {MAX_CENTS}) "
@@ -101,8 +113,8 @@ class LoanEvent(Base):
             "uq_one_item_return",
             "loan_id",
             unique=True,
-            postgresql_where=text("action = 'return'"),
-            sqlite_where=text("action = 'return'"),
+            postgresql_where=text("action = 'return' AND reversed_at IS NULL"),
+            sqlite_where=text("action = 'return' AND reversed_at IS NULL"),
         ),
         {"schema": SCHEMA},
     )
@@ -112,8 +124,96 @@ class LoanEvent(Base):
     loan_id: Mapped[UUID]
     loan_kind: Mapped[str] = mapped_column(String(10))
     action: Mapped[str] = mapped_column(String(10))
+    # Projection only: the financial fields stay intact; an immutable audit records the reversal.
+    reversed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    replaces_event_id: Mapped[UUID | None]
     amount_cents: Mapped[int | None] = mapped_column(BigInteger)
     note: Mapped[str | None] = mapped_column(String(2000))
+    effective_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class Audit(Base):
+    """Append-only application history; not a tamper-proof accounting journal."""
+
+    __tablename__ = "ledger_audit"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["loan_id", "owner_id"],
+            [f"{SCHEMA}.loans.id", f"{SCHEMA}.loans.owner_id"],
+            name="fk_audit_loan_owner",
+        ),
+        ForeignKeyConstraint(
+            ["event_id", "owner_id", "loan_id"],
+            [
+                f"{SCHEMA}.loan_events.id",
+                f"{SCHEMA}.loan_events.owner_id",
+                f"{SCHEMA}.loan_events.loan_id",
+            ],
+            name="fk_audit_event_owner_loan",
+        ),
+        ForeignKeyConstraint(
+            ["replacement_event_id", "owner_id", "loan_id"],
+            [
+                f"{SCHEMA}.loan_events.id",
+                f"{SCHEMA}.loan_events.owner_id",
+                f"{SCHEMA}.loan_events.loan_id",
+            ],
+            name="fk_audit_replacement_owner_loan",
+        ),
+        ForeignKeyConstraint(
+            ["evidence_id", "owner_id", "loan_id"],
+            [f"{SCHEMA}.evidence.id", f"{SCHEMA}.evidence.owner_id", f"{SCHEMA}.evidence.loan_id"],
+            name="fk_audit_evidence_owner_loan",
+        ),
+        CheckConstraint("actor IN ('owner', 'system')", name="ck_audit_actor"),
+        CheckConstraint(
+            "(action = 'reversal' AND event_id IS NOT NULL AND evidence_id IS NULL "
+            "AND reason IS NOT NULL AND length(trim(reason)) > 0) OR "
+            "(action = 'void' AND event_id IS NULL AND replacement_event_id IS NULL "
+            "AND evidence_id IS NULL AND reason IS NOT NULL AND length(trim(reason)) > 0) OR "
+            "(action IN ('evidence_added', 'evidence_removed') AND evidence_id IS NOT NULL "
+            "AND replacement_event_id IS NULL AND (action = 'evidence_added' OR "
+            "(reason IS NOT NULL AND length(trim(reason)) > 0)))",
+            name="ck_audit_action",
+        ),
+        Index(
+            "uq_event_reversal",
+            "event_id",
+            unique=True,
+            postgresql_where=text("action = 'reversal'"),
+            sqlite_where=text("action = 'reversal'"),
+        ),
+        Index(
+            "uq_loan_void",
+            "loan_id",
+            unique=True,
+            postgresql_where=text("action = 'void'"),
+            sqlite_where=text("action = 'void'"),
+        ),
+        Index(
+            "uq_evidence_audit_action",
+            "evidence_id",
+            "action",
+            unique=True,
+            postgresql_where=text("action IN ('evidence_added', 'evidence_removed')"),
+            sqlite_where=text("action IN ('evidence_added', 'evidence_removed')"),
+        ),
+        Index("ix_audit_owner_loan_time", "owner_id", "loan_id", "effective_at", "id"),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    owner_id: Mapped[UUID]
+    loan_id: Mapped[UUID]
+    action: Mapped[str] = mapped_column(String(24))
+    actor: Mapped[str] = mapped_column(String(10), default="owner", server_default="owner")
+    reason: Mapped[str | None] = mapped_column(String(1000))
+    event_id: Mapped[UUID | None]
+    replacement_event_id: Mapped[UUID | None]
+    evidence_id: Mapped[UUID | None]
     effective_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     recorded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

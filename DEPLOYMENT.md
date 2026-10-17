@@ -6,7 +6,8 @@ requirements. The Docker build and local container routes are smoke-tested; this
 not prove either hosted platform works.
 
 Google authentication, private profiles, and the backend lending ledger are
-implemented; frontend lending screens, email delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
+implemented, including Level 2 corrections/private evidence workflows; frontend
+lending screens, email delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
 hosted owner-isolation checks, privacy controls, and rate limits before any real-data
 public release. Use fake data for demos.
 
@@ -21,6 +22,10 @@ public release. Use fake data for demos.
 - Keep `EMAIL_MODE=disabled`; there is no delivery implementation yet.
 - Review [Level 1's migration and retry contract](docs/LEDGER.md) before deploying
   the lending API. All new ledger tables remain private; no direct browser SQL access.
+- Follow [Level 2's release safety and private Storage setup](docs/HISTORY_PROOF.md):
+  do not mix old/new financial writers after reversals exist. Add server-only
+  `CURSOR_SIGNING_KEY` / `SUPABASE_STORAGE_KEY` for optional cursors/images and run the
+  cleanup command regularly outside API workers. Never expose the Storage key in Vite.
 - Run `alembic -c backend/alembic.ini upgrade head` once in the release process with
   appropriate credentials, not in every API worker or serverless request.
 - Plan backups, least-privilege runtime credentials, connection limits, and secrets storage.
@@ -74,6 +79,11 @@ Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in Vercel's build
 environment; these are compiled into the public frontend. Configure `SUPABASE_URL`,
 `DATABASE_URL`, and `DATABASE_POOL_MODE` separately for the server runtime. Redeploy
 after changing frontend configuration.
+
+Evidence uploads proxy raw bytes through FastAPI for validation (application cap
+5 MiB). Verify current function body-size, timeout, and memory limits: a platform
+may impose a lower body limit, requiring a smaller client file or a separate backend.
+Do not enable direct browser Storage writes to bypass our validation.
 
 Before choosing this route, validate Python runtime selection, source inclusion,
 rewrites, backend dependencies, managed database connectivity, connection pooling,

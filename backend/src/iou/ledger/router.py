@@ -7,6 +7,7 @@ from fastapi import APIRouter, Body, Depends, Header, Query, Response
 from sqlalchemy import or_, select
 
 from iou.auth import CurrentUser
+from iou.ledger import pagination as pages
 from iou.ledger import service
 from iou.ledger.models import Friend, Loan
 from iou.ledger.schemas import (
@@ -32,6 +33,8 @@ router = APIRouter(tags=["ledger"], dependencies=[Depends(no_store)])
 Key = Annotated[UUID, Header(alias="Idempotency-Key")]
 Limit = Annotated[int, Query(ge=1, le=100)]
 Offset = Annotated[int, Query(ge=0, le=100_000)]
+Mode = Literal["offset", "cursor"]
+Cursor = Annotated[str | None, Query(max_length=4096)]
 
 
 @router.post("/friends", response_model=FriendRead, status_code=201)
@@ -53,20 +56,33 @@ def friends(
     archived: Literal["exclude", "only", "include"] = "exclude",
     limit: Limit = 25,
     offset: Offset = 0,
+    pagination: Mode = "offset",
+    cursor: Cursor = None,
 ):
     query = select(Friend).where(Friend.owner_id == user.id)
     if archived != "include":
         query = query.where(
             Friend.archived_at.is_not(None) if archived == "only" else Friend.archived_at.is_(None)
         )
-    rows = session.scalars(
-        query.order_by(Friend.created_at.desc(), Friend.id.desc()).offset(offset).limit(limit + 1)
-    ).all()
-    return Page[FriendRead](
-        items=[FriendRead.model_validate(friend) for friend in rows[:limit]],
+    page = pages.paginate(
+        session,
+        query,
+        owner=user.id,
+        scope={"endpoint": "friends", "archived": archived},
         limit=limit,
         offset=offset,
-        has_more=len(rows) > limit,
+        mode=pagination,
+        cursor=cursor,
+        order=(Friend.created_at, Friend.id),
+        recorded=Friend.created_at,
+        now=service.now_utc(),
+    )
+    return Page[FriendRead](
+        items=[FriendRead.model_validate(row[0]) for row in page.rows],
+        limit=limit,
+        offset=offset,
+        has_more=page.has_more,
+        next_cursor=page.next_cursor,
     )
 
 
@@ -109,8 +125,10 @@ def history(
     session: SessionDependency,
     limit: Limit = 25,
     offset: Offset = 0,
+    pagination: Mode = "offset",
+    cursor: Cursor = None,
 ):
-    return service.history(session, user.id, friend_id, limit, offset)
+    return service.history(session, user.id, friend_id, limit, offset, pagination, cursor)
 
 
 @router.post("/loans", response_model=LoanRead, status_code=201)
@@ -131,35 +149,59 @@ def loans(
     session: SessionDependency,
     friend_id: UUID | None = None,
     kind: Literal["money", "item"] | None = None,
-    status: Literal["open", "completed"] | None = None,
+    status: Literal["open", "completed", "voided"] | None = None,
     overdue: bool | None = None,
     limit: Limit = 25,
     offset: Offset = 0,
+    pagination: Mode = "offset",
+    cursor: Cursor = None,
 ):
     at = service.now_utc()
     query = service.loan_query(user.id)
     complete = query.selected_columns.is_complete
+    voided = query.selected_columns.is_voided
     if friend_id is not None:
         service.friend_for_owner(session, user.id, friend_id)
         query = query.where(Loan.friend_id == friend_id)
     if kind is not None:
         query = query.where(Loan.kind == kind)
-    if status is not None:
-        query = query.where(complete == (status == "completed"))
+    if status == "open":
+        query = query.where(~complete, ~voided)
+    elif status == "completed":
+        query = query.where(complete)
+    elif status == "voided":
+        query = query.where(voided)
     if overdue is not None:
         query = query.where(
-            or_(complete, Loan.overdue_at > at)
+            or_(complete, voided, Loan.overdue_at > at)
             if not overdue
             else (~complete & (Loan.overdue_at <= at))
         )
-    rows = session.execute(
-        query.order_by(Loan.created_at.desc(), Loan.id.desc()).offset(offset).limit(limit + 1)
-    ).all()
-    return Page[LoanRead](
-        items=[service.loan_read(row, at) for row in rows[:limit]],
+    page = pages.paginate(
+        session,
+        query,
+        owner=user.id,
+        scope={
+            "endpoint": "loans",
+            "friend": friend_id,
+            "kind": kind,
+            "status": status,
+            "overdue": overdue,
+        },
         limit=limit,
         offset=offset,
-        has_more=len(rows) > limit,
+        mode=pagination,
+        cursor=cursor,
+        order=(Loan.created_at, Loan.id),
+        recorded=Loan.created_at,
+        now=at,
+    )
+    return Page[LoanRead](
+        items=[service.loan_read(row, at) for row in page.rows],
+        limit=limit,
+        offset=offset,
+        has_more=page.has_more,
+        next_cursor=page.next_cursor,
     )
 
 

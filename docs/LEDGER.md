@@ -1,8 +1,10 @@
 # Level 1 — private friends and basic borrowing API
 
 This slice is **backend-only**. The existing frontend still shows sign-in/profile
-editing; friends/loans screens can consume these contracts next. No images, fees,
-interest calculations, scores, reminders, or shared social network are implemented.
+editing; friends/loans screens can consume these contracts next. This page documents
+the baseline ledger. [Level 2](HISTORY_PROOF.md) now extends it with corrections,
+voids, proof images, and signed cursors. Fees, interest calculations, scores,
+reminders, and a shared social network are not implemented.
 
 ## Setup and release
 
@@ -98,8 +100,9 @@ Item example:
   The loan snapshots the timezone and the following midnight as `overdue_at` in UTC.
   The due date is inclusive; overdue starts at that boundary, including DST changes.
   Later profile timezone edits never rewrite an existing loan's boundary.
-- No loan PATCH/DELETE exists. Financial edits, corrections, cancellation/voiding,
-  and waivers need an explicit history-preserving Level 2 workflow.
+- No loan PATCH/DELETE exists. Use the explicit [Level 2 correction/void
+  workflows](HISTORY_PROOF.md) rather than editing historical financial fields.
+  Original loan terms still require void/recreate; waivers are future work.
 
 ## Repayments and item returns
 
@@ -123,11 +126,11 @@ are rejected.
 Settlement returns `{ "event": ..., "loan": ... }`. The event includes its ID,
 loan ID, action, amount (null for returns), note, and effective/recorded timestamps.
 Loan state includes principal/currency, repaid/outstanding cents, due date/timezone,
-`overdue_at`, `status` (`open`/`completed`), `overdue`, `returned_at`, and
+`overdue_at`, `status` (`open`/`completed`/`voided`), `overdue`, `returned_at`, and
 `completed_at`. Item monetary fields are null, not an estimated cash debt. Interest
 and fees are always zero. Completed loans are never currently overdue.
 
-Money balances derive from repayment records, not editable balance fields. Full
+Money balances derive from active (not reversed) repayment records, not editable balance fields. Full
 repayment completes the loan; completion time is the latest effective payment time,
 including when entries were recorded out of order. Item return completes the item
 loan. A new request that overpays, repeats an already completed loan, or applies the
@@ -177,20 +180,20 @@ must go through this service.
 List/history envelope:
 
 ```json
-{"items": [], "limit": 25, "offset": 0, "has_more": false}
+{"items": [], "limit": 25, "offset": 0, "has_more": false, "next_cursor": null}
 ```
 
 `limit` defaults to 25 (1–100); `offset` defaults to 0 (0–100,000). Lists sort by
 creation time descending, then ID. Loan filters: `friend_id`, `kind=money|item`,
-`status=open|completed`, and `overdue=true|false`. Archived friends' existing loans
+`status=open|completed|voided`, and `overdue=true|false`. Archived friends' existing loans
 remain visible. A supplied foreign/missing friend filter returns 404.
 
 History sorts by effective time descending, then recorded time and event ID. Entries
 have action `lent`, `repayment`, or `return`; include amount/note/timestamps; and
 embed **current** loan state. A lending entry uses the original loan ID and amount.
 Backdated events appear in effective-time order. This is a basic ledger timeline,
-not yet the correction/audit system planned for Level 2. Offset pagination is stable
-for unchanged data; concurrent inserts may shift pages. Cursor pagination is deferred.
+extended by [Level 2's audit actions and cursor mode](HISTORY_PROOF.md). Offset
+pagination remains available; concurrent inserts may shift offset pages.
 
 ## Security, testing, and launch limits
 
@@ -199,7 +202,9 @@ including when Supabase default privileges would otherwise grant access. Never
 expose `iou_app` in the Data API. Use separate migration/runtime credentials for
 production. A runtime role needs SELECT/INSERT on loans, events, and receipts,
 and SELECT/INSERT/UPDATE on friends/profiles; not schema CREATE, record DELETE, or
-UPDATE on immutable lending/event records. SQLAlchemy does not inherit browser RLS.
+UPDATE on immutable lending/event financial fields. Level 2 additionally needs
+SELECT/INSERT on audit, SELECT/INSERT/UPDATE on evidence, and only UPDATE(reversed_at)
+on settlement events; see its setup guide. SQLAlchemy does not inherit browser RLS.
 
 `check` covers contract validation, both loan lifecycles, owner isolation, archival,
 retry snapshots, rollback on failure, pagination, backdating, and timezone boundaries.
