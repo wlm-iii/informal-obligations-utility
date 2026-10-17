@@ -1,7 +1,8 @@
 # Level 2 — corrections, audit history, private proof, and cursors
 
 Backend-only implementation. The frontend still contains account/profile UI, not
-lending/evidence screens. Interest, fees, scores, reminders, and AI remain later work.
+lending/evidence screens. [Level 3](CHARGES_SCORES.md) now adds optional periodic
+charges, waivers, and fictional scores; reminders and AI remain later work.
 See [Level 1](LEDGER.md) for the base contracts and bearer/idempotency conventions.
 
 ## Migration and deployment safety
@@ -60,7 +61,9 @@ it defaults to the original event's effective time, **not now**. Replacement not
 defaults to null; the original note is still preserved on the original event.
 All other settlement validation (positive integer cents, USD, date bounds) applies.
 
-Original amount/note/effective/recorded fields never change. `reversed_at` is a
+Original amount/note/effective/recorded fields never change. Level 3 additionally
+preserves payment allocation snapshots and may reject corrections that change a
+later allocation; reverse those dependent events first. `reversed_at` is a
 mutable projection updated in the **same transaction** as the append-only reversal
 audit. The replacement is a new settlement with `replaces_event_id`; the audit links
 both event IDs. An active replacement can itself be corrected, forming an explicit
@@ -245,6 +248,8 @@ GRANT UPDATE (reversed_at) ON iou_app.loan_events TO iou_runtime;
 
 This is not a grant to Supabase's browser `authenticated` role. Configure the
 runtime connection separately and retain elevated credentials only for migrations.
+After Level 3 migration, also grant UPDATE(settled_at) on iou_app.loans for its
+settlement projection; original financial terms remain immutable.
 
 Automated tests use local signing secrets, real PostgreSQL locks/constraints, and
 fake Storage adapters. They test corrections after later payments, rollback on
