@@ -1,5 +1,9 @@
 # IOU frontend
 
+Use the [terminal design system](../docs/DESIGN_SYSTEM.md) when styling additional
+pages. It documents the implemented login tokens and the work needed to share
+them with React screens.
+
 React 19 + Vite 7, JavaScript/JSX. Google sign-in, session restoration/logout, and
 profile editing are implemented; lending features are not. Copy `.env.example` to
 `.env.local` inside `frontend/` and follow [auth setup](../docs/AUTH.md).
