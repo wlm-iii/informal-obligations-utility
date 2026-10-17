@@ -4,6 +4,7 @@ import TerminalLogin from "./components/TerminalLogin";
 import { supabase } from "./services/supabase";
 import { useSession } from "./services/useSession";
 import { profileRequest } from "./services/api";
+import Statistics from "./components/Statistics";
 
 function ProfileForm({ profile, onSaved }) {
 	const [name, setName] = useState(profile.display_name);
@@ -103,7 +104,14 @@ function Account({ session }) {
 		<div className="profile-layout">
 			<aside className="profile-sidebar">
 				<div className="avatar" aria-hidden="true">
-					{profile?.display_name?.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => Array.from(part)[0]).join("").toUpperCase() || "IO"}
+					{profile?.display_name
+						?.trim()
+						.split(/\s+/)
+						.filter(Boolean)
+						.slice(0, 2)
+						.map((part) => Array.from(part)[0])
+						.join("")
+						.toUpperCase() || "IO"}
 				</div>
 				<p className="eyebrow">PERSONAL TERMINAL</p>
 				<h1>
@@ -115,6 +123,9 @@ function Account({ session }) {
 				<div className="sidebar-divider" />
 				<a className="profile-nav active" href="#details" aria-current="page">
 					<span>01</span> Profile <span>↗</span>
+				</a>
+				<a className="profile-nav" href="#statistics">
+					<span>02</span> Statistics <span>?</span>
 				</a>
 				<div className="sidebar-note">
 					<span>PRIVATE WORKSPACE</span>
@@ -163,6 +174,12 @@ function Account({ session }) {
 }
 
 function App() {
+	const [page, setPage] = useState(window.location.hash);
+	useEffect(() => {
+		const update = () => setPage(window.location.hash);
+		window.addEventListener("hashchange", update);
+		return () => window.removeEventListener("hashchange", update);
+	}, []);
 	const { session, loading, error: sessionError } = useSession();
 	if (!loading && !session) {
 		return (
@@ -190,7 +207,11 @@ function App() {
 				{loading ? (
 					<p role="status">Restoring your session.</p>
 				) : session ? (
-					<Account key={session.user.id} session={session} />
+					page === "#statistics" ? (
+						<Statistics key={session.user.id} />
+					) : (
+						<Account key={session.user.id} session={session} />
+					)
 				) : null}
 			</section>
 			<footer className="site-footer">
