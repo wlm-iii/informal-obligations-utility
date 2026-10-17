@@ -7,7 +7,9 @@ for configuration, migrations, idempotency headers, and endpoint examples. No ne
 API keys are needed for basic lending. Level 2 adds audited corrections/voids,
 private proof images, durable cleanup, and signed cursors; see
 [setup and safety](../docs/HISTORY_PROOF.md). Storage and cursor mode need optional
-server-only configuration; existing auth/offset APIs do not.
+server-only configuration; existing auth/offset APIs do not. Level 3 adds optional
+periodic charges, immutable allocations, waivers, and private fictional scores with
+no new API keys; see [the charge/score contract](../docs/CHARGES_SCORES.md).
 
 From the repository root:
 
@@ -26,7 +28,8 @@ Nix is optional; see the [setup instructions](../docs/DEVELOPMENT.md).
 private `iou_app.profiles` table. `ledger/` owns contacts, loans, settlement events,
 and retry receipts in the same private schema. `evidence/` validates images, talks
 to private Supabase Storage, and provides a dry-run-first cleanup command. Ownership
-comes only from verified JWT subjects. Ledger creation/settlement requires UUID `Idempotency-Key` headers.
+comes only from verified JWT subjects. Ledger creation/settlement requires UUID `Idempotency-Key` headers. Charges are
+bookkeeping only: no real payment processing is implemented.
 
 The app is `backend/src/iou/api.py`; API docs are at <http://127.0.0.1:8000/docs>.
 `src/api.py` is a compatibility entry point. `src/main.py` mounts the API and built

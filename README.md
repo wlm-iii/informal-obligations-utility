@@ -8,10 +8,13 @@ assigning clearly fictional credit scores.
 
 **Status:** The backend supports Google sign-in/profiles, private lending, audited
 corrections/voids, private proof-image workflows, and signed cursor pagination.
-The frontend still has account UI only. Hosted Storage requires setup/acceptance;
-lending screens, reminders, and scores are not implemented. Use fake demo data.
+The backend also supports optional periodic interest/late fees, charge waivers,
+and explained fictional reliability scores. The frontend has terminal login/account
+UI only. Hosted setup/acceptance, lending screens, and reminders remain separate.
+Use fake demo data.
 See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md), and
-[Level 2 setup and safety](docs/HISTORY_PROOF.md).
+[Level 2 setup and safety](docs/HISTORY_PROOF.md), and
+[Level 3 charges and scores](docs/CHARGES_SCORES.md).
 
 ## Stack
 
@@ -95,6 +98,7 @@ Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.m
 - [Google sign-in and private profiles](docs/AUTH.md)
 - [Level 1 ledger API and migration](docs/LEDGER.md)
 - [Level 2 corrections, proof images, and cursors](docs/HISTORY_PROOF.md)
+- [Level 3 periodic charges, waivers, and fictional scores](docs/CHARGES_SCORES.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)

@@ -7,6 +7,7 @@ The app supports Google sign-in/private profiles and a backend lending ledger; t
 frontend still has account UI only. Follow [auth setup](AUTH.md) to configure login
 and hosted PostgreSQL, [ledger contracts](LEDGER.md) for lending, and
 [Level 2 setup](HISTORY_PROOF.md) for audited corrections, private proof, and cursors.
+[Level 3](CHARGES_SCORES.md) covers optional periodic charges, waivers, and scores.
 
 ## Default setup (without Nix)
 
@@ -165,7 +166,9 @@ On Linux/macOS the virtual environment's Python is `backend/.venv/bin/python`.
 The initial `0001_baseline` is empty; `0002_profiles` creates private
 `iou_app.profiles` storage; `0003_ledger` adds private friends, loans, settlement
 events, and retry receipts; `0004_history_proof` adds audit/evidence storage and
-reversal metadata. Downgrade of Level 2 is guarded once history exists. These
+reversal metadata; `0005_charges_scores` backfills zero-charge legacy terms and
+principal-only allocations, adds optional periodic terms, and tracks settlement.
+Downgrades are guarded once new feature data exists. These
 migrations revoke browser-role access. Alembic autogeneration
 only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
 and Alembic. Never generate migrations against production or rely on API startup

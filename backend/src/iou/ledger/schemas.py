@@ -89,12 +89,19 @@ class LoanInput(Input):
     notes: Notes | None = None
     lent_at: AwareDatetime | None = None
     due_date: date
+    late_fee_cents: Annotated[int, Field(strict=True, ge=0, le=MAX_CENTS)] = 0
+    grace_days: Annotated[int, Field(strict=True, ge=0, le=365)] = 0
+    charge_cap_cents: Annotated[int, Field(strict=True, ge=0, le=MAX_CENTS)] | None = None
 
 
 class MoneyLoanCreate(LoanInput):
     kind: Literal["money"]
     principal_cents: Cents
     currency: Literal["USD"] = "USD"
+    interest_rate_bps: Annotated[int, Field(strict=True, ge=0, le=10000)] = 0
+    interest_period: Literal["daily", "weekly", "biweekly", "monthly", "quarterly", "yearly"] = (
+        "weekly"
+    )
 
 
 class ItemLoanCreate(LoanInput):
@@ -113,6 +120,12 @@ class RepaymentCreate(SettlementInput):
     amount_cents: Cents
 
 
+class WaiverCreate(SettlementInput):
+    amount_cents: Cents
+    component: Literal["interest", "fees"]
+    reason: Annotated[str, Field(min_length=1, max_length=1000)]
+
+
 class LoanRead(ReadModel):
     id: UUID
     friend_id: UUID
@@ -128,8 +141,29 @@ class LoanRead(ReadModel):
     currency: Literal["USD"] | None
     repaid_cents: int | None
     outstanding_cents: int | None
-    interest_cents: Literal[0] = 0
-    fees_cents: Literal[0] = 0
+    interest_cents: int = 0
+    fees_cents: int = 0
+    interest_rate_bps: int = 0
+    interest_period: str = "weekly"
+    interest_period_days: int = 7
+    late_fee_cents: int = 0
+    grace_days: int = 0
+    charge_cap_cents: int = 0
+    calculation_version: int = 0
+    calculated_at: datetime | None = None
+    fee_at: datetime | None = None
+    late_fee_assessed_at: datetime | None = None
+    interest_accrued_cents: int = 0
+    late_fee_assessed_cents: int = 0
+    principal_repaid_cents: int = 0
+    interest_paid_cents: int = 0
+    fees_paid_cents: int = 0
+    interest_waived_cents: int = 0
+    fees_waived_cents: int = 0
+    total_outstanding_cents: int = 0
+    charges_currency: Literal["USD"] = "USD"
+    borrowing_status: Literal["outstanding", "repaid", "returned", "voided"] = "outstanding"
+    settlement_status: Literal["unpaid", "settled", "voided"] = "unpaid"
     returned_at: datetime | None
     completed_at: datetime | None
     status: Literal["open", "completed", "voided"]
@@ -141,13 +175,19 @@ class LoanRead(ReadModel):
 class EventRead(ReadModel):
     id: UUID
     loan_id: UUID
-    action: Literal["repayment", "return"]
+    action: Literal["repayment", "return", "fee_payment", "waiver"]
     amount_cents: int | None
     note: str | None
     effective_at: datetime
     recorded_at: datetime
     reversed_at: datetime | None = None
     replaces_event_id: UUID | None = None
+    allocation_order: int = 0
+    component: Literal["interest", "fees"] | None = None
+    reason: str | None = None
+    principal_applied_cents: int | None = None
+    interest_applied_cents: int | None = None
+    fees_applied_cents: int | None = None
 
 
 class SettlementRead(ReadModel):
@@ -158,7 +198,15 @@ class SettlementRead(ReadModel):
 class HistoryEntry(ReadModel):
     id: UUID
     action: Literal[
-        "lent", "repayment", "return", "reversal", "void", "evidence_added", "evidence_removed"
+        "lent",
+        "repayment",
+        "return",
+        "fee_payment",
+        "waiver",
+        "reversal",
+        "void",
+        "evidence_added",
+        "evidence_removed",
     ]
     amount_cents: int | None
     note: str | None
@@ -172,6 +220,11 @@ class HistoryEntry(ReadModel):
     evidence_id: UUID | None = None
     reversed_at: datetime | None = None
     replaces_event_id: UUID | None = None
+    allocation_order: int | None = None
+    component: Literal["interest", "fees"] | None = None
+    principal_applied_cents: int | None = None
+    interest_applied_cents: int | None = None
+    fees_applied_cents: int | None = None
 
 
 class ReasonInput(Input):
@@ -186,8 +239,19 @@ class ReplacementReturn(SettlementInput):
     action: Literal["return"]
 
 
+class ReplacementFeePayment(RepaymentCreate):
+    action: Literal["fee_payment"]
+
+
+class ReplacementWaiver(WaiverCreate):
+    action: Literal["waiver"]
+
+
 class CorrectionInput(ReasonInput):
-    replacement: Annotated[ReplacementRepayment | ReplacementReturn, Field(discriminator="action")]
+    replacement: Annotated[
+        ReplacementRepayment | ReplacementReturn | ReplacementFeePayment | ReplacementWaiver,
+        Field(discriminator="action"),
+    ]
 
 
 class AuditRead(ReadModel):

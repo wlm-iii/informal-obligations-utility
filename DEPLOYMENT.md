@@ -7,7 +7,8 @@ not prove either hosted platform works.
 
 Google authentication, private profiles, and the backend lending ledger are
 implemented, including Level 2 corrections/private evidence workflows; frontend
-lending screens, email delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
+lending screens, email delivery, and a scheduler are not. Level 3 periodic charges,
+waivers, and fictional scores are backend-only and require their release migration. Complete [auth setup and acceptance](docs/AUTH.md),
 hosted owner-isolation checks, privacy controls, and rate limits before any real-data
 public release. Use fake data for demos.
 
@@ -26,6 +27,10 @@ public release. Use fake data for demos.
   do not mix old/new financial writers after reversals exist. Add server-only
   `CURSOR_SIGNING_KEY` / `SUPABASE_STORAGE_KEY` for optional cursors/images and run the
   cleanup command regularly outside API workers. Never expose the Storage key in Vite.
+- Follow [Level 3's migration and allocation rules](docs/CHARGES_SCORES.md). Legacy
+  loans must remain zero-charge; do not mix pre-Level-3 financial writers/readers.
+  Runtime roles need UPDATE(settled_at) on loans, not permission to edit original terms.
+  No payment provider or new external API key is required by this feature.
 - Run `alembic -c backend/alembic.ini upgrade head` once in the release process with
   appropriate credentials, not in every API worker or serverless request.
 - Plan backups, least-privilege runtime credentials, connection limits, and secrets storage.

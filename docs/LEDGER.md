@@ -3,8 +3,9 @@
 This slice is **backend-only**. The existing frontend still shows sign-in/profile
 editing; friends/loans screens can consume these contracts next. This page documents
 the baseline ledger. [Level 2](HISTORY_PROOF.md) now extends it with corrections,
-voids, proof images, and signed cursors. Fees, interest calculations, scores,
-reminders, and a shared social network are not implemented.
+voids, proof images, and signed cursors. [Level 3](CHARGES_SCORES.md) adds optional
+periodic charges, waivers, and fictional scores. Reminders and a shared social
+network are not implemented.
 
 ## Setup and release
 
@@ -92,7 +93,7 @@ Item example:
 - Description is trimmed, nonempty, at most 500 characters; notes max 2,000.
 - Currency is USD only (default USD for money). Amounts are **integer cents**,
   1–1,000,000,000,000 inclusive. Floats, numeric strings, and booleans are rejected.
-- Item loans represent exactly one item and reject money/currency fields. No
+- Item loans represent exactly one item and reject principal/interest/currency inputs. No
   reference valuations, quantities, loss/damage, or partial item returns yet.
 - `lent_at` defaults to server time. Supplied timestamps require an explicit offset
   and are normalized to UTC. Future lending/settlement timestamps are rejected.
@@ -102,7 +103,7 @@ Item example:
   Later profile timezone edits never rewrite an existing loan's boundary.
 - No loan PATCH/DELETE exists. Use the explicit [Level 2 correction/void
   workflows](HISTORY_PROOF.md) rather than editing historical financial fields.
-  Original loan terms still require void/recreate; waivers are future work.
+  Original loan terms still require void/recreate. Level 3 adds charge waivers.
 
 ## Repayments and item returns
 
@@ -127,13 +128,13 @@ Settlement returns `{ "event": ..., "loan": ... }`. The event includes its ID,
 loan ID, action, amount (null for returns), note, and effective/recorded timestamps.
 Loan state includes principal/currency, repaid/outstanding cents, due date/timezone,
 `overdue_at`, `status` (`open`/`completed`/`voided`), `overdue`, `returned_at`, and
-`completed_at`. Item monetary fields are null, not an estimated cash debt. Interest
-and fees are always zero. Completed loans are never currently overdue.
+`completed_at`. Item principal fields are null, not an estimated cash debt. Charges
+default to zero; optional Level 3 terms introduce separate fee/interest/total fields.
+An item return may leave charges unpaid; see its separate borrowing/settlement states.
 
 Money balances derive from active (not reversed) repayment records, not editable balance fields. Full
-repayment completes the loan; completion time is the latest effective payment time,
-including when entries were recorded out of order. Item return completes the item
-loan. A new request that overpays, repeats an already completed loan, or applies the
+repayment of principal and agreed charges completes the loan. Item return completes
+the borrowing interval; any assessed fees must be paid/waived for financial completion. A new request that overpays, repeats an already completed loan, or applies the
 wrong action to a loan kind returns 409 without recording an event.
 
 ## Retry and concurrency contract

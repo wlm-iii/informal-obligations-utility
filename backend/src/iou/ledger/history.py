@@ -2,7 +2,18 @@
 
 from uuid import UUID
 
-from sqlalchemy import DateTime, String, Uuid, and_, case, literal, select, union_all
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    Integer,
+    String,
+    Uuid,
+    and_,
+    case,
+    literal,
+    select,
+    union_all,
+)
 from sqlalchemy.orm import Session
 
 from iou.ledger import pagination, service
@@ -29,6 +40,11 @@ def timeline_query(owner: UUID, friend_id: UUID):
         empty_uuid("evidence_id"),
         literal(None, type_=DateTime(timezone=True)).label("reversed_at"),
         empty_uuid("replaces_event_id"),
+        literal(None, type_=String()).label("component"),
+        literal(None, type_=BigInteger()).label("principal_applied_cents"),
+        literal(None, type_=BigInteger()).label("interest_applied_cents"),
+        literal(None, type_=BigInteger()).label("fees_applied_cents"),
+        literal(None, type_=Integer()).label("allocation_order"),
     ).where(Loan.owner_id == owner, Loan.friend_id == friend_id)
     settlements = (
         select(
@@ -40,12 +56,17 @@ def timeline_query(owner: UUID, friend_id: UUID):
             LoanEvent.effective_at,
             LoanEvent.recorded_at,
             literal("owner"),
-            literal(None, type_=String()),
+            LoanEvent.reason,
             LoanEvent.id,
             empty_uuid("replacement_event_id"),
             empty_uuid("evidence_id"),
             LoanEvent.reversed_at,
             LoanEvent.replaces_event_id,
+            LoanEvent.component,
+            LoanEvent.principal_applied_cents,
+            LoanEvent.interest_applied_cents,
+            LoanEvent.fees_applied_cents,
+            LoanEvent.allocation_order,
         )
         .join(Loan, and_(Loan.id == LoanEvent.loan_id, Loan.owner_id == LoanEvent.owner_id))
         .where(
@@ -69,6 +90,11 @@ def timeline_query(owner: UUID, friend_id: UUID):
             Audit.evidence_id,
             literal(None, type_=DateTime(timezone=True)),
             empty_uuid("replaces_event_id"),
+            case((Audit.action == "reversal", LoanEvent.component)),
+            case((Audit.action == "reversal", -LoanEvent.principal_applied_cents)),
+            case((Audit.action == "reversal", -LoanEvent.interest_applied_cents)),
+            case((Audit.action == "reversal", -LoanEvent.fees_applied_cents)),
+            case((Audit.action == "reversal", LoanEvent.allocation_order)),
         )
         .join(Loan, and_(Loan.id == Audit.loan_id, Loan.owner_id == Audit.owner_id))
         .outerjoin(
