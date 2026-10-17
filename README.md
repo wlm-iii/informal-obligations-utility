@@ -6,8 +6,9 @@ A hackathon app for tracking money and items friends borrow, recording repayment
 and returns, calculating optional fees/interest, sending playful reminders, and
 assigning clearly fictional credit scores.
 
-**Status:** repository foundation only. Loan management, authentication, reminder
-sending, scheduling, and scores are not implemented. Use fake data for demos.
+**Status:** Level 0 Google sign-in and private profiles are implemented. Hosted
+login/deployment still require acceptance testing. Friends, loans, reminders, and
+scores are not implemented. Use fake data for demos. See [auth setup](docs/AUTH.md).
 
 ## Stack
 
@@ -87,6 +88,8 @@ scripts/dev.py          Cross-platform setup, tasks, and local PostgreSQL lifecy
 Use short-lived feature branches, Conventional Commits, and GitHub PRs into `main`.
 Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.md).
 
+- [Backend feature roadmap](docs/BACKEND_ROADMAP.md)
+- [Google sign-in and private profiles](docs/AUTH.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)

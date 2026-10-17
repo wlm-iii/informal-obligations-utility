@@ -2,8 +2,10 @@
 
 **Informal Obligations Utility** · Draft v0.1 · Decisions below are provisional.
 
-This describes intended behavior, not shipped features. The initial repository
-implements only tooling, health/demo endpoints, database scaffolding, and CI.
+This primarily describes intended behavior, not shipped features. Level 0 now
+implements Google sign-in and private owner profiles; see [auth setup](AUTH.md)
+and the [backend roadmap](BACKEND_ROADMAP.md). Lending, scores, and reminders below
+remain provisional.
 
 ## Product and audience
 
@@ -192,7 +194,8 @@ parallelize frontend/backend safely. Do not let both branches invent the same mo
 ## Open decisions
 
 - Team confirmation of interest timing, allocations, charge caps, and score formula.
-- Auth provider and whether the hackathon demo stays private/fake-data only.
+- Auth choice: Supabase Google sign-in is implemented; email/password UI is deferred.
+  Hosted acceptance and the decision to expose anything beyond fake demo data remain open.
 - Email provider, how permission is collected, and unsubscribe/reconciliation design.
 - Hosting choice, managed PostgreSQL, scheduler, and migration release process.
 - Handling item loss/damage, multiple items, waivers, and edited/backdated records.

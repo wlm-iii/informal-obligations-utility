@@ -18,12 +18,20 @@ anyio==4.15.1
     #   httpx2
     #   starlette
     #   watchfiles
+cffi==2.1.1 ; platform_python_implementation != 'PyPy'
+    # via
+    #   -c requirements.txt
+    #   cryptography
 click==8.5.0
     # via
     #   -c requirements.txt
     #   uvicorn
 colorama==0.4.6 ; sys_platform == 'win32'
     # via pytest
+cryptography==50.0.2
+    # via
+    #   -c requirements.txt
+    #   pyjwt
 fastapi==0.143.3
     # via
     #   -c requirements.txt
@@ -78,6 +86,10 @@ psycopg-binary==3.3.6 ; implementation_name != 'pypy'
     # via
     #   -c requirements.txt
     #   psycopg
+pycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
+    # via
+    #   -c requirements.txt
+    #   cffi
 pydantic==2.14.1
     # via
     #   -c requirements.txt
@@ -93,6 +105,10 @@ pydantic-settings==2.16.0
     #   -r requirements.in
 pygments==2.21.0
     # via pytest
+pyjwt==2.15.1
+    # via
+    #   -c requirements.txt
+    #   -r requirements.in
 pytest==9.1.1
     # via -r requirements-dev.in
 python-dotenv==1.2.4
@@ -144,9 +160,10 @@ typing-inspection==0.4.4
     #   fastapi
     #   pydantic
     #   pydantic-settings
-tzdata==2026.5 ; sys_platform == 'win32'
+tzdata==2026.5
     # via
     #   -c requirements.txt
+    #   -r requirements.in
     #   psycopg
 uvicorn==0.54.0
     # via

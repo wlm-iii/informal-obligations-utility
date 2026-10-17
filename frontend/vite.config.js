@@ -11,6 +11,9 @@ export default defineConfig({
 		},
 	},
 	server: {
+		port: 5173,
+		// OAuth redirects are allowlisted for this exact origin; do not silently change ports.
+		strictPort: true,
 		proxy: {
 			/*
 			This item adds what's known as a proxy from the frontend development server

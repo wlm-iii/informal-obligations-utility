@@ -3,7 +3,8 @@
 Run commands from the repository root. **Native Windows, Linux, and macOS do not
 require Nix.** Windows uses PowerShell; no WSL, Bash, Make, Docker, virtual-environment
 activation, or PowerShell execution-policy change is needed. Use fake data only.
-The app currently contains a branded shell and starter connectivity check.
+The app supports Google sign-in and private profiles; lending features are not yet
+implemented. Follow [auth setup](AUTH.md) to configure login and hosted PostgreSQL.
 
 ## Default setup (without Nix)
 
@@ -159,8 +160,9 @@ backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
 ```
 
 On Linux/macOS the virtual environment's Python is `backend/.venv/bin/python`.
-The initial `0001_baseline` creates no product tables; Alembic only records its
-revision. Subsequent PRs own schema design. `DATABASE_URL` applies to both the app
+The initial `0001_baseline` is empty; `0002_profiles` creates private
+`iou_app.profiles` storage and revokes browser-role access. Alembic autogeneration
+only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
 and Alembic. Never generate migrations against production or rely on API startup
 to mutate the schema.
 
@@ -174,8 +176,9 @@ py -3.12 scripts/dev.py test-db    # connectivity, upgrade twice, schema drift c
 `test` needs no running database. **`test-db` does apply migrations to `DATABASE_URL`**,
 so use the disposable local database or an explicitly isolated test database.
 CI provisions its own PostgreSQL 17 service with throwaway credentials, and checks
-the native task runner on Windows too. No tests send email. There are no frontend
-unit/browser tests yet; add them with interactive product features.
+the native task runner on Windows too. No tests send email. Frontend Vitest tests
+cover account flows with mocked Supabase/network; real Google login is a manual
+acceptance check, not something the offline suite proves.
 
 Format Python with `backend/.venv/Scripts/python.exe -m ruff format --config
 backend/pyproject.toml backend scripts` (one line; use `bin/python` on Unix).
@@ -201,11 +204,13 @@ installs. Review audit findings; do not apply blanket `npm audit fix --force` up
 | Variable | Default / behavior |
 |---|---|
 | `DATABASE_URL` | `postgresql+psycopg://iou@127.0.0.1:54329/iou`; server only |
+| `SUPABASE_URL` | Server-side project origin; missing means protected routes fail closed |
+| `DATABASE_POOL_MODE` | `session` by default; `transaction` disables client pooling/prepared statements |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Public frontend config in `frontend/.env.local` |
 | `EMAIL_MODE` | Only `disabled` is supported; other values fail validation |
 | `PORT` | Docker runtime port, defaults to 8000; local backend task uses 8000 |
 
-There is no mail provider configuration, job scheduler, authentication, or delivery
-code yet. Do not put database or email credentials in frontend `VITE_*` variables.
+There is no mail provider configuration, job scheduler, or delivery code yet. Do not put database or email credentials in frontend `VITE_*` variables.
 For hosted PostgreSQL, use a Psycopg SQLAlchemy URL (`postgresql+psycopg://...`),
 percent-encode special characters in credentials, and use provider-required TLS.
 
