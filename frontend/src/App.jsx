@@ -92,7 +92,7 @@ function App() {
 		return <><TerminalLogin />{sessionError && <p className="session-error" role="alert">{sessionError}</p>}</>;
 	}
 	return (
-		<main>
+		<main className="account-shell">
 			<p className="eyebrow">Informal Obligations Utility</p>
 			<h1>IOU</h1>
 			<section className="card" aria-label="Account">
