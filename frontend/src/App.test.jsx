@@ -48,6 +48,15 @@ afterEach(() => {
 });
 
 describe("Level 0 account flow", () => {
+	it("shows profile identity and keeps the provider email read-only", async () => {
+		auth.getSession.mockResolvedValue({ data: { session }, error: null });
+		render(<App />);
+		const email = await screen.findByLabelText(/Email address/);
+		expect(email).toHaveValue(profile.email);
+		expect(email).toHaveAttribute("readonly");
+		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Person");
+		expect(screen.getByRole("link", { name: /Activity/ })).toHaveAttribute("href", "#activity");
+	});
 	it("signs in with a password and loads the backend profile with the access token", async () => {
 		auth.signInWithPassword.mockImplementation(async () => {
 			auth.getSession.mockResolvedValue({ data: { session }, error: null });
