@@ -103,16 +103,6 @@ function Account({ session }) {
 	return (
 		<div className="profile-layout">
 			<aside className="profile-sidebar">
-				<div className="avatar" aria-hidden="true">
-					{profile?.display_name
-						?.trim()
-						.split(/\s+/)
-						.filter(Boolean)
-						.slice(0, 2)
-						.map((part) => Array.from(part)[0])
-						.join("")
-						.toUpperCase() || "IO"}
-				</div>
 				<p className="eyebrow">PERSONAL TERMINAL</p>
 				<h1>
 					{profile?.display_name || "Your account"}
