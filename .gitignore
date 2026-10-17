@@ -1,5 +1,6 @@
 # Secrets (examples are safe to commit)
 .env
+.envrc
 .env.*
 **/.env
 **/.env.*
