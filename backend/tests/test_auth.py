@@ -193,6 +193,18 @@ def test_profile_validation(setup, body):
     assert setup.client.patch("/me", headers=headers(setup), json=body).status_code == 422
 
 
+def test_verified_subject_owns_ledger_not_the_request_body(setup):
+    alice = {**headers(setup), "Idempotency-Key": str(uuid4())}
+    friend = setup.client.post("/friends", headers=alice, json={"display_name": "Alex"})
+    assert friend.status_code == 201
+    bob = headers(setup, sub=str(uuid4()), email="bob@example.com")
+    assert setup.client.get(f"/friends/{friend.json()['id']}", headers=bob).status_code == 404
+    assert setup.client.get("/friends", headers=bob).json()["items"] == []
+    assert (
+        setup.client.get("/friends", headers=alice).json()["items"][0]["id"] == friend.json()["id"]
+    )
+
+
 def test_timezone_update(setup):
     response = setup.client.patch(
         "/me", headers=headers(setup), json={"timezone": "America/Los_Angeles"}

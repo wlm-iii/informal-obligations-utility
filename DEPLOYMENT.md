@@ -5,8 +5,8 @@ Docker/Render and Vercel options, with updates for the IOU package and pinned ru
 requirements. The Docker build and local container routes are smoke-tested; this does
 not prove either hosted platform works.
 
-Google authentication and private profiles are implemented; loan features, email
-delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
+Google authentication, private profiles, and the backend lending ledger are
+implemented; frontend lending screens, email delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
 hosted owner-isolation checks, privacy controls, and rate limits before any real-data
 public release. Use fake data for demos.
 
@@ -19,6 +19,8 @@ public release. Use fake data for demos.
   `VITE_SUPABASE_PUBLISHABLE_KEY`. Google client secrets stay in Supabase, not the app.
 - Configure exact Google/Supabase callback origins for the hosted frontend.
 - Keep `EMAIL_MODE=disabled`; there is no delivery implementation yet.
+- Review [Level 1's migration and retry contract](docs/LEDGER.md) before deploying
+  the lending API. All new ledger tables remain private; no direct browser SQL access.
 - Run `alembic -c backend/alembic.ini upgrade head` once in the release process with
   appropriate credentials, not in every API worker or serverless request.
 - Plan backups, least-privilege runtime credentials, connection limits, and secrets storage.

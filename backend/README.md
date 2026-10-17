@@ -1,9 +1,10 @@
 # IOU backend
 
 Python 3.12 + FastAPI, with SQLAlchemy/Psycopg and Alembic scaffolding for PostgreSQL 17.
-Google sign-in token verification and private profiles are implemented; lending
-features are not. Follow [auth setup](../docs/AUTH.md) for Supabase configuration
-and migrations before testing `/me`.
+Google sign-in token verification, private profiles, and the Level 1 ledger API are
+implemented. Follow [auth setup](../docs/AUTH.md) and [ledger contracts](../docs/LEDGER.md)
+for configuration, migrations, idempotency headers, and endpoint examples. No new
+API keys are needed for lending.
 
 From the repository root:
 
@@ -19,7 +20,9 @@ On Linux/macOS replace `py -3.12` with `python3`, or use `make <task>`.
 Nix is optional; see the [setup instructions](../docs/DEVELOPMENT.md).
 
 `auth.py` verifies Supabase tokens; `profiles.py` owns `GET/PATCH /me` and the
-private `iou_app.profiles` table. Ownership comes only from verified JWT subjects.
+private `iou_app.profiles` table. `ledger/` owns contacts, loans, settlement events,
+and retry receipts in the same private schema. Ownership comes only from verified
+JWT subjects. Ledger creation/settlement requires UUID `Idempotency-Key` headers.
 
 The app is `backend/src/iou/api.py`; API docs are at <http://127.0.0.1:8000/docs>.
 `src/api.py` is a compatibility entry point. `src/main.py` mounts the API and built

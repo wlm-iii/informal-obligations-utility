@@ -3,8 +3,9 @@
 Run commands from the repository root. **Native Windows, Linux, and macOS do not
 require Nix.** Windows uses PowerShell; no WSL, Bash, Make, Docker, virtual-environment
 activation, or PowerShell execution-policy change is needed. Use fake data only.
-The app supports Google sign-in and private profiles; lending features are not yet
-implemented. Follow [auth setup](AUTH.md) to configure login and hosted PostgreSQL.
+The app supports Google sign-in/private profiles and a backend lending ledger; the
+frontend still has account UI only. Follow [auth setup](AUTH.md) to configure login
+and hosted PostgreSQL and [ledger contracts](LEDGER.md) to exercise the new API.
 
 ## Default setup (without Nix)
 
@@ -161,7 +162,8 @@ backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
 
 On Linux/macOS the virtual environment's Python is `backend/.venv/bin/python`.
 The initial `0001_baseline` is empty; `0002_profiles` creates private
-`iou_app.profiles` storage and revokes browser-role access. Alembic autogeneration
+`iou_app.profiles` storage; `0003_ledger` adds private friends, loans, settlement
+events, and retry receipts. These migrations revoke browser-role access. Alembic autogeneration
 only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
 and Alembic. Never generate migrations against production or rely on API startup
 to mutate the schema.

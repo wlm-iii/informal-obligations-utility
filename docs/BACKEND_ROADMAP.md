@@ -18,15 +18,19 @@ Email/password UI is deferred; we do not manage passwords ourselves.
 
 ## Level 1 — Friends and basic borrowing
 
-Friend create/edit/list/archive; optional email and notes; money/item obligations
-with lent/due times; partial/full repayments and item returns; per-friend history.
-Interest and fees start at zero. Done when a user can lend $50 and a hoodie, record
-a partial payment, and complete both obligations without exposing another user's data.
+Implemented in the backend: friend create/edit/list/archive; optional email/notes;
+money/item obligations with lent/due times and snapshotted timezone; partial/full
+repayments, item returns, and per-friend history. Interest/fees remain zero. Basic
+pagination, atomic writes, owner-row locking, and replay-safe idempotency were pulled
+forward from Level 2 because settlement cannot safely ship without them. API and real
+PostgreSQL tests cover the $50/hoodie lifecycle, owner isolation, and concurrency.
+See [ledger API and acceptance notes](LEDGER.md). Hosted migration/acceptance and
+frontend lending screens remain pending; the frontend currently has account UI only.
 
 ## Level 2 — Trustworthy history and proof
 
 Effective vs recorded timestamps; append-preserving corrections/voids; transactional
-updates; idempotent retries; pagination; private proof images on loans/events with
+updates; richer auditing/retry handling and cursor pagination; private proof images on loans/events with
 size/type checks and temporary viewing URLs. Done when duplicate requests cannot
 change balances twice, corrections remain visible, and images are owner-only.
 

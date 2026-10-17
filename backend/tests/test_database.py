@@ -24,6 +24,7 @@ def test_postgres_and_migrations():
     try:
         with engine.connect() as connection:
             assert connection.scalar(text("SELECT 1")) == 1
+            assert connection.scalar(text("SHOW transaction_isolation")) == "read committed"
             assert "PostgreSQL" in connection.scalar(text("SELECT version()"))
         command.upgrade(config, "head")
         # Re-running must be harmless; verify schema and migration metadata agree.
@@ -31,9 +32,10 @@ def test_postgres_and_migrations():
         command.check(config)
         with engine.connect() as connection:
             assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
-                "0002_profiles"
+                "0003_ledger"
             )
-            assert "profiles" in inspect(connection).get_table_names(schema="iou_app")
+            tables = ("profiles", "friends", "loans", "loan_events", "mutation_receipts")
+            assert set(tables) <= set(inspect(connection).get_table_names(schema="iou_app"))
             # PostgreSQL ACLs defend the private schema independently of HTTP authorization.
             for role in ("anon", "authenticated"):
                 if connection.scalar(
@@ -43,6 +45,11 @@ def test_postgres_and_migrations():
                         text("SELECT has_schema_privilege(:role, 'iou_app', 'USAGE')"),
                         {"role": role},
                     )
+                    for table in tables:
+                        assert not connection.scalar(
+                            text("SELECT has_table_privilege(:role, :table, 'SELECT')"),
+                            {"role": role, "table": f"iou_app.{table}"},
+                        )
     finally:
         engine.dispose()
 
