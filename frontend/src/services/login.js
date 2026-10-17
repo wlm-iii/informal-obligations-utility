@@ -1,4 +1,4 @@
-// The parent owns the Supabase session; tokens never enter the design frame.
+// Use the shared Supabase client so useSession and authenticated API calls stay in sync.
 export async function loginRequest(auth, request, origin) {
 	if (!auth) throw new Error("Sign-in is not configured. Please contact the IOU team.");
 	if (request.action === "google") {

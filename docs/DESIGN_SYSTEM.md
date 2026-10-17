@@ -8,22 +8,27 @@ small status details carry the theme.
 
 ## Source of truth and current implementation
 
-- Visual reference: [IOU-Terminal-Login.html](../frontend/public/IOU-Terminal-Login.html).
-- Integration: [TerminalLogin.jsx](../frontend/src/components/TerminalLogin.jsx)
-  and [terminal login documentation](TERMINAL_LOGIN.md).
-- Font license: [Iosevka SIL Open Font License](licenses/Iosevka-LICENSE.txt).
+The production login is native React. There is no standalone HTML bundle,
+iframe, HTML injection, or cross-window authentication bridge in the app.
 
-The HTML currently contains its own styles, embedded fonts, and graph code. Its
-later Flexoki overrides and final `.headline-chart` rules define the current
-appearance. Earlier amber colors, large corner radii, sculptural forms, and
-upward-trace styles remain in the file as historical overrides; do not copy them
-as the current theme.
+| Source | Responsibility |
+| --- | --- |
+| [tokens.css](../frontend/src/styles/tokens.css) | Shared palette, font faces, radii, and typography variables |
+| [index.css](../frontend/src/index.css) | Global reset, body typography, form controls, focus, and inline feedback |
+| [terminal.css](../frontend/src/styles/terminal.css) | Login layout, responsive rules, cards, dialogs, and background styling |
+| [TerminalLogin.jsx](../frontend/src/components/TerminalLogin.jsx) | Controlled sign-in form, navigation, and background controls |
+| [MarketChart.jsx](../frontend/src/components/MarketChart.jsx) | React SVG graph and lifecycle-managed timer |
+| [InfoDialog.jsx](../frontend/src/components/InfoDialog.jsx) | Shared native dialog, rendered through a React portal |
+| [App.css](../frontend/src/App.css) | Signed-in account layout using the shared tokens |
+| [DemoWorkspace.jsx](../frontend/src/demo/DemoWorkspace.jsx) | Lazy-loaded local demo in React |
 
-The design is rendered in a same-origin iframe. Its styles **do not cascade into
-React pages**. The signed-in account screen and the embedded local demo have not
-been migrated to this visual system. `src/App.css` and `src/index.css` are not the
-shared terminal theme. This document is a specification, not a loaded stylesheet
-or an assertion that all pages already match.
+The shared theme is imported by `src/index.css` at the React entry point. New
+React screens inherit its tokens and form defaults. Use scoped layout rules for
+each page instead of copying a whole login stylesheet. The independently saved
+HTML preview is not a source dependency of this repository.
+
+See [terminal login integration](TERMINAL_LOGIN.md) and the
+[Iosevka SIL Open Font License](licenses/Iosevka-LICENSE.txt).
 
 ## Palette
 
@@ -49,20 +54,21 @@ reserve green, red, and yellow for purposeful accents.
 | Red | `#d14d41` | Negative graph, overdue status indicator |
 | Red foreground | `#e8705f` | Overdue badge text |
 
-Status treatments already used in the login:
+Status treatments (the warning palette is reserved for future warning notices):
 
 | Treatment | Fill | Border | Text |
 | --- | --- | --- | --- |
-| Overdue | `#261312` | `#6c201c` | `#e8705f` |
-| Warning / inline notice | `#241e08` | `#664d01` | `#eccb60` |
+| Overdue / inline error | `#261312` | `#6c201c` | `#e8705f` |
+| Warning (reserved) | `#241e08` | `#664d01` | `#eccb60` |
 | Selected background option | `#1a1e0c` | `#879a39` | `#a0af54` |
 | Initials avatar | `#3a2d04` | `#664d01` | `#eccb60` |
 
 Use text and an icon or marker alongside status color. A green primary action is
 not automatically a financial success state. Errors should explain the problem
-and recovery action; do not copy the yellow `.error` treatment for every severity.
+and recovery action. The current `.inline-error` treatment is red; do not use a
+warning color for every severity.
 
-The existing variable names can seed a future shared stylesheet:
+The shared variables are declared in `src/styles/tokens.css`:
 
 ```css
 :root {
@@ -85,9 +91,9 @@ The existing variable names can seed a future shared stylesheet:
 ## Typography and font assets
 
 Use **Iosevka** throughout: headings, navigation, body copy, form controls, numbers,
-and metadata. The internal embedded family is `IOU Iosevka`, with regular `400`
-and bold `700` WOFF2 faces, normal style, and `font-display: swap`. Preserve that
-family name when reusing the existing definitions. Set form controls explicitly
+and metadata. The internal family is `IOU Iosevka`, with regular `400`
+and bold `700` WOFF2 assets, normal style, and `font-display: swap`. Preserve that
+family name when reusing the shared definitions. Set form controls explicitly
 to the same family; otherwise browser defaults can introduce another font.
 
 ```css
@@ -119,11 +125,13 @@ Use one prominent page title, then smaller section headings; do not repeat the
 large marketing hero scale on every dashboard section. Keep amounts aligned in
 tables and format currencies consistently, including currency labels where needed.
 
-When creating shared React styles, extract the two existing embedded WOFF2 assets
-into a shared font location and define `@font-face` once. That extraction is not
-implemented yet; there is currently no public `/fonts` directory promised by this
-guide. Avoid duplicating the multi-megabyte font data URI on every page. Retain
-the font copyright and SIL license with any redistributed font files.
+The two fonts live in `frontend/src/assets/fonts/Iosevka-400.woff2` and
+`Iosevka-700.woff2`. `tokens.css` defines each face once through a relative asset
+URL; Vite emits hashed, separately cacheable WOFF2 files in the build. They are
+binary assets, not base64 strings inside HTML or JavaScript. Keep the font
+copyright and [SIL license](licenses/Iosevka-LICENSE.txt) with redistributed fonts.
+The full font files are large; any later subsetting should preserve the glyphs
+needed by names, currency values, and UI symbols, and retain the license.
 
 ## Geometry, spacing, and layout
 
@@ -209,15 +217,17 @@ the left-hand headline. It does not cover the login card or represent live data.
 - Occasional labels such as `CHARGER` or `$20.00` travel with points. A new label
   is added every 12 samples; label text is `10px` at `.5` opacity.
 - The SVG uses a `720 × 400` viewBox. Its wrapper is positioned relative to the
-  hero and resized with the heading; a horizontal mask fades its edges.
+  hero heading and follows its CSS dimensions; a horizontal mask fades its edges.
 - Keep it behind text, clipped, `aria-hidden`, and `pointer-events: none`.
 - Stop animation when paused, when the document is hidden, when another pattern
-  is selected, or when `prefers-reduced-motion: reduce` is set. Reduced motion
+  is selected, or when `prefers-reduced-motion: reduce` is set. React effects clean
+  up timers and listeners on unmount, including StrictMode remounts. Reduced motion
   leaves a static graph. Other reduced-motion styling also removes transitions.
 
 Other study patterns (contours, grid, signals, off) remain optional preview
 controls. They are not required navigation or a production settings feature.
-Do not reuse retired `.market-series` or upward-draw rules as the active ticker.
+Use `MarketChart` and its pure sample functions in `marketSeries.js`; do not
+copy a second animation loop into another page.
 On dense working pages, prefer a static or absent decorative chart. Real charts
 need their own labeled axes, units, source data, and accessible interpretation;
 never mix decorative movement with a user's actual balance or statistics.
@@ -236,10 +246,10 @@ local demos, and decorative market data must remain identifiable as such.
 
 ## Applying the design to another page
 
-1. Establish a single shared token/font layer from the values above. Import it in
-   the React entry point when performing that migration; iframe CSS cannot do it.
-2. Create reusable Button, Input, Panel, StatusBadge, and Dialog components with
-   the documented states. Scope page styles to avoid global `h1`/`label` overrides
+1. Reuse the token/font layer already imported through `src/index.css`. Add new
+   semantic tokens to `src/styles/tokens.css` instead of duplicating color literals.
+2. Reuse `InfoDialog` and the shared control classes. Extract additional reusable
+   Button, Input, Panel, and StatusBadge components as their behaviors repeat. Scope page styles to avoid global `h1`/`label` overrides
    accidentally applying marketing dimensions to working screens.
 3. Apply canvas/panel separation and the typography hierarchy first, then small
    yellow brand details and semantic green/red statuses. Keep dense data legible.
@@ -249,7 +259,7 @@ local demos, and decorative market data must remain identifiable as such.
    screens, and reduced motion. Test essential text contrast on its actual surface;
    low-opacity decorative tokens are not text colors or accessibility guarantees.
 6. Compare with the login reference and run the relevant frontend tests, lint,
-   and build. Run `npm run test:login` when changing the login graph or auth bridge.
+   and build. Run `npm run test:login` when changing the login graph or form behavior.
 
 Page recipes: use neutral panels and a clear Add reminder action for Your Circle;
 aligned amounts, dates, units, and labeled charts for reports; labeled fields and
