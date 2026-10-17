@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { statisticsRequest, summarizePayments } from "../services/statistics";
 import "./Statistics.css";
+import StatisticsActions, { PaymentReceipt } from "./StatisticsActions";
 
 const money = (cents) =>
 	new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -19,6 +20,8 @@ export default function Statistics({ initialData = null }) {
 	const [selected, setSelected] = useState(initialData?.friends[0]?.id ?? "");
 	const [records, setRecords] = useState(initialData ?? { loans: [], history: [] });
 	const [days, setDays] = useState(0);
+	const [hovered, setHovered] = useState(null);
+	const [receipt, setReceipt] = useState(null);
 	const [busy, setBusy] = useState(!initialData);
 	const [error, setError] = useState("");
 	const [retry, setRetry] = useState(0);
@@ -101,7 +104,25 @@ export default function Statistics({ initialData = null }) {
 		[880, 270 - (summary.repaid / peak) * 220],
 	];
 	const line = points.map(([x, y], i) => `${i ? "L" : "M"} ${x} ${y}`).join(" ");
+	function recorded(result) {
+		setRecords((previous) => ({
+			...previous,
+			loans: previous.loans.map((loan) =>
+				loan.id === result.loan.id ? result.loan : loan,
+			),
+			history: [
+				...previous.history.filter(
+					(event) => (event.event_id || event.id) !== result.event.id,
+				),
+				{ ...result.event, loan: result.loan },
+			],
+		}));
+		setDays(0);
+		setHovered(null);
+	}
 	const selectFriend = (event) => {
+		setHovered(null);
+		setReceipt(null);
 		setSelected(event.target.value);
 		if (!initialData) {
 			setBusy(true);
@@ -189,6 +210,14 @@ export default function Statistics({ initialData = null }) {
 				) : (
 					!error && (
 						<>
+							<StatisticsActions
+								key={selected}
+								friend={friend}
+								loans={loans}
+								summary={summary}
+								demo={Boolean(initialData)}
+								onRecorded={recorded}
+							/>
 							<div className="stats-metrics">
 								<div>
 									<span>REPAID IN PERIOD</span>
@@ -231,7 +260,10 @@ export default function Statistics({ initialData = null }) {
 											<button
 												key={value}
 												aria-pressed={days === value}
-												onClick={() => setDays(value)}
+												onClick={() => {
+													setDays(value);
+													setHovered(null);
+												}}
 											>
 												{label}
 											</button>
@@ -244,7 +276,7 @@ export default function Statistics({ initialData = null }) {
 								<svg
 									className="payment-chart"
 									viewBox="0 0 920 320"
-									role="img"
+									role="group"
 									aria-label={`${friend?.display_name || "Contact"} repaid ${money(summary.repaid)} across ${summary.payments.length} payments in the selected period. Cumulative repayments increase with each payment.`}
 								>
 									<defs>
@@ -284,7 +316,21 @@ export default function Statistics({ initialData = null }) {
 											key={payment.id}
 											cx={points[i + 1][0]}
 											cy={points[i + 1][1]}
-											r="4"
+											r={hovered?.id === payment.id ? "7" : "5"}
+											tabIndex="0"
+											role="button"
+											aria-label={`View receipt: ${money(payment.amount_cents)} on ${dateLabel(payment.effective_at)}`}
+											onMouseEnter={() => setHovered(payment)}
+											onFocus={() => setHovered(payment)}
+											onMouseLeave={() => setHovered(null)}
+											onBlur={() => setHovered(null)}
+											onClick={() => setReceipt(payment)}
+											onKeyDown={(event) => {
+												if (event.key === "Enter" || event.key === " ") {
+													event.preventDefault();
+													setReceipt(payment);
+												}
+											}}
 											fill="var(--bg)"
 											stroke="var(--green-hover)"
 											strokeWidth="2"
@@ -301,6 +347,14 @@ export default function Statistics({ initialData = null }) {
 										{dateLabel(now)}
 									</text>
 								</svg>
+								{hovered && (
+									<div className="chart-payment-detail" role="status">
+										<strong>{money(hovered.amount_cents)}</strong>
+										<span>{dateLabel(hovered.effective_at)}</span>
+										<span>{hovered.loan.description}</span>
+										<span>Click or press Enter for receipt</span>
+									</div>
+								)}
 								{!summary.payments.length && (
 									<p className="stats-empty">
 										No repayments in this period. Recorded repayments will appear on
@@ -332,9 +386,21 @@ export default function Statistics({ initialData = null }) {
 										</thead>
 										<tbody>
 											{[...summary.payments].reverse().map((payment) => (
-												<tr key={payment.id}>
+												<tr key={payment.id} onClick={() => setReceipt(payment)}>
 													<td>{dateLabel(payment.effective_at)}</td>
-													<td>{payment.loan.description}</td>
+													<td>
+														<button
+															className="receipt-link"
+															onClick={(event) => {
+																event.stopPropagation();
+																setReceipt(payment);
+															}}
+															aria-label={`View receipt for ${payment.loan.description} on ${dateLabel(payment.effective_at)}`}
+														>
+															{payment.loan.description}{" "}
+															<span aria-hidden="true">?</span>
+														</button>
+													</td>
 													<td>{money(payment.amount_cents)}</td>
 													<td>
 														<span className="payment-badge">? Recorded</span>
@@ -350,6 +416,9 @@ export default function Statistics({ initialData = null }) {
 							</section>
 						</>
 					)
+				)}
+				{receipt && (
+					<PaymentReceipt payment={receipt} onClose={() => setReceipt(null)} />
 				)}
 				<p className="stats-source">
 					{initialData
