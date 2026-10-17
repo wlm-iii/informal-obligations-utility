@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import ReturnTracker from "./components/ReturnTracker";
+import Leaderboards from "./components/Leaderboards";
 import { supabase } from "./services/supabase";
 import { useSession } from "./services/useSession";
 import { profileRequest } from "./services/api";
@@ -44,6 +45,7 @@ function ProfileForm({ profile, onSaved }) {
 }
 
 function Account({ session }) {
+	const [view, setView] = useState("overview");
 	const [profile, setProfile] = useState(null);
 	const [error, setError] = useState("");
 	const [retry, setRetry] = useState(0);
@@ -76,12 +78,23 @@ function Account({ session }) {
 
 	return (
 		<>
-			<h2>Your account</h2>
+			<nav className="app-sidebar" aria-label="Main navigation">
+    <a className="iou-brand" href="#overview" onClick={() => setView("overview")}>IOU /</a>
+    <div className="app-tabs">
+     <button aria-current={view === "overview" ? "page" : undefined} onClick={() => setView("overview")}>Overview</button>
+     <button aria-current={view === "hall" ? "page" : undefined} onClick={() => setView("hall")}>Hall of Fame</button>
+    </div>
+   </nav>
+   <div className="dashboard-content">
+   {view === "hall" ? <Leaderboards /> : <>
+   {profile && <ReturnTracker />}
+   <h2>Your account</h2>
 			{!profile && !error && <p role="status">Loading your profile…</p>}
 			{profile && <ProfileForm key={profile.id} profile={profile} onSaved={setProfile} />}
 			{error && <><p role="alert">{error}</p><button onClick={() => setRetry((value) => value + 1)}>Retry profile</button></>}
 			<button disabled={signingOut} onClick={signOut}>{signingOut ? "Signing out…" : "Sign out"}</button>
-			{profile && <ReturnTracker />}
+   </>}
+   </div>
 		</>
 	);
 }
@@ -107,11 +120,11 @@ function App() {
 	}
 
 	return (
-		<main>
-			<p className="eyebrow">Informal Obligations Utility</p>
+		<main className={session ? "signed-in" : "signed-out"}>
+			{!session && <><p className="eyebrow">Informal Obligations Utility</p>
 			<h1>IOU</h1>
 			<p>Your friends forget. We don’t.</p>
-			<p>A private ledger for borrowed money, missing hoodies, and fictional credit scores.</p>
+			<p>A private ledger for borrowed money, missing hoodies, and fictional credit scores.</p></>}
 			<section className="card" aria-label="Account">
 				{!supabase ? <p role="alert">Google sign-in is not configured. Set the frontend Supabase environment variables and restart Vite.</p>
 					: loading ? <p role="status">Restoring your session…</p>

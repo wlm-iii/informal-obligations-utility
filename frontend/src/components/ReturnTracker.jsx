@@ -31,7 +31,7 @@ export default function ReturnTracker() {
  return <section className="return-overview" aria-labelledby="return-heading">
   <header className="return-heading"><div><p className="return-eyebrow">YOUR LENDING, AT A GLANCE</p><h2 id="return-heading">THE RETURN BREAKDOWN.</h2><p>A clearer picture of what is still out, and what made it back.</p></div><button className="return-sample" onClick={refresh}>Refresh data</button></header>
   <section className="return-panel" aria-labelledby="return-chart-heading">
-   <h3 id="return-chart-heading">Items lent vs. returned</h3><p className="return-description">The share of all items you have lent out that are still out or returned to you.</p>
+   <h3 id="return-chart-heading">Still lent out vs. returned to you</h3><p className="return-description">The share of all items you have lent out that are still out or returned to you.</p>
    <div className="return-chart-area">
     <div className="return-chart-wrap"><svg viewBox="0 0 240 240" role="img" aria-labelledby="return-chart-title"><title id="return-chart-title">{total ? 100 - returnedPercent : 0}% still lent out; {returnedPercent}% returned to you.</title>
      <g transform="rotate(-90 120 120)"><circle cx="120" cy="120" r="90" fill="none" stroke={total ? "#879A39" : "#343331"} strokeWidth="28"/><circle cx="120" cy="120" r="90" fill="none" stroke="#D0A215" strokeWidth="28" strokeDasharray={`${(total ? summary.outstanding / total : 0) * circumference} ${circumference}`}/></g>

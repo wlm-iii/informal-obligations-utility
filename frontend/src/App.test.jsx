@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { StrictMode } from "react";
 
@@ -108,4 +108,21 @@ describe("Level 0 account flow", () => {
 		fireEvent.click(await screen.findByRole("button", { name: "Retry profile" }));
 		await waitFor(() => expect(screen.getByLabelText("Display name")).toHaveValue("Person"));
 	});
+});
+
+it("uses one sidebar to switch between the live overview and sample leaderboards", async () => {
+ auth.getSession.mockResolvedValue({ data: { session }, error: null });
+ fetch.mockImplementation(async url => ({ ok: true, status: 200, json: async () => url.startsWith("/api/loans") ? { items: [], has_more: false } : profile }));
+ render(<App />);
+ expect(await screen.findByRole("heading", { name: "Still lent out vs. returned to you" })).toBeInTheDocument();
+ const nav = screen.getByRole("navigation", { name: "Main navigation" });
+ expect(within(nav).getByRole("link", { name: "IOU /" })).toBeInTheDocument();
+ expect(within(nav).getByRole("button", { name: "Overview" })).toHaveAttribute("aria-current", "page");
+ fireEvent.click(within(nav).getByRole("button", { name: "Hall of Fame" }));
+ expect(screen.getByRole("heading", { name: "THE LEADERBOARDS." })).toBeInTheDocument();
+ expect(within(nav).getByRole("button", { name: "Hall of Fame" })).toHaveAttribute("aria-current", "page");
+ expect(within(nav).getByRole("button", { name: "Overview" })).not.toHaveAttribute("aria-current");
+ fireEvent.click(within(nav).getByRole("button", { name: "Overview" }));
+ expect(await screen.findByRole("heading", { name: "Still lent out vs. returned to you" })).toBeInTheDocument();
+ expect(screen.queryByRole("heading", { name: "THE LEADERBOARDS." })).not.toBeInTheDocument();
 });
