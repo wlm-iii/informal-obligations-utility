@@ -10,6 +10,9 @@ private proof images, durable cleanup, and signed cursors; see
 server-only configuration; existing auth/offset APIs do not. Level 3 adds optional
 periodic charges, immutable allocations, waivers, and private fictional scores with
 no new API keys; see [the charge/score contract](../docs/CHARGES_SCORES.md).
+Level 4 adds read-only `/dashboard/summary`, `/dashboard/obligations`,
+`/dashboard/rankings`, and `/dashboard/trends`; see [metrics/filters](../docs/DASHBOARD.md).
+Apply `0006_event_action_width` to fix Level 3 item fee-payment storage on PostgreSQL.
 
 From the repository root:
 

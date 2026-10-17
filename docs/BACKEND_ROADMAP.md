@@ -51,9 +51,14 @@ and frontend terms/score UI remain explicit release/product work.
 
 ## Level 4 — Dashboard APIs
 
-Principal/charges separated; overdue/upcoming obligations; private friend rankings;
-repayment/lending trends and date filters. Item counts are not cash owed. Done when
-all chart/ranking metrics have documented definitions and reconcile with the ledger.
+Implemented in the backend: owner-private summaries, overdue/upcoming obligations,
+returned items with unpaid fees, private friend rankings, and zero-filled lending/
+repayment/waiver trends with calendar date filters. Principal, charges, actual cash,
+and waivers are separate; items are counted, not valued as money. Metrics reuse the
+ledger calculator and score rules and reconcile to their source events. Shared owner
+locks keep each response consistent during financial writes. See [dashboard contracts](DASHBOARD.md).
+Includes forward migration `0006_event_action_width` for Level 3's item fee-payment
+PostgreSQL column-width bug. Dashboard UI and hosted acceptance remain separate.
 
 ## Level 5 — Manually approved reminders
 

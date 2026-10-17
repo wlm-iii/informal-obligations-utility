@@ -212,6 +212,10 @@ and Gemini reminders are not implemented by this slice.
 
 ## Migration, compatibility, and release
 
+Apply migrations through `0006_event_action_width`: it fixes PostgreSQL storage of
+11-character `fee_payment` actions (the prior column allowed 10). The forward fix
+preserves `0005`; rollback refuses to truncate longer action names, even reversed ones.
+
 `0005_charges_scores` adds terms, settlement projection, per-event ordering, and
 allocation columns/constraints. It does not add a payment provider, API secret, or
 Supabase-managed schema change. **Existing loans remain version 0**, with zero
