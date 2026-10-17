@@ -34,7 +34,7 @@ function ProfileForm({ profile, onSaved }) {
 				<span className="section-number">01 /</span>
 				<div>
 					<h2>Personal details</h2>
-					<p>A little about the person behind the IOUs.</p>
+					<p>Manage your name and local timezone.</p>
 				</div>
 			</div>
 			<label htmlFor="profile-email">
@@ -117,18 +117,13 @@ function Account({ session }) {
 			<aside className="profile-sidebar">
 				<div className="avatar" aria-hidden="true">
 					{profile?.display_name?.trim().slice(0, 2).toUpperCase() || "IO"}
-					<span>✳</span>
 				</div>
-				<p className="eyebrow">YOUR PERSONAL LEDGER</p>
+				<p className="eyebrow">PERSONAL TERMINAL</p>
 				<h1>
 					{profile?.display_name || "Your account"}
 					<span className="name-dot">.</span>
 				</h1>
-				<p className="sidebar-description">
-					Good friends.
-					<br />
-					Clear accounts.
-				</p>
+				<p className="sidebar-description">Your friendship finance account.</p>
 				<span className="member-badge">● Personal account</span>
 				<div className="sidebar-divider" />
 				<a className="profile-nav active" href="#details" aria-current="page">
@@ -138,18 +133,22 @@ function Account({ session }) {
 					<span>02</span> Activity <span>↓</span>
 				</a>
 				<div className="sidebar-note">
-					<span>THE IOU WAY</span>
-					<p>A little accountability goes a long way.</p>
+					<span>PRIVATE WORKSPACE</span>
+					<p>
+						Your profile is visible only to you. No bank connection. No money movement.
+					</p>
 				</div>
 			</aside>
 			<div className="profile-content">
 				<header className="page-heading">
 					<div>
 						<p className="eyebrow">ACCOUNT / PROFILE</p>
-						<h2>Make yourself at home.</h2>
-						<p>Your details, all in one place.</p>
+						<h2>
+							Account <span className="title-accent">settings.</span>
+						</h2>
+						<p>Your identity. Your timezone. Same receipts.</p>
 					</div>
-					<span className="edition">IOU / 001</span>
+					<span className="edition">● PRIVATE ACCESS</span>
 				</header>
 				<section className="details-panel" id="details" aria-label="Personal details">
 					{!profile && !error && <p role="status">Loading your profile…</p>}
@@ -174,7 +173,7 @@ function Account({ session }) {
 						<span className="section-number">02 /</span>
 						<div>
 							<h2 id="activity-title">Your activity</h2>
-							<p>Every favor has a story.</p>
+							<p>Friends and borrowing history.</p>
 						</div>
 						<span className="coming-soon">COMING SOON</span>
 					</div>
@@ -183,11 +182,11 @@ function Account({ session }) {
 							↔
 						</span>
 						<div>
-							<h3>A fresh page.</h3>
+							<h3>No history available yet.</h3>
 							<p>
 								Friends and borrowing history are coming next.
 								<br />
-								This is where your shared stories will live.
+								Your records will appear here when connected.
 							</p>
 						</div>
 					</div>
@@ -224,10 +223,11 @@ function App() {
 		<main className="account-shell">
 			<header className="topbar">
 				<a href="/" className="wordmark" aria-label="IOU home">
-					iou<span>✳</span>
+					<span className="monogram">IOU</span>
+					<span className="brand-name">IOU</span>
 				</a>
-				<span className="brand-caption">INFORMAL OBLIGATIONS UTILITY</span>
-				<span className="topbar-label">A FRIENDLY ACCOUNT OF THINGS.</span>
+				<span className="brand-caption">Friendship Finance</span>
+				<span className="topbar-label">PERSONAL TERMINAL / ACCOUNT</span>
 			</header>
 			<section aria-label="Account">
 				{loading ? (
@@ -237,7 +237,7 @@ function App() {
 				) : null}
 			</section>
 			<footer className="site-footer">
-				<span>IOU — KEEP FRIENDSHIP IN THE BLACK.</span>
+				<span>IOU / FRIENDSHIP FINANCE</span>
 				<span>
 					Made for the people you count on. <span aria-hidden="true">↗</span>
 				</span>

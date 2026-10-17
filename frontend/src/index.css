@@ -1,14 +1,23 @@
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/iosevka@5/index.css");
+@import "./fonts.css";
 :root {
-	font-family: "Iosevka", "Cascadia Code", monospace;
-	color: #100f0f;
-	background: #fffcf0;
+	color-scheme: dark;
+	--bg: #100f0f;
+	--panel: #1c1b1a;
+	--surface: #282726;
+	--line: #403e3c;
+	--ink: #cecdc3;
+	--muted: #9f9d96;
+	--green: #879a39;
+	--red: #d14d41;
+	--yellow: #d0a215;
+	--mono: "IOU Iosevka", "Iosevka", Consolas, monospace;
+	font-family: var(--mono);
+	background: var(--bg);
+	color: var(--ink);
+	line-height: 1.6;
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
-	line-height: 1.5;
-	font-weight: 400;
-	color-scheme: light;
 }
 * {
 	box-sizing: border-box;
@@ -16,15 +25,15 @@
 body {
 	margin: 0;
 	min-width: 320px;
+	font-feature-settings:
+		"calt" 1,
+		"liga" 1;
 }
 button,
-input {
-	font: inherit;
-}
-button,
-a,
-input {
-	-webkit-tap-highlight-color: transparent;
+input,
+textarea,
+select {
+	font-family: var(--mono);
 }
 button {
 	cursor: pointer;
@@ -37,14 +46,16 @@ button:disabled {
 	cursor: wait;
 }
 button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-	outline: 2px solid #af3029;
+a:focus-visible {
+	outline: 2px solid var(--yellow);
 	outline-offset: 4px;
 }
-html {
-	scroll-behavior: smooth;
+input:focus-visible {
+	outline: none;
+	border-color: var(--green);
+	box-shadow: 0 0 0 2px #879a391a;
 }
 ::selection {
-	background: #f6e2a0;
+	background: #503d02;
+	color: #fffcf0;
 }
