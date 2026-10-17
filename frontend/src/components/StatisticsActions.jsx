@@ -149,10 +149,10 @@ export default function StatisticsActions({
 			<section className="repayment-progress" aria-label="Repayment progress">
 				<div className="progress-heading">
 					<div>
-						<span className="eyebrow">THE ROAD TO EVEN</span>
+						<span className="eyebrow">REPAYMENT PROGRESS</span>
 						<h3>
 							{summary.outstanding === 0 && allRepaid > 0
-								? "All settled. Friendship intact."
+								? "Balance paid in full"
 								: `${progress}% of recorded balance repaid`}
 						</h3>
 					</div>
@@ -276,7 +276,7 @@ export default function StatisticsActions({
 				</InfoDialog>
 			)}
 			{mode === "reminder" && (
-				<InfoDialog title="A little nudge" onClose={() => setMode(null)}>
+				<InfoDialog title="Draft reminder" onClose={() => setMode(null)}>
 					<div className="stats-dialog-body">
 						<p>Pick a tone, make it yours, then copy. Nothing is sent automatically.</p>
 						<div className="reminder-tones" role="group" aria-label="Reminder tone">

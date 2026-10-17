@@ -80,7 +80,7 @@ export default function Statistics({ initialData = null }) {
 			.slice(0, 2)
 			.map((word) => Array.from(word)[0])
 			.join("")
-			.toUpperCase() || "�";
+			.toUpperCase() || "-";
 	const peak = Math.max(summary.repaid, 10000);
 	let running = 0;
 	const now = new Date();
@@ -134,18 +134,11 @@ export default function Statistics({ initialData = null }) {
 			<aside className="stats-sidebar">
 				<p className="eyebrow">YOUR WORKSPACE</p>
 				<a href="#profile" className="profile-nav">
-					<span>01</span> Profile <span>?</span>
+					<span>01</span> Profile <span aria-hidden="true">&rarr;</span>
 				</a>
 				<a href="#statistics" className="profile-nav active" aria-current="page">
-					<span>02</span> Statistics <span>?</span>
+					<span>02</span> Statistics <span aria-hidden="true">&rarr;</span>
 				</a>
-				<div className="sidebar-note">
-					<span>THE RECEIPTS DEPARTMENT</span>
-					<p>
-						A record of what came back. Because �I paid you already� deserves a paper
-						trail.
-					</p>
-				</div>
 			</aside>
 			<div className="stats-content">
 				<header className="page-heading">
@@ -154,7 +147,7 @@ export default function Statistics({ initialData = null }) {
 						<h2>
 							Payment <span className="title-accent">history.</span>
 						</h2>
-						<p>A closer look at the people who owe you.</p>
+
 					</div>
 					<span className="edition">
 						{initialData ? "FICTIONAL DEMO DATA" : "PRIVATE RECORDS"}
@@ -179,14 +172,7 @@ export default function Statistics({ initialData = null }) {
 								</option>
 							))}
 						</select>
-						<p>{friend?.email || "Private contact"}</p>
-					</div>
-					<div className="score-placeholder">
-						<span>BRO SCORE</span>
-						<strong>
-							� <small>/ 100</small>
-						</strong>
-						<span>Fictional score � not available yet</span>
+						<p>{friend?.email || ""}</p>
 					</div>
 				</section>
 				{error && (
@@ -205,7 +191,7 @@ export default function Statistics({ initialData = null }) {
 				)}
 				{busy ? (
 					<p className="stats-feedback" role="status">
-						Loading payment history�
+						Loading payment history-
 					</p>
 				) : (
 					!error && (
@@ -229,13 +215,13 @@ export default function Statistics({ initialData = null }) {
 									<strong className={summary.outstanding ? "negative" : ""}>
 										{money(summary.outstanding)}
 									</strong>
-									<small>Current balance � all time</small>
+									<small>Current balance - all time</small>
 								</div>
 								<div>
 									<span>TOTAL LENT</span>
 									<strong>{money(summary.lent)}</strong>
 									<small>
-										{summary.open} open money {summary.open === 1 ? "loan" : "loans"} �
+										{summary.open} open money {summary.open === 1 ? "loan" : "loans"} -
 										all time
 									</small>
 								</div>
@@ -244,8 +230,8 @@ export default function Statistics({ initialData = null }) {
 								<div className="chart-heading">
 									<div>
 										<p className="eyebrow">01 / REPAYMENT TREND</p>
-										<h3 id="chart-title">Money finding its way back.</h3>
-										<p>Cumulative repayments � USD � dates in UTC</p>
+										<h3 id="chart-title">Cumulative repayments</h3>
+										<p>Cumulative repayments - USD - dates in UTC</p>
 									</div>
 									<div
 										className="range-controls"
@@ -362,14 +348,14 @@ export default function Statistics({ initialData = null }) {
 									</p>
 								)}
 								<div className="chart-footnote">
-									<span>? Recorded repayments only</span>
+									<span>Recorded repayments only</span>
 									<span>Reversed payments and voided loans excluded</span>
 								</div>
 							</section>
 							<section className="payment-table-panel" aria-labelledby="payments-title">
 								<div className="chart-heading">
 									<div>
-										<p className="eyebrow">02 / THE PAPER TRAIL</p>
+										<p className="eyebrow">02 / PAYMENT RECORDS</p>
 										<h3 id="payments-title">Past payments</h3>
 									</div>
 									<span className="table-count">{summary.payments.length} RECORDS</span>
@@ -403,7 +389,7 @@ export default function Statistics({ initialData = null }) {
 													</td>
 													<td>{money(payment.amount_cents)}</td>
 													<td>
-														<span className="payment-badge">? Recorded</span>
+														<span className="payment-badge">Recorded</span>
 													</td>
 												</tr>
 											))}
@@ -422,7 +408,7 @@ export default function Statistics({ initialData = null }) {
 				)}
 				<p className="stats-source">
 					{initialData
-						? "Design preview � fictional people and payments. No real account data."
+						? "Demo data. Changes reset when you reload."
 						: "Based on your privately recorded USD money loans. Item returns are not included."}
 				</p>
 			</div>
