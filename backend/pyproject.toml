@@ -11,5 +11,8 @@ line-length = 100
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["iou"]
+
 [tool.ruff.format]
 quote-style = "double"

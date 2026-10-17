@@ -65,11 +65,34 @@ jobs:
           cache-dependency-glob: backend/requirements*.txt
       - run: uv venv --python python3.12 backend/.venv
       - run: uv pip sync --python backend/.venv/bin/python backend/requirements-dev.txt
-      - run: backend/.venv/bin/ruff check backend
-      - run: backend/.venv/bin/ruff format --check backend
+      - run: backend/.venv/bin/ruff check --config backend/pyproject.toml backend scripts
+      - run: backend/.venv/bin/ruff format --check --config backend/pyproject.toml backend scripts
+      - run: python -m unittest discover -s scripts/tests
       - run: make test
       - run: make migrate
       - run: make test-db
+
+  native-windows:
+    name: Native Windows
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.0'
+          enable-cache: true
+          cache-dependency-glob: backend/requirements*.txt
+      - run: python scripts/dev.py install
+      - run: python scripts/dev.py check
 
   pr-title:
     name: Conventional PR title

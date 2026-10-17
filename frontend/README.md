@@ -5,11 +5,14 @@ starter API connectivity example; lending features are not implemented yet.
 
 From the repository root:
 
-```sh
-make install
-make backend      # terminal 1
-make frontend     # terminal 2
+```powershell
+py -3.12 scripts/dev.py install
+py -3.12 scripts/dev.py backend    # terminal 1
+py -3.12 scripts/dev.py frontend   # terminal 2
 ```
+
+On Linux/macOS replace `py -3.12` with `python3`, or use `make <task>`.
+Nix is optional; see the [setup instructions](../docs/DEVELOPMENT.md).
 
 UI: <http://localhost:5173>. Vite proxies `/api/*` to FastAPI on port 8000 and removes
 the prefix. The Docker deployment mounts the API under `/api` as well.

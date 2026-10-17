@@ -18,46 +18,58 @@ sending, scheduling, and scores are not implemented. Use fake data for demos.
 
 ## Quick start
 
-On Linux/macOS (Windows: use WSL), install [Nix](https://nixos.org/download/)
-with `nix-command` and `flakes` enabled, then:
+### Windows (PowerShell, no WSL or Nix required)
 
-```sh
-nix develop
-cp .env.example .env             # first setup only; do not overwrite your secrets
-make install
-make db-init
-make db-start
-make migrate
-make backend                    # terminal 1
+Install **Python 3.12, Node 22 (22.12+), uv, and PostgreSQL 17** using the
+[Windows setup instructions](docs/DEVELOPMENT.md#windows-powershell). Then, from
+the repository root in a normal (non-administrator) PowerShell terminal:
+
+```powershell
+py -3.12 scripts/dev.py install   # creates .env only if missing
+py -3.12 scripts/dev.py db-init
+py -3.12 scripts/dev.py db-start
+py -3.12 scripts/dev.py migrate
+py -3.12 scripts/dev.py backend   # terminal 1
 ```
 
-In another terminal at the repo root:
+In another PowerShell terminal at the repo root:
 
-```sh
-nix develop
-make frontend
+```powershell
+py -3.12 scripts/dev.py frontend
 ```
+
+### Linux/macOS
+
+Install the same tools through your package manager (see [setup](docs/DEVELOPMENT.md)),
+then use the same commands with `python3` instead of `py -3.12`. If Make is installed,
+`make install`, `make db-init`, `make db-start`, `make migrate`, `make backend`, and
+`make frontend` are equivalent shortcuts.
+
+**Nix is optional:** `nix develop` supplies the tools on supported Linux/macOS hosts;
+then follow the same setup commands. It does not install dependencies or start services.
 
 - UI: <http://localhost:5173>
 - Backend docs: <http://127.0.0.1:8000/docs>
 - Liveness: <http://127.0.0.1:8000/health>
 - UI API requests use `/api/*`; Vite proxies to the backend without that prefix.
-- `make db-stop` explicitly stops the development database; leaving the shell does not.
+- The `db-stop` task explicitly stops the development database; leaving the shell does not.
 
-Nix does **not** install app dependencies or start services automatically. See
-[development instructions](docs/DEVELOPMENT.md) for non-Nix setup, database safety,
-configuration, checks, and troubleshooting.
+See [development instructions](docs/DEVELOPMENT.md) for database safety, configuration,
+checks, and troubleshooting. Bash, Make, Docker, and Nix are not required on Windows.
 
 ## Common commands
 
-```sh
-make help
-make check                       # linters, unit/API tests, frontend build
-make test-db                     # disposable PostgreSQL required; applies migrations
-make migration message="add loans"
-make migrate
-make lock                        # recompile pinned Python dependencies
+```powershell
+py -3.12 scripts/dev.py help
+py -3.12 scripts/dev.py check     # linters, tests, frontend build
+py -3.12 scripts/dev.py test-db   # disposable PostgreSQL required; applies migrations
+py -3.12 scripts/dev.py migration --message "add loans"
+py -3.12 scripts/dev.py migrate
+py -3.12 scripts/dev.py lock      # recompile pinned Python dependencies
 ```
+
+On Linux/macOS, replace `py -3.12` with `python3`, or use the optional Make shortcuts
+(`make check`, `make migration message="add loans"`, etc.).
 
 ## Repository map
 
@@ -66,7 +78,7 @@ frontend/               React application and npm lockfile
 backend/src/iou/        FastAPI app, server config, database foundation
 backend/migrations/     Alembic migrations (currently an empty baseline)
 backend/tests/          API/config tests and PostgreSQL smoke test
-scripts/db.sh           Explicit, project-local PostgreSQL lifecycle
+scripts/dev.py          Cross-platform setup, tasks, and local PostgreSQL lifecycle
 .github/                PR template and CI
 ```
 

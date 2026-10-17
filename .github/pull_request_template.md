@@ -6,8 +6,8 @@
 
 <!-- Commands run and results. Explain anything you could not test. -->
 
-- [ ] `make check` passes
-- [ ] `make test-db` passes if database/migrations changed
+- [ ] `scripts/dev.py check` passes (run with `py -3.12` on Windows or `python3` on Unix)
+- [ ] `scripts/dev.py test-db` passes if database/migrations changed
 - [ ] Screenshots included for visible UI changes, if applicable
 
 ## Configuration and data

@@ -50,7 +50,8 @@ Before merging, remove noisy temporary commit messages from the squash body.
 ## Pull requests and reviews
 
 1. Implement one focused change and add appropriate tests.
-2. Run `make check`; run `make test-db` when database code/migrations change.
+2. Run `py -3.12 scripts/dev.py check`; run the `test-db` task when database code/
+   migrations change. On Linux/macOS use `python3`, or optional `make check` / `make test-db`.
 3. Push your branch and open a PR against `main`; fill out the template.
 4. Explain manual testing and attach screenshots for visible UI changes.
 5. Request at least one teammate review, address feedback, and resolve discussions.
@@ -74,7 +75,7 @@ you own. If a rebase needs a force push, use `--force-with-lease`; never force p
   and document destructive changes and rollback limitations.
 - Coordinate migration branches to avoid multiple heads; resolve with a reviewed merge
   revision rather than rewriting already-applied shared migrations.
-- Edit Python `requirements*.in`, then `make lock`; commit both source files and generated
+- Edit Python `requirements*.in`, then run the `lock` task; commit both source files and generated
   locks. `requirements-dev.txt` includes the complete runtime constrained to its lock.
 - Use npm to update frontend dependencies and commit `package-lock.json`.
 - Document new configuration in `.env.example` and setup docs. Backend secrets never
@@ -91,7 +92,7 @@ After creating and pushing the empty `informal-obligations-utility` repository:
 - Disable merge commits/rebase merging for a consistent workflow.
 - Enable automatic deletion of merged branches.
 - Protect `main` (or add a ruleset): require PRs, one approval, resolved conversations,
-  passing **Frontend**, **Backend**, and **Conventional PR title** checks; block force
+  passing **Frontend**, **Backend**, **Native Windows**, and **Conventional PR title** checks; block force
   pushes and deletion. Enable the protections for administrators where practical.
 - Enable Actions and run the first CI workflow so its check names become selectable.
 - Require an up-to-date branch before merge if it does not become a hackathon bottleneck.
