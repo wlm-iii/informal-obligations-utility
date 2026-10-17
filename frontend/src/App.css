@@ -4,7 +4,7 @@
 .profile-form { display: grid; gap: 12px; margin-bottom: 24px; }
 .profile-form label { margin: 0; }
 .profile-form small { color: var(--muted); }
-.account-shell button { background: var(--green); color: var(--bg); border: 1px solid var(--green); border-radius: var(--radius-control); min-height: 44px; padding: 12px 17px; font-weight: 700; }
-.account-shell button:hover { background: #a0af54; }
-.account-shell [role="alert"] { color: #e8705f; }
+.account-shell button { background: var(--green); color: #fff; border: 1px solid var(--green); border-radius: var(--radius-control); min-height: 44px; padding: 12px 17px; font-weight: 700; }
+.account-shell button:hover { background: #13764c; }
+.account-shell [role="alert"] { color: #a93436; }
 .session-error { position: fixed; bottom: 12px; left: 16px; z-index: 10; max-width: 80vw; padding: 12px; background: var(--panel); border: 1px solid var(--red); border-radius: 6px; }

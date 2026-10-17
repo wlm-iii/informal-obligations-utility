@@ -32,36 +32,36 @@ See [terminal login integration](TERMINAL_LOGIN.md) and the
 
 ## Palette
 
-Colors are the implemented Flexoki dark palette. Keep backgrounds neutral and
+Colors follow the mint-and-emerald study from the latest design preview. Keep backgrounds pale and
 reserve green, red, and yellow for purposeful accents.
 
 | Role | Current value | Apply to |
 | --- | --- | --- |
-| Canvas / input fill | `#100f0f` | Page background, recessed input surfaces |
-| Panel | `#1c1b1a` | Cards, dialogs, grouped information |
-| Raised surface | `#282726` | Secondary buttons and compact controls |
-| Hover / subtle separator | `#343331` | Secondary hover fill, header/footer rules |
-| Standard border | `#403e3c` | Cards, inputs, dividers |
-| Strong border | `#575653` | Secondary controls, dialogs, input hover |
-| Primary text | `#cecdc3` | Labels and default text |
-| Emphasized text | `#e6e4d9` | Headings, amounts, important names |
-| Supporting text | `#b7b5ac` | Descriptions and secondary actions |
-| Muted text | `#9f9d96` | Metadata, placeholders, helper text |
-| Green | `#879a39` | Primary action, positive status, positive graph |
-| Green hover / link | `#a0af54` | Primary hover, selected links |
-| Yellow | `#d0a215` | Headline emphasis, brand accents, attention |
-| Yellow detail | `#dfb431` | Small emphasized captions and links |
-| Red | `#d14d41` | Negative graph, overdue status indicator |
-| Red foreground | `#e8705f` | Overdue badge text |
+| Canvas | `#f1f7ed` | Page background |
+| Panel | `#fcfef9` | Cards, dialogs, grouped information |
+| Raised surface | `#e5f0df` | Inputs, secondary buttons and compact controls |
+| Hover / subtle separator | `#dce8d7` | Secondary hover fill, header/footer rules |
+| Standard border | `#d6e5d2` | Cards, inputs, dividers |
+| Strong border | `#a2c5a9` | Secondary controls, dialogs, input hover |
+| Primary text | `#15261f` | Labels and default text |
+| Emphasized text | `#15261f` | Headings, amounts, important names |
+| Supporting text | `#425e52` | Descriptions and secondary actions |
+| Muted text | `#536c60` | Metadata, placeholders, helper text |
+| Green | `#198357` | Primary action, positive status, positive graph |
+| Green hover / link | `#13764c` | Primary hover, selected links |
+| Yellow | `#bd871b` | Gold coin, receipt details, attention |
+| Yellow detail | `#856214` | Small emphasized captions and links |
+| Red | `#bb413f` | Negative graph, overdue status indicator |
+| Red foreground | `#a93436` | Overdue badge text |
 
 Status treatments (the warning palette is reserved for future warning notices):
 
 | Treatment | Fill | Border | Text |
 | --- | --- | --- | --- |
-| Overdue / inline error | `#261312` | `#6c201c` | `#e8705f` |
-| Warning (reserved) | `#241e08` | `#664d01` | `#eccb60` |
-| Selected background option | `#1a1e0c` | `#879a39` | `#a0af54` |
-| Initials avatar | `#3a2d04` | `#664d01` | `#eccb60` |
+| Overdue / inline error | `#ffe7e1` | `#f5c6ba` | `#a93436` |
+| Warning (reserved) | `#fff3d5` | `#f1d38a` | `#4b390a` |
+| Selected background option | `#e3f1df` | `#198357` | `#13764c` |
+| Initials avatar | `#ffe6a0` | `#f1d38a` | `#4b390a` |
 
 Use text and an icon or marker alongside status color. A green primary action is
 not automatically a financial success state. Errors should explain the problem
@@ -72,17 +72,17 @@ The shared variables are declared in `src/styles/tokens.css`:
 
 ```css
 :root {
-  color-scheme: dark;
-  --bg: #100f0f;
-  --panel: #1c1b1a;
-  --surface: #282726;
-  --line: #403e3c;
-  --ink: #cecdc3;
-  --muted: #9f9d96;
-  --green: #879a39;
-  --red: #d14d41;
-  --yellow: #d0a215;
-  --amber: var(--yellow); /* Compatibility alias; visually yellow. */
+  color-scheme: light;
+  --bg: #f1f7ed;
+  --panel: #fcfef9;
+  --surface: #e5f0df;
+  --line: #d6e5d2;
+  --ink: #15261f;
+  --muted: #536c60;
+  --green: #198357;
+  --red: #bb413f;
+  --yellow: #bd871b;
+  --amber: var(--green); /* Compatibility alias for the emerald accent. */
   --mono: 'IOU Iosevka', 'Iosevka', Consolas, monospace;
   --sans: var(--mono);
 }
@@ -164,12 +164,12 @@ than separate sections.
 
 ## Components and interaction states
 
-- **Primary action:** green fill, dark `#100f0f` text, green border, `6px` radius;
-  hover `#a0af54`, no vertical jump. Use one dominant action per local task.
+- **Primary action:** green fill, white `#ffffff` text, green border, `6px` radius;
+  hover `#13764c`, no vertical jump. Use one dominant action per local task.
 - **Secondary action:** raised neutral fill, strong border, emphasized text;
-  hover fill `#343331`. Text links underline on hover with a small offset.
+  hover fill `#dce8d7`. Text links underline on hover with a small offset.
 - **Inputs:** recessed canvas fill, standard border, emphasized value text;
-  hover border `#575653`; focus border green plus `0 0 0 2px #879a391a` ring.
+  hover border `#a2c5a9`; focus border green plus `0 0 0 2px #19835717` ring.
   Keep persistent labels; placeholders do not replace them.
 - **Keyboard focus:** preserve visible focus. The current generic rule is a
   `2px` yellow outline with `4px` offset; inputs use the green focus treatment.
@@ -210,7 +210,7 @@ the left-hand headline. It does not cover the login card or represent live data.
 
 - New sample every `1000ms`; a roughly one-minute window moves left smoothly
   between samples, and older values exit through the clipped left edge.
-- Color is green `#879a39` or red `#d14d41` according to the decorative reference
+- Color is green `#198357` or red `#bb413f` according to the decorative reference
   level. The line uses `1.35px` stroke at `.48` opacity.
 - Area fill fades from `.17` to `.015` opacity. Grid lines use `.055` opacity and
   the dashed reference line `.09`, keeping the reading surface quiet.
