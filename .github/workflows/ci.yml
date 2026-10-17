@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: postgresql+psycopg://iou:iou@127.0.0.1:5432/iou_test
+      EMAIL_MODE: disabled
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: iou
+          POSTGRES_PASSWORD: iou
+          POSTGRES_DB: iou_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd 'pg_isready -U iou -d iou_test'
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.0'
+          enable-cache: true
+          cache-dependency-glob: backend/requirements*.txt
+      - run: uv venv --python python3.12 backend/.venv
+      - run: uv pip sync --python backend/.venv/bin/python backend/requirements-dev.txt
+      - run: backend/.venv/bin/ruff check backend
+      - run: backend/.venv/bin/ruff format --check backend
+      - run: make test
+      - run: make migrate
+      - run: make test-db
+
+  pr-title:
+    name: Conventional PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check title without interpolating it into shell code
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          title = os.environ["PR_TITLE"]
+          pattern = r"(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([a-zA-Z0-9_.\/-]+\))?!?: \S[^\r\n]*"
+          if not re.fullmatch(pattern, title):
+              print("Use a Conventional Commit PR title, e.g. feat(loans): add repayment endpoint")
+              sys.exit(1)
+          PY

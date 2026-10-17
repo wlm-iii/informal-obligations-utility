@@ -1,0 +1,32 @@
+# Secrets (examples are safe to commit)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Local databases, sockets, logs, caches
+.local/
+.direnv/
+result
+result-*
+*.log
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.swp

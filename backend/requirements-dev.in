@@ -1,0 +1,6 @@
+# Includes the entire runtime; constrained to requirements.txt during compilation.
+-r requirements.in
+# Current Starlette TestClient uses httpx2 (legacy httpx emits a deprecation warning).
+httpx2>=2.13,<3
+pytest>=8,<10
+ruff>=0.11,<1

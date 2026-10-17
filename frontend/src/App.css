@@ -1,0 +1,18 @@
+#root {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+
+.eyebrow {
+	font-weight: 600;
+	letter-spacing: 0.08em;
+}
+
+.card {
+	margin-top: 2rem;
+	padding: 1.5rem;
+	border: 1px solid #888;
+	border-radius: 12px;
+}
