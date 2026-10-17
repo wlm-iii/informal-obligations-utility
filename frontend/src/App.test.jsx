@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { StrictMode } from "react";
 
@@ -15,6 +15,8 @@ const profile = { id: "user-1", email: "person@example.com", display_name: "Pers
 let onAuthChange;
 async function requestLogin(action = "google", credentials = {}) {
 	const frame = await screen.findByTitle("IOU sign in");
+	// Session restoration can render the frame before passive effects attach.
+	await act(async () => {});
 	const reply = vi.spyOn(frame.contentWindow, "postMessage");
 	fireEvent(window, new MessageEvent("message", {
 		origin: window.location.origin,

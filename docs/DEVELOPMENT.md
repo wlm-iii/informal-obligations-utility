@@ -5,7 +5,8 @@ require Nix.** Windows uses PowerShell; no WSL, Bash, Make, Docker, virtual-envi
 activation, or PowerShell execution-policy change is needed. Use fake data only.
 The app supports Google sign-in/private profiles and a backend lending ledger; the
 frontend still has account UI only. Follow [auth setup](AUTH.md) to configure login
-and hosted PostgreSQL and [ledger contracts](LEDGER.md) to exercise the new API.
+and hosted PostgreSQL, [ledger contracts](LEDGER.md) for lending, and
+[Level 2 setup](HISTORY_PROOF.md) for audited corrections, private proof, and cursors.
 
 ## Default setup (without Nix)
 
@@ -163,7 +164,9 @@ backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
 On Linux/macOS the virtual environment's Python is `backend/.venv/bin/python`.
 The initial `0001_baseline` is empty; `0002_profiles` creates private
 `iou_app.profiles` storage; `0003_ledger` adds private friends, loans, settlement
-events, and retry receipts. These migrations revoke browser-role access. Alembic autogeneration
+events, and retry receipts; `0004_history_proof` adds audit/evidence storage and
+reversal metadata. Downgrade of Level 2 is guarded once history exists. These
+migrations revoke browser-role access. Alembic autogeneration
 only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
 and Alembic. Never generate migrations against production or rely on API startup
 to mutate the schema.
@@ -209,6 +212,10 @@ installs. Review audit findings; do not apply blanket `npm audit fix --force` up
 | `SUPABASE_URL` | Server-side project origin; missing means protected routes fail closed |
 | `DATABASE_POOL_MODE` | `session` by default; `transaction` disables client pooling/prepared statements |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Public frontend config in `frontend/.env.local` |
+| `CURSOR_SIGNING_KEY` | Optional server-only random secret, at least 32 bytes; stable across workers |
+| `SUPABASE_STORAGE_KEY` | Optional server-only secret/service_role key for private evidence |
+| `EVIDENCE_BUCKET` | `iou-evidence`; must be private, PNG/JPEG only |
+| `EVIDENCE_SIGNED_URL_SECONDS` | 60 by default; 30–300 allowed |
 | `EMAIL_MODE` | Only `disabled` is supported; other values fail validation |
 | `PORT` | Docker runtime port, defaults to 8000; local backend task uses 8000 |
 

@@ -29,10 +29,14 @@ frontend lending screens remain pending; the frontend currently has account UI o
 
 ## Level 2 — Trustworthy history and proof
 
-Effective vs recorded timestamps; append-preserving corrections/voids; transactional
-updates; richer auditing/retry handling and cursor pagination; private proof images on loans/events with
-size/type checks and temporary viewing URLs. Done when duplicate requests cannot
-change balances twice, corrections remain visible, and images are owner-only.
+Implemented in the backend: append-preserving reversals/replacement corrections,
+restricted loan voiding, expanded audit timelines, signed cursor pagination, and
+private proof-image intents/validation/viewing/removal with durable orphan cleanup.
+Financial timestamps and original records are preserved, and mutations remain
+owner-serialized and replay-safe. PostgreSQL/fake-provider tests cover races and
+failures. See [Level 2 contracts and deployment safety](HISTORY_PROOF.md).
+Hosted migration, Storage bucket/server key/cursor-secret configuration, and real
+provider acceptance remain release steps; frontend lending/evidence UI is separate.
 
 ## Level 3 — Charges and fictional reliability
 

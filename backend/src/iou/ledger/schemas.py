@@ -16,6 +16,13 @@ Notes = Annotated[str, Field(max_length=2000)]
 class Input(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
+    @field_validator("*")
+    @classmethod
+    def no_nul_text(cls, value):
+        if isinstance(value, str) and "\u0000" in value:
+            raise ValueError("NUL characters are not supported in text fields.")
+        return value
+
     @field_validator("lent_at", "effective_at", mode="before", check_fields=False)
     @classmethod
     def timestamp_not_epoch(cls, value):
@@ -125,8 +132,10 @@ class LoanRead(ReadModel):
     fees_cents: Literal[0] = 0
     returned_at: datetime | None
     completed_at: datetime | None
-    status: Literal["open", "completed"]
+    status: Literal["open", "completed", "voided"]
     overdue: bool
+    voided_at: datetime | None = None
+    void_reason: str | None = None
 
 
 class EventRead(ReadModel):
@@ -137,6 +146,8 @@ class EventRead(ReadModel):
     note: str | None
     effective_at: datetime
     recorded_at: datetime
+    reversed_at: datetime | None = None
+    replaces_event_id: UUID | None = None
 
 
 class SettlementRead(ReadModel):
@@ -146,11 +157,61 @@ class SettlementRead(ReadModel):
 
 class HistoryEntry(ReadModel):
     id: UUID
-    action: Literal["lent", "repayment", "return"]
+    action: Literal[
+        "lent", "repayment", "return", "reversal", "void", "evidence_added", "evidence_removed"
+    ]
     amount_cents: int | None
     note: str | None
     effective_at: datetime
     recorded_at: datetime
+    loan: LoanRead
+    actor: Literal["owner", "system"] = "owner"
+    reason: str | None = None
+    event_id: UUID | None = None
+    replacement_event_id: UUID | None = None
+    evidence_id: UUID | None = None
+    reversed_at: datetime | None = None
+    replaces_event_id: UUID | None = None
+
+
+class ReasonInput(Input):
+    reason: Annotated[str, Field(min_length=1, max_length=1000)]
+
+
+class ReplacementRepayment(RepaymentCreate):
+    action: Literal["repayment"]
+
+
+class ReplacementReturn(SettlementInput):
+    action: Literal["return"]
+
+
+class CorrectionInput(ReasonInput):
+    replacement: Annotated[ReplacementRepayment | ReplacementReturn, Field(discriminator="action")]
+
+
+class AuditRead(ReadModel):
+    id: UUID
+    loan_id: UUID
+    action: Literal["reversal", "void", "evidence_added", "evidence_removed"]
+    actor: Literal["owner", "system"]
+    reason: str | None
+    event_id: UUID | None
+    replacement_event_id: UUID | None
+    evidence_id: UUID | None
+    effective_at: datetime
+    recorded_at: datetime
+
+
+class CorrectionRead(ReadModel):
+    reversal: AuditRead
+    original_event: EventRead
+    replacement: EventRead | None
+    loan: LoanRead
+
+
+class VoidRead(ReadModel):
+    audit: AuditRead
     loan: LoanRead
 
 
@@ -159,3 +220,4 @@ class Page[T](BaseModel):
     limit: int
     offset: int
     has_more: bool
+    next_cursor: str | None = None
