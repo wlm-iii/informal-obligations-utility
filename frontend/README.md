@@ -24,7 +24,7 @@ the prefix. The Docker deployment mounts the API under `/api` as well.
 - `src/App.jsx`: session-aware React entry point, account UI, and profile form.
 - `src/components/TerminalLogin.jsx`: native React login; no iframe or HTML bundle.
 - `src/components/MarketChart.jsx`: decorative SVG and lifecycle-managed animation.
-- `src/styles/tokens.css`: shared Flexoki palette and Iosevka font definitions.
+- `src/styles/tokens.css`: shared mint-and-emerald palette and Iosevka font definitions.
 - `src/assets/fonts/`: binary WOFF2 assets; see `docs/licenses/` for the SIL license.
 - `src/demo/`: lazy-loaded React demo with separate local storage.
 - `src/services/`: Supabase PKCE/session integration and authenticated profile requests.

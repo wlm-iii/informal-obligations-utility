@@ -10,10 +10,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 label { display: block; font-size: 12px; color: var(--ink); margin-bottom: 9px; }
 input, textarea, select { width: 100%; min-width: 0; min-height: 47px; background: var(--bg); color: var(--bright); border: 1px solid var(--line); border-radius: var(--radius-control); padding: 13px 14px; transition: border-color .15s; }
 input::placeholder, textarea::placeholder { color: var(--muted); font-size: 12px; }
-input:hover, select:hover, textarea:hover { border-color: #575653; }
-input:focus, textarea:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 2px #879a391a; }
+input:hover, select:hover, textarea:hover { border-color: #a2c5a9; }
+input:focus, textarea:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 2px #19835717; }
 h1, h2, h3 { color: var(--bright); }
-.inline-error { padding: 11px 12px; margin: 0 0 16px; background: #261312; border: 1px solid #6c201c; color: #e8705f; border-radius: 5px; font-size: 12px; line-height: 1.7; }
+.inline-error { padding: 11px 12px; margin: 0 0 16px; background: #ffe7e1; border: 1px solid #f5c6ba; color: #a93436; border-radius: 5px; font-size: 12px; line-height: 1.7; }
 .loading-screen { padding: 40px; }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }

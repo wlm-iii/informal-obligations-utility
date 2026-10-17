@@ -13,19 +13,19 @@
 	font-display: swap;
 }
 :root {
-	color-scheme: dark;
-	--bg: #100f0f;
-	--panel: #1c1b1a;
-	--surface: #282726;
-	--line: #403e3c;
-	--ink: #cecdc3;
-	--muted: #9f9d96;
-	--bright: #e6e4d9;
-	--supporting: #b7b5ac;
-	--green: #879a39;
-	--red: #d14d41;
-	--yellow: #d0a215;
-	--amber: var(--yellow);
+	color-scheme: light;
+	--bg: #f1f7ed;
+	--panel: #fcfef9;
+	--surface: #e5f0df;
+	--line: #d6e5d2;
+	--ink: #15261f;
+	--muted: #536c60;
+	--bright: #15261f;
+	--supporting: #425e52;
+	--green: #198357;
+	--red: #bb413f;
+	--yellow: #bd871b;
+	--amber: var(--green);
 	--mono: "IOU Iosevka", Iosevka, Consolas, monospace;
 	--sans: var(--mono);
 	--radius-control: 6px;

@@ -8,7 +8,7 @@ has been removed. `frontend/index.html` remains Vite's small normal entry docume
 
 ## Shared styling
 
-`src/index.css` imports `src/styles/tokens.css`, which declares the Flexoki palette,
+`src/index.css` imports `src/styles/tokens.css`, which declares the mint-and-emerald palette,
 Iosevka font faces, and shared geometry. WOFF2 files are ordinary binary assets in
 `src/assets/fonts/`; Vite builds cacheable hashed URLs. `terminal.css` contains the
 login-specific layout, backgrounds, and dialog classes. The signed-in profile and
