@@ -65,7 +65,7 @@ const boards = [
 
 export default function Leaderboards() {
  return <section className="leaderboards" aria-labelledby="leaderboards-heading">
-  <header><p className="eyebrow">GOOD FRIENDS. GREAT TRACK RECORDS.</p><h1 id="leaderboards-heading">THE LEADERBOARDS.</h1></header>
+  <header><p className="eyebrow">GOOD FRIENDS. GREAT TRACK RECORDS.</p><h1 id="leaderboards-heading">LEADERBOARDS.</h1></header>
   <div className="hall-columns">{boards.map((board, index) => <section className={`hall ${index ? "shame" : "fame"}`} key={board.label} aria-label={index ? "Hall of Shame" : "Hall of Fame"}>
    <h2>{index ? "Hall of Shame" : "Hall of Fame"}</h2>
    <ol>{rankEntries(board.entries, Boolean(index)).map(entry => <li key={entry.title}>
