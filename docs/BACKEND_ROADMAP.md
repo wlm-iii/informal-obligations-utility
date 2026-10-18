@@ -29,31 +29,50 @@ frontend lending screens remain pending; the frontend currently has account UI o
 
 ## Level 2 — Trustworthy history and proof
 
-Effective vs recorded timestamps; append-preserving corrections/voids; transactional
-updates; richer auditing/retry handling and cursor pagination; private proof images on loans/events with
-size/type checks and temporary viewing URLs. Done when duplicate requests cannot
-change balances twice, corrections remain visible, and images are owner-only.
+Implemented in the backend: append-preserving reversals/replacement corrections,
+restricted loan voiding, expanded audit timelines, signed cursor pagination, and
+private proof-image intents/validation/viewing/removal with durable orphan cleanup.
+Financial timestamps and original records are preserved, and mutations remain
+owner-serialized and replay-safe. PostgreSQL/fake-provider tests cover races and
+failures. See [Level 2 contracts and deployment safety](HISTORY_PROOF.md).
+Hosted migration, Storage bucket/server key/cursor-secret configuration, and real
+provider acceptance remain release steps; frontend lending/evidence UI is separate.
 
 ## Level 3 — Charges and fictional reliability
 
-Opt-in simple interest, one-time fees, grace periods/caps, deterministic allocation,
-rounding/backdating/waivers, and clear charge breakdowns. Versioned fictional score
-with explanations and insufficient-history state. Confirm the provisional formulas
-in [SPEC.md](SPEC.md) first. Done when balances/scores reconcile to tested events.
+Implemented in the backend: optional simple interest per daily/weekly/biweekly/
+monthly/quarterly/yearly fixed-day period (not annual-only), optional one-time late
+fees, automatic/optional caps, grace, immutable allocation breakdowns, and audited
+charge waivers. Corrections reject changes to later allocations rather than silently
+rewriting history. Item return and fee settlement are separate. Versioned fictional
+scores explain counts/points and return null until enough history exists. Legacy
+loans stay zero-charge. See [Level 3 contracts](CHARGES_SCORES.md); hosted migration
+and frontend terms/score UI remain explicit release/product work.
 
 ## Level 4 — Dashboard APIs
 
-Principal/charges separated; overdue/upcoming obligations; private friend rankings;
-repayment/lending trends and date filters. Item counts are not cash owed. Done when
-all chart/ranking metrics have documented definitions and reconcile with the ledger.
+Implemented in the backend: owner-private summaries, overdue/upcoming obligations,
+returned items with unpaid fees, private friend rankings, and zero-filled lending/
+repayment/waiver trends with calendar date filters. Principal, charges, actual cash,
+and waivers are separate; items are counted, not valued as money. Metrics reuse the
+ledger calculator and score rules and reconcile to their source events. Shared owner
+locks keep each response consistent during financial writes. See [dashboard contracts](DASHBOARD.md).
+Includes forward migration `0006_event_action_width` for Level 3's item fee-payment
+PostgreSQL column-width bug. Dashboard UI and hosted acceptance remain separate.
 
 ## Level 5 — Manually approved reminders
 
-Editable template previews, email-provider integration, permission confirmation,
-unsubscribe, shared rate limits, delivery records, duplicate protection and final
-status rechecks. Gemini drafting is optional, minimal-context, preview-only, with a
-template fallback. No autonomous sending or Gmail access required. Done when opted-out
-contacts and duplicate sends are blocked and every send requires explicit approval.
+Level 5.0 is implemented in the backend: fixed friendly/playful/direct-but-polite
+template previews, explicit approval of recipient/message, central Gmail send-only
+OAuth, recipient permission, global unsubscribe/cooldown, durable claims, delivery
+history, stale-preview/final eligibility checks, and conservative uncertain outcomes.
+Only currently owing contacts qualify; no arbitrary text or autonomous sending.
+Default email mode is disabled and live recipients are restricted to the sender.
+See [reminder setup and the local self-email demo](REMINDERS.md). Hosted migration,
+real Gmail acceptance, and frontend integration remain explicit steps.
+
+Level 5.1 will add optional minimal-context Gemini drafting behind the same approval
+flow, with template fallback. No inbox reading or user-by-user Gmail authorization.
 
 ## Level 6 — Automation and operations
 

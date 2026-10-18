@@ -68,6 +68,11 @@ describe("summarizeLoans", () => {
    { kind: "money", status: "completed" },
   ])).toEqual({ outstanding: 2, returned: 1, unpaid: 3, repaid: 2 });
  });
+ it("counts returned items even while fees remain and excludes voids",()=>{
+  expect(summarizeLoans([{kind:"item",status:"open",returned_at:"2026-01-02",fees_cents:200},
+   {kind:"item",status:"voided"},{kind:"money",status:"voided"}]))
+   .toEqual({outstanding:0,returned:1,unpaid:1,repaid:0});
+ });
  it("returns zero totals for an empty ledger", () => {
   expect(summarizeLoans([])).toEqual({ outstanding: 0, returned: 0, unpaid: 0, repaid: 0 });
  });

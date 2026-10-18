@@ -10,7 +10,7 @@ afterEach(cleanup);
 it("renders Fame in descending score order with each matching award and illustration", () => {
  render(<Leaderboards />);
  const rows = within(screen.getByRole("region", { name: "Hall of Fame" })).getAllByRole("listitem");
- expect(rows.map(row => within(row).getByText(/^(980|965|940|910)$/).textContent)).toEqual(["980", "965", "940", "910"]);
+ expect(rows.map(row => within(row).getByText(/^(825|790|740|710)$/).textContent)).toEqual(["825", "790", "740", "710"]);
  for (const [index, title] of ["Credit Royalty", "Certified Green Flag", "Walking ATM", "Speedrun Champion"].entries()) {
   expect(within(rows[index]).getByRole("heading", { name: title })).toBeInTheDocument();
   expect(within(rows[index]).getByRole("img", { name: `${title} illustration` })).toBeInTheDocument();

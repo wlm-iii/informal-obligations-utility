@@ -12,10 +12,10 @@ export const demoLoans = [
 ];
 
 export const demoPayments = [
- {action:"repayment",amount_cents:500,effective_at:"2026-10-04T12:00:00Z"},
- {action:"repayment",amount_cents:750,effective_at:"2026-10-08T12:00:00Z"},
- {action:"repayment",amount_cents:1250,effective_at:"2026-10-14T12:00:00Z"},
+ {action:"repayment",loan_id:"2",amount_cents:500,effective_at:"2026-10-04T12:00:00Z"},
+ {action:"repayment",loan_id:"2",amount_cents:750,effective_at:"2026-10-08T12:00:00Z"},
+ {action:"repayment",loan_id:"2",amount_cents:1250,effective_at:"2026-10-14T12:00:00Z"},
 ];
 
-export const referenceLoans = demoLoans.map(l => l.id === "1" ? {...l,kind:"item",description:"Travel mug",principal_cents:null,outstanding_cents:null,repaid_cents:null} : l.id === "2" ? {...l,description:"Concert tickets",interest_percent:2,repayment_type:"money",due_date:"2026-10-15",overdue:true,principal_cents:38500,outstanding_cents:12500,repaid_cents:26000} : l);
+export const referenceLoans = demoLoans.map(l => l.id === "1" ? {...l,kind:"item",description:"Travel mug",principal_cents:null,outstanding_cents:null,repaid_cents:null} : l.id === "2" ? {...l,description:"Concert tickets",interest_rate_bps:0,interest_period:"weekly",repayment_type:"money",due_date:"2026-10-15",overdue:true,principal_cents:38500,outstanding_cents:12500,repaid_cents:26000} : l);
 export const referencePayments = [["2026-07-01",2500,"Lunch & coffee"],["2026-07-26",3000,"Concert tickets"],["2026-08-14",3000,"Lunch & coffee"],["2026-08-29",5000,"Concert tickets"],["2026-09-13",3000,"Lunch & coffee"],["2026-09-28",4000,"Concert tickets"],["2026-10-06",2500,"Concert tickets"],["2026-10-14",3000,"Concert tickets"]].map(([date,amount,description],i)=>({id:`preview-payment-${i}`,loan_id:"2",action:"repayment",effective_at:`${date}T12:00:00Z`,amount_cents:amount,description}));

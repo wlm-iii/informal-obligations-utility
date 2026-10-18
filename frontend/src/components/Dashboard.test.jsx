@@ -41,17 +41,16 @@ it("keeps an IOU visible after a failed settlement and retries with the same key
  expect(ledgerRequest.mock.calls[0][1].body).toEqual({amount_cents:1850});
  expect(ledgerRequest.mock.calls[1][1].key).toBe(ledgerRequest.mock.calls[0][1].key);
 });
-it("hides and clears daily interest when repayment changes to item", () => {
+it("keeps interest terms independent of repayment preference metadata", () => {
  render(<Dashboard demo={demo}/>);
  fireEvent.click(screen.getByRole("button",{name:"Add friend",exact:true}));
  fireEvent.change(screen.getByLabelText("Type"),{target:{value:"amount"}});
  fireEvent.change(screen.getByLabelText("Repayment type"),{target:{value:"money"}});
  fireEvent.change(screen.getByRole("slider"),{target:{value:"25"}});
  fireEvent.change(screen.getByLabelText("Repayment type"),{target:{value:"item"}});
- expect(screen.queryByRole("slider")).not.toBeInTheDocument();
- expect(screen.queryByText(/Interest is not automatically/)).not.toBeInTheDocument();
- fireEvent.change(screen.getByLabelText("Repayment type"),{target:{value:"money"}});
- expect(screen.getByRole("slider")).toHaveValue("0");
+ expect(screen.getByRole("slider")).toHaveValue("25");
+ expect(screen.getByRole("slider")).toHaveAttribute("max","100");
+ expect(screen.getByLabelText("Interest period")).toHaveValue("weekly");
 });
 it("preserves a saved friend and retries a failed IOU without creating a duplicate", async () => {
  loadFriends.mockResolvedValue([]); loadLoans.mockResolvedValue([]);
@@ -68,7 +67,7 @@ it("preserves a saved friend and retries a failed IOU without creating a duplica
  expect(within(dialog).getByLabelText("Name")).toHaveAttribute("readonly");
  const firstSave = ledgerRequest.mock.calls[1];
  expect(firstSave[0]).toBe("/loans");
- expect(firstSave[1].body).toEqual({friend_id:"saved",kind:"money",description:"Money lent",principal_cents:1234,due_date:"2099-12-01",repayment_type:"other",repayment_other:"Dinner",interest_percent:0});
+ expect(firstSave[1].body).toEqual({friend_id:"saved",kind:"money",description:"Money lent",principal_cents:1234,due_date:"2099-12-01",repayment_type:"other",repayment_other:"Dinner",interest_rate_bps:0,interest_period:"weekly"});
  fireEvent.click(within(dialog).getByRole("button",{name:"Add friend"}));
  await screen.findByRole("button",{name:"Riley",exact:true});
  expect(ledgerRequest.mock.calls.filter(([path])=>path==="/friends")).toHaveLength(1);

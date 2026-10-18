@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 vi.mock("./supabase", () => ({ supabase: { auth: { getSession: vi.fn() } } }));
 import { supabase } from "./supabase";
-import { ledgerRequest, loadFriends, reminderFor, reminderTones } from "./dashboard";
+import { activePayments, ledgerRequest, loadFriends, reminderFor, reminderTones } from "./dashboard";
 beforeEach(() => {
  vi.resetAllMocks();
  supabase.auth.getSession.mockResolvedValue({ data: { session: { access_token: "private-token" } } });
@@ -37,6 +37,14 @@ it("rejects malformed friend data and failed requests", async () => {
  await expect(loadFriends()).rejects.toThrow("Friend data is unavailable");
  fetch.mockResolvedValueOnce({ ok: false, status: 401 });
  await expect(loadFriends()).rejects.toThrow("Your session expired");
+});
+it("excludes reversals, waivers, and voided obligations from cash history",()=>{
+ const loans=[{id:"a",status:"open"},{id:"v",status:"voided"}];
+ const events=[{id:"cash",action:"repayment",loan:{id:"a"}},
+ {id:"fees",action:"fee_payment",loan_id:"a"},
+ {id:"reversed",action:"repayment",loan_id:"a",reversed_at:"2026-01-02"},
+ {id:"waived",action:"waiver",loan_id:"a"},{id:"void",action:"repayment",loan_id:"v"}];
+ expect(activePayments(events,loans).map(event=>event.id)).toEqual(["cash","fees"]);
 });
 it("formats item reminders as returns instead of money debt", () => {
  const text = reminderFor({ display_name: "Sam" }, { kind: "item", description: "Blue hoodie", due_date: "2026-10-20" }, "Direct");

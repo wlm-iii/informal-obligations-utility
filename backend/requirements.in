@@ -7,6 +7,7 @@ psycopg[binary]>=3.2,<4
 alembic>=1.13,<2
 pydantic-settings>=2.6,<3
 email-validator>=2,<3
+Pillow>=12.1,<14
 PyJWT[crypto]>=2.10,<3
 # IANA timezone validation on Windows as well as Unix.
 tzdata>=2025.1

@@ -6,7 +6,12 @@ requirements. The Docker build and local container routes are smoke-tested; this
 not prove either hosted platform works.
 
 Google authentication, private profiles, and the backend lending ledger are
-implemented; frontend lending screens, email delivery, and a scheduler are not. Complete [auth setup and acceptance](docs/AUTH.md),
+implemented, including Level 2 corrections/private evidence workflows; frontend
+lending screens, email delivery, and a scheduler are not. Level 3 periodic charges,
+waivers, and fictional scores are backend-only and require their release migration.
+Level 4 adds private dashboard APIs; see [metric and release guidance](docs/DASHBOARD.md).
+Apply `0006_event_action_width` for PostgreSQL item fee-payment compatibility.
+Complete [auth setup and acceptance](docs/AUTH.md),
 hosted owner-isolation checks, privacy controls, and rate limits before any real-data
 public release. Use fake data for demos.
 
@@ -18,9 +23,20 @@ public release. Use fake data for demos.
 - Set server-only `SUPABASE_URL` and the frontend's `VITE_SUPABASE_URL` /
   `VITE_SUPABASE_PUBLISHABLE_KEY`. Google client secrets stay in Supabase, not the app.
 - Configure exact Google/Supabase callback origins for the hosted frontend.
-- Keep `EMAIL_MODE=disabled`; there is no delivery implementation yet.
+- Keep `EMAIL_MODE=disabled` until [Level 5.0 acceptance](docs/REMINDERS.md) passes.
+  Gmail sender OAuth credentials/signing key belong only in backend secrets. Apply
+  `0007_manual_reminders`, configure a public unsubscribe base, review runtime grants,
+  and test self-addressed delivery before widening the default recipient allowlist.
 - Review [Level 1's migration and retry contract](docs/LEDGER.md) before deploying
   the lending API. All new ledger tables remain private; no direct browser SQL access.
+- Follow [Level 2's release safety and private Storage setup](docs/HISTORY_PROOF.md):
+  do not mix old/new financial writers after reversals exist. Add server-only
+  `CURSOR_SIGNING_KEY` / `SUPABASE_STORAGE_KEY` for optional cursors/images and run the
+  cleanup command regularly outside API workers. Never expose the Storage key in Vite.
+- Follow [Level 3's migration and allocation rules](docs/CHARGES_SCORES.md). Legacy
+  loans must remain zero-charge; do not mix pre-Level-3 financial writers/readers.
+  Runtime roles need UPDATE(settled_at) on loans, not permission to edit original terms.
+  No payment provider or new external API key is required by this feature.
 - Run `alembic -c backend/alembic.ini upgrade head` once in the release process with
   appropriate credentials, not in every API worker or serverless request.
 - Plan backups, least-privilege runtime credentials, connection limits, and secrets storage.
@@ -74,6 +90,11 @@ Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in Vercel's build
 environment; these are compiled into the public frontend. Configure `SUPABASE_URL`,
 `DATABASE_URL`, and `DATABASE_POOL_MODE` separately for the server runtime. Redeploy
 after changing frontend configuration.
+
+Evidence uploads proxy raw bytes through FastAPI for validation (application cap
+5 MiB). Verify current function body-size, timeout, and memory limits: a platform
+may impose a lower body limit, requiring a smaller client file or a separate backend.
+Do not enable direct browser Storage writes to bypass our validation.
 
 Before choosing this route, validate Python runtime selection, source inclusion,
 rewrites, backend dependencies, managed database connectivity, connection pooling,

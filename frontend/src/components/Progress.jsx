@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { loadLedgerHistory, money, utcDate } from "../services/dashboard";
+import { activePayments, loadLedgerHistory, money, utcDate } from "../services/dashboard";
 import "./Progress.css";
+import { totalOutstanding } from "../services/interest";
 
 export default function Progress({ loans, friends, demo, onRefresh, onRecord, onNudge }) {
  const [events, setEvents] = useState([]);
@@ -16,14 +17,17 @@ export default function Progress({ loans, friends, demo, onRefresh, onRecord, on
    .catch(e => { if (!controller.signal.aborted) { setError(e.message); setLoading(false); } });
   return () => controller.abort();
  }, [friends, demo, revision]);
- const allPayments = demo?.payments || events.filter(e => e.action === "repayment");
+ const validLoans = loans.filter(l => l.status !== "voided");
+ const allPayments = activePayments(demo?.payments || events, validLoans);
  const cutoff = range === "ALL" ? -Infinity : Date.now() - Number(range) * 86400000;
- const payments = [...allPayments].filter(e => new Date(e.effective_at).getTime() >= cutoff).sort((a,b) => a.effective_at.localeCompare(b.effective_at));
- const moneyLoans = loans.filter(l => l.kind === "money");
- const repaid = moneyLoans.reduce((sum,l) => sum + (l.repaid_cents || 0),0);
- const outstanding = moneyLoans.reduce((sum,l) => sum + (l.outstanding_cents || 0),0);
+ const payments = [...allPayments].filter(e => new Date(e.effective_at).getTime() >= cutoff && new Date(e.effective_at).getTime() <= Date.now()).sort((a,b) => a.effective_at.localeCompare(b.effective_at));
+ const moneyLoans = validLoans.filter(l => l.kind === "money");
+ const repaid = validLoans.reduce((sum,l) => sum + (l.kind === "money" ? l.repaid_cents || 0 : l.fees_paid_cents || 0),0);
+ const outstanding = validLoans.reduce((sum,l) => sum + totalOutstanding(l),0);
  const principal = moneyLoans.reduce((sum,l) => sum + (l.principal_cents || 0),0);
- const percent = principal ? Math.round(repaid / (principal + moneyLoans.reduce((sum,l) => sum + (l.interest_cents || 0),0)) * 100) : 0;
+ const waived = validLoans.reduce((sum,l) => sum + (l.interest_waived_cents || 0) + (l.fees_waived_cents || 0),0);
+ const gross = repaid + outstanding + waived;
+ const percent = gross ? Math.min(100,Math.round(repaid / gross * 100)) : 0;
  const periodTotal = payments.reduce((sum,e) => sum + (e.amount_cents || 0),0);
  let cumulative = 0;
  const values = payments.map(e => ({ date: e.effective_at, value: cumulative += e.amount_cents || 0 }));

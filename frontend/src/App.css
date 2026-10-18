@@ -1,51 +1,531 @@
 #root {
-	max-width: 800px;
-	margin: 0 auto;
-	padding: 2rem;
-	text-align: center;
+	min-height: 100vh;
 }
-
-.eyebrow {
-	font-weight: 600;
-	letter-spacing: 0.08em;
+.account-shell {
+	max-width: 1360px;
+	padding: 0 7%;
+	margin: auto;
 }
-
-.card {
-	margin-top: 2rem;
-	padding: 1.5rem;
-	border: 1px solid #888;
-	border-radius: 12px;
+.account-shell .topbar {
+	height: 105px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	border-bottom: 1px solid var(--separator);
 }
-
-.profile-form {
+.account-shell .wordmark {
+	display: flex;
+	align-items: center;
+	gap: 13px;
+	text-decoration: none;
+}
+.account-shell .monogram {
 	display: grid;
-	gap: 0.75rem;
-	text-align: left;
-	margin-bottom: 1.5rem;
+	place-items: center;
+	width: 43px;
+	height: 43px;
+	background: var(--brand-gradient);
+	border: 1px solid var(--line);
+	border-radius: 5px;
+	color: var(--primary-ink);
+	font-size: 12px;
+	font-weight: 700;
 }
-
-.profile-form input {
-	font: inherit;
-	padding: 0.65rem;
-	border: 1px solid #888;
-	border-radius: 6px;
+.account-shell .brand-name {
+	font-size: 21px;
+	font-weight: 700;
+	letter-spacing: -0.7px;
+	color: var(--bright);
+}
+.account-shell .brand-caption {
+	font-size: 12px;
+	color: var(--supporting);
+}
+.account-shell .topbar-label {
+	margin-left: auto;
+	font-size: 10px;
+	letter-spacing: 0.6px;
+	color: var(--muted);
+}
+.account-shell .profile-layout {
+	display: grid;
+	grid-template-columns: 230px minmax(0, 1fr);
+	gap: 56px;
+	padding: 48px 0 40px;
+	min-height: calc(100svh - 183px);
+}
+.account-shell .profile-sidebar {
+	padding-top: 4px;
+}
+.account-shell .avatar {
+	width: 64px;
+	height: 64px;
+	display: grid;
+	place-items: center;
+	background: var(--avatar-bg);
+	border: 1px solid var(--avatar-line);
+	border-radius: 5px;
+	color: var(--avatar-ink);
+	font-size: 25px;
+	font-weight: 700;
+	margin-bottom: 24px;
+}
+.account-shell .eyebrow {
+	font-size: 10px;
+	letter-spacing: 1px;
+	color: var(--muted);
+	margin: 0 0 10px;
+}
+.account-shell .profile-sidebar h1 {
+	color: var(--bright);
+	font-size: 26px;
+	line-height: 1.2;
+	letter-spacing: -0.5px;
+	margin: 0 0 12px;
+	overflow-wrap: anywhere;
+}
+.account-shell .name-dot {
+	display: none;
+}
+.account-shell .sidebar-description {
+	font-size: 13px;
+	color: var(--supporting);
+	max-width: 190px;
+	margin: 0 0 20px;
+}
+.account-shell .member-badge {
+	display: inline-block;
+	font-size: 11px;
+	border: 1px solid var(--line);
+	padding: 4px 8px;
+	border-radius: 4px;
+	color: var(--supporting);
+	background: var(--panel);
+}
+.account-shell .sidebar-divider {
+	border-top: 1px solid var(--line);
+	margin: 28px 0 16px;
+}
+.account-shell .profile-nav {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+	padding: 12px;
+	text-decoration: none;
+	font-size: 14px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	min-height: 44px;
+	margin-bottom: 8px;
+	color: var(--supporting);
+}
+.account-shell .profile-nav span {
+	font-size: 11px;
+	color: var(--muted);
+}
+.account-shell .profile-nav span:last-child {
+	margin-left: auto;
+}
+.account-shell .profile-nav.active {
+	background: var(--surface);
+	border-color: var(--line);
+	color: var(--yellow-detail);
+}
+.account-shell .profile-nav.active span {
+	color: var(--yellow-detail);
+}
+.account-shell .profile-nav:hover {
+	background: var(--surface);
+}
+.account-shell .sidebar-note {
+	margin-top: 48px;
+	padding-top: 20px;
+	border-top: 1px solid var(--line);
+	color: var(--muted);
+}
+.account-shell .sidebar-note > span {
+	font-size: 10px;
+	letter-spacing: 0.7px;
+}
+.account-shell .sidebar-note p {
+	font-size: 12px;
+	line-height: 1.8;
+}
+.account-shell .page-heading {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 20px;
+	margin-bottom: 28px;
+}
+.account-shell .page-heading h2 {
+	margin: 0 0 12px;
+	font-size: 36px;
+	line-height: 1.1;
+	font-weight: 700;
+	letter-spacing: -1px;
+	color: var(--bright);
+}
+.account-shell .title-accent {
+	color: var(--green);
+}
+.account-shell .page-heading > div > p:last-child {
+	font-size: 14px;
+	color: var(--supporting);
+	margin: 0;
+}
+.account-shell .edition {
+	font-size: 9px;
+	letter-spacing: 0.7px;
+	color: var(--supporting);
+	white-space: nowrap;
+	margin-top: 4px;
+}
+.account-shell .details-panel,
+.account-shell .activity-panel {
+	background: var(--panel);
+	border: 1px solid var(--line);
+	border-radius: 9px;
+	padding: 28px;
+}
+.account-shell .section-heading {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 24px;
+}
+.account-shell .section-number {
+	font-size: 11px;
+	color: var(--yellow-detail);
+	padding-top: 3px;
+}
+.account-shell .section-heading h2 {
+	margin: 0 0 6px;
+	font-size: 17px;
+	color: var(--bright);
+	font-weight: 700;
+}
+.account-shell .section-heading p {
+	font-size: 13px;
+	margin: 0;
+	color: var(--muted);
+}
+.account-shell .profile-form {
+	display: grid;
+	gap: 9px;
+}
+.account-shell .profile-form .section-heading {
+	padding-bottom: 22px;
+	border-bottom: 1px solid var(--line);
+	margin-bottom: 4px;
+}
+.account-shell .profile-form label {
+	font-size: 12px;
+	margin-top: 12px;
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+}
+.account-shell .field-note {
+	font-size: 10px;
+	color: var(--muted);
+}
+.account-shell .profile-form input {
+	width: 100%;
 	min-width: 0;
+	min-height: 47px;
+	padding: 13px 14px;
+	font-size: 14px;
+	background: var(--bg);
+	color: var(--bright);
+	border: 1px solid var(--line);
+	border-radius: 6px;
 }
-
-button:disabled {
-	opacity: 0.6;
-	cursor: wait;
+.account-shell .profile-form input:hover {
+	border-color: var(--strong-line);
 }
-
-[role="alert"] {
-	color: #d95555;
+.account-shell .profile-form input[readonly] {
+	color: var(--muted);
 }
-#root{max-width:1040px}
-.card{border-color:#343331;border-radius:5px;background:#1C1B1A}
-.profile-form input{border-color:#403E3C;border-radius:5px;background:#100F0F;color:#CECDC3}
-[role="alert"]{color:#D14D41}
-@media(max-width:650px){#root{padding:1rem}}
-
-#root{max-width:none;padding:0}.signed-out{max-width:800px;margin:auto;padding:32px}.signed-in>.card{margin:0;padding:0;border:0;background:transparent}.dashboard-content{margin-left:210px;max-width:1250px;padding:40px;text-align:left}.app-sidebar{position:fixed;inset:0 auto 0 0;width:210px;padding:40px 24px;background:#1C1B1A;border-right:1px solid #343331;text-align:left;z-index:10}.iou-brand{display:block;color:#879A39;font-size:22px;font-weight:700;letter-spacing:.13em;margin-bottom:36px}.app-tabs{display:flex;flex-direction:column;gap:8px}.app-tabs button{text-align:left;font-size:14px;padding:13px 14px;border:1px solid transparent;background:transparent;color:#878580}.app-tabs button[aria-current=page]{background:#282726;color:#879A39;border:1px solid #343331;border-left:3px solid #879A39;font-weight:700}.dashboard-content .return-overview{margin:0 0 32px;padding:0}.profile-form{max-width:600px}
-@media(max-width:700px){.app-sidebar{width:150px;padding:28px 12px}.dashboard-content{margin-left:150px;padding:30px 18px}.app-tabs button{font-size:12px;padding:12px 10px}.iou-brand{font-size:20px}.dashboard-content .return-heading h2{font-size:28px}}
-@media(max-width:420px){.app-sidebar{width:115px;padding:24px 8px}.dashboard-content{margin-left:115px;padding:24px 12px}.app-tabs button{font-size:11px;padding:11px 6px}.iou-brand{font-size:18px}.return-cards,.return-legend{grid-template-columns:1fr}}
+.account-shell .profile-form small {
+	font-size: 11px;
+	color: var(--muted);
+}
+.account-shell .form-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	margin-top: 16px;
+	padding-top: 22px;
+	border-top: 1px solid var(--line);
+}
+.account-shell .form-footer > span {
+	font-size: 11px;
+	color: var(--muted);
+}
+.account-shell button {
+	min-height: 44px;
+	font-size: 13px;
+	padding: 10px 18px;
+	background: var(--surface);
+	border: 1px solid var(--strong-line);
+	border-radius: 6px;
+	color: var(--bright);
+}
+.account-shell button:hover {
+	background: var(--separator);
+}
+.account-shell .primary-button {
+	font-size: 14px;
+	font-weight: 700;
+	background: var(--primary-gradient);
+	border-color: var(--green);
+	color: var(--primary-ink);
+}
+.account-shell .primary-button:hover {
+	background: var(--green-hover);
+}
+.account-shell .primary-button span {
+	margin-left: 12px;
+}
+.account-shell .activity-panel {
+	margin-top: 20px;
+	padding: 24px 28px;
+}
+.account-shell .coming-soon {
+	margin-left: auto;
+	font-size: 9px;
+	letter-spacing: 0.5px;
+	padding: 3px 7px;
+	border: 1px solid var(--avatar-line);
+	border-radius: 4px;
+	background: var(--warning-bg);
+	color: var(--avatar-ink);
+	white-space: nowrap;
+}
+.account-shell .empty-state {
+	display: flex;
+	gap: 18px;
+	border-top: 1px solid var(--line);
+	padding-top: 20px;
+	align-items: center;
+}
+.account-shell .empty-icon {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border: 1px solid var(--line);
+	border-radius: 5px;
+	background: var(--surface);
+	color: var(--muted);
+	font-size: 22px;
+	flex-shrink: 0;
+}
+.account-shell .empty-state h3,
+.account-shell .signout-panel h3 {
+	font-size: 14px;
+	font-weight: 400;
+	color: var(--ink);
+	margin: 0 0 6px;
+}
+.account-shell .empty-state p,
+.account-shell .signout-panel p {
+	font-size: 12px;
+	color: var(--muted);
+	margin: 0;
+	line-height: 1.7;
+}
+.account-shell .signout-panel {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+	padding: 24px 0;
+}
+.account-shell .signout-panel button {
+	color: var(--error-ink);
+	border-color: var(--error-line);
+	background: var(--error-bg);
+}
+.account-shell .signout-panel button:hover {
+	background: var(--error-hover);
+}
+.account-shell .site-footer {
+	min-height: 78px;
+	border-top: 1px solid var(--separator);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+	color: var(--muted);
+	font-size: 10px;
+}
+.account-shell .site-footer span span {
+	color: var(--yellow-detail);
+	margin-left: 10px;
+}
+.account-shell [role="alert"] {
+	color: var(--error-ink);
+	font-size: 13px;
+}
+.account-shell [role="status"] {
+	font-size: 13px;
+	color: var(--ink);
+}
+.account-shell .session-error {
+	position: fixed;
+	bottom: 12px;
+	left: 16px;
+	z-index: 2;
+	max-width: 80vw;
+	padding: 12px;
+	background: var(--panel);
+	border: 1px solid var(--red);
+	border-radius: 5px;
+}
+@media (min-width: 1500px) {
+	.account-shell {
+		max-width: 1450px;
+		padding: 0 100px;
+	}
+}
+@media (max-width: 1000px) {
+	.account-shell {
+		padding: 0 6%;
+	}
+	.account-shell .profile-layout {
+		grid-template-columns: 190px minmax(0, 1fr);
+		gap: 32px;
+	}
+	.account-shell .edition {
+		display: none;
+	}
+	.account-shell .page-heading h2 {
+		font-size: 32px;
+	}
+	.account-shell .topbar-label {
+		font-size: 9px;
+	}
+}
+@media (max-width: 740px) {
+	.account-shell .topbar {
+		height: 88px;
+	}
+	.account-shell .brand-caption,
+	.account-shell .topbar-label {
+		display: none;
+	}
+	.account-shell .profile-layout {
+		grid-template-columns: 1fr;
+		gap: 28px;
+		padding: 32px 0;
+	}
+	.account-shell .profile-sidebar {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: 18px;
+	}
+	.account-shell .avatar {
+		grid-row: 1/4;
+		margin: 0;
+	}
+	.account-shell .profile-sidebar .eyebrow {
+        grid-column: 1 / -1;
+		margin: 0;
+		font-size: 9px;
+	}
+	.account-shell .profile-sidebar h1 {
+        grid-column: 1 / -1;
+		font-size: 24px;
+		margin: 4px 0;
+	}
+	.account-shell .sidebar-description {
+        grid-column: 1 / -1;
+		margin: 0;
+		max-width: none;
+		font-size: 12px;
+	}
+	.account-shell .member-badge {
+		grid-column: 2;
+		justify-self: start;
+		margin-top: 12px;
+	}
+	.account-shell .sidebar-divider,
+	.account-shell .sidebar-note {
+		display: none;
+	}
+	.account-shell .profile-nav {
+		margin-top: 20px;
+		margin-bottom: 0;
+	}
+	.account-shell .profile-nav.active {
+		grid-column: 1;
+	}
+	.account-shell .profile-nav:last-of-type {
+		grid-column: 2;
+	}
+	.account-shell .details-panel,
+	.account-shell .activity-panel {
+		padding: 24px;
+	}
+	.account-shell .form-footer {
+		flex-wrap: wrap;
+	}
+	.account-shell .page-heading h2 {
+		font-size: 32px;
+	}
+	.account-shell .site-footer {
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 20px 0;
+		font-size: 9px;
+	}
+	.account-shell .coming-soon {
+		font-size: 8px;
+	}
+	.account-shell .section-heading {
+		gap: 10px;
+	}
+}
+@media (max-width: 430px) {
+	.account-shell .topbar {
+		height: 77px;
+	}
+	.account-shell .page-heading h2 {
+		font-size: 30px;
+	}
+	.account-shell .details-panel,
+	.account-shell .activity-panel {
+		padding: 20px;
+	}
+	.account-shell .section-heading p {
+		font-size: 12px;
+	}
+	.account-shell .field-note {
+		font-size: 9px;
+	}
+	.account-shell .form-footer {
+		align-items: stretch;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.account-shell .coming-soon {
+		margin-left: 0;
+	}
+	.account-shell .activity-panel .section-heading {
+		flex-wrap: wrap;
+	}
+	.account-shell .signout-panel p {
+		max-width: 190px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.account-shell html {
+		scroll-behavior: auto;
+	}
+	.account-shell * {
+		transition: none !important;
+	}
+}
