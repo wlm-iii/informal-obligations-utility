@@ -24,6 +24,7 @@ class PermissionRead(ReadModel):
 
 class PreviewInput(Input):
     tone: Tone = "friendly"
+    template_id: Annotated[int, Field(strict=True, ge=1, le=3)] = 1
 
 
 class SendInput(Input):

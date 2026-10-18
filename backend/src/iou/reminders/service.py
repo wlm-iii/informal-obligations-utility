@@ -19,7 +19,7 @@ from iou.config import get_settings
 from iou.ledger import service as ledger
 from iou.ledger.models import Loan
 from iou.profiles import Profile
-from iou.reminders import gmail
+from iou.reminders import gmail, templates
 from iou.reminders.models import Permission, Recipient, Reminder
 from iou.reminders.schemas import PermissionRead, ReminderRead
 
@@ -198,19 +198,14 @@ def create_preview(session, owner, friend_id, body):
         f"{get_settings().reminder_public_base_url}/reminders/unsubscribe"
         f"?token={unsubscribe_token(identity)}"
     )
-    facts = []
-    if cents:
-        facts.append(f"${cents // 100:,}.{cents % 100:02d} recorded as owing")
-    if items:
-        facts.append(f"{items} borrowed item{'s' if items != 1 else ''} to return")
-    name = " ".join(friend.display_name.split())
-    opening = {
-        "friendly": f"Hi {name}, just a friendly reminder:",
-        "playful": f"Hey {name}, your IOU has waved hello:",
-        "direct": f"Hi {name}, a quick reminder:",
-    }[body.tone]
-    lender = " ".join(session.get(Profile, owner).display_name.split())
-    text = f"{opening} you have {' and '.join(facts)}. Please check in with {lender} when you can."
+    text = templates.render(
+        body.tone,
+        body.template_id,
+        friend.display_name,
+        session.get(Profile, owner).display_name,
+        cents,
+        items,
+    )
     text += (
         "\n\nSent through IOU on your contact's behalf; amounts and returns are manually recorded."
         f"\nStop IOU reminders: {link}"

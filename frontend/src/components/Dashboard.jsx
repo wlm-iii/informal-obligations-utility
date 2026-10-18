@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Progress from "./Progress";
 import AddFriendForm from "./AddFriendForm";
+import EmailReminder from "./EmailReminder";
 import { interestLabel, itemReturned, percentToBps, totalOutstanding } from "../services/interest";
 import { amountToCents } from "../services/repayments";
 import History from "./History";
@@ -10,10 +11,10 @@ import { applyDemoPayment, ledgerRequest, loadFriends, money, reminderFor, remin
 import "./Dashboard.css";
 import "./ReferenceTheme.css";
 
-function Modal({ title, onClose, children }) {
+function Modal({ title, onClose, children, busy = false }) {
  const ref = useRef(null);
  useEffect(() => { const previous = document.activeElement; ref.current.showModal(); return () => previous?.focus(); }, []);
- return <dialog ref={ref} className="dash-modal" onCancel={onClose} aria-label={title}><button className="close-modal" aria-label="Close dialog" onClick={onClose}>×</button><h2>{title}</h2>{children}</dialog>;
+ return <dialog ref={ref} className="dash-modal" onCancel={event => { event.preventDefault(); if (!busy) onClose(); }} aria-label={title}><button className="close-modal" aria-label="Close dialog" disabled={busy} onClick={onClose}>×</button><h2>{title}</h2>{children}</dialog>;
 }
 
 export default function Dashboard({ account, profile, demo, accountError }) {
@@ -34,6 +35,7 @@ export default function Dashboard({ account, profile, demo, accountError }) {
  const [search, setSearch] = useState("");
  const [selected, setSelected] = useState(null);
  const [nudge, setNudge] = useState(null);
+ const [nudgeBusy, setNudgeBusy] = useState(false);
  const [tone, setTone] = useState("Friendly");
  const [message, setMessage] = useState("");
  const [copyStatus, setCopyStatus] = useState("");
@@ -60,7 +62,7 @@ export default function Dashboard({ account, profile, demo, accountError }) {
  }, [demo, revision]);
  const person = id => friends.find(friend => friend.id === id) || { display_name: "Archived friend", id };
  const navigate = tab => { setView(tab); setSelected(null); };
- const openNudge = loan => { setNudge(loan); setTone("Friendly"); setMessage(reminderFor(person(loan.friend_id), loan, "Friendly")); setCopyStatus(""); };
+ const openNudge = loan => { setNudgeBusy(false); setNudge(loan); setTone("Friendly"); setMessage(reminderFor(person(loan.friend_id), loan, "Friendly")); setCopyStatus(""); };
  async function copy() {
   try { await navigator.clipboard.writeText(message); setCopyStatus("Reminder copied."); }
   catch { setCopyStatus("Copy unavailable. Select and copy the reminder text manually."); }
@@ -148,7 +150,12 @@ export default function Dashboard({ account, profile, demo, accountError }) {
    {view !== "Account" && accountError && <div role="alert">{accountError}<button onClick={() => navigate("Account")}>Open account</button></div>}
    {view === "Account" && <section className="friend-profile" aria-label="Your profile"><button onClick={() => navigate("Dashboard")}>← Back to dashboard</button><div className="profile-heading"><span className="friend-avatar large">{(profile?.display_name || "You")[0]}</span><div><p className="tiny-label">YOUR PROFILE</p><h1>{profile?.display_name || "Your account"}</h1><p>{profile?.email || "Your private IOU account"}</p></div></div><div className="friend-stats account-stats"><article><small>Friends</small><strong>{friends.filter(friend => !friend.archived_at).length}</strong></article><article><small>Money outstanding</small><strong>{money(loans.filter(l => l.kind === "money").reduce((sum,l) => sum + totalOutstanding(l),0))}</strong></article><article><small>Money repaid</small><strong>{money(loans.filter(l => l.kind === "money").reduce((sum,l) => sum + (l.repaid_cents || 0),0))}</strong></article><article><small>Items still out</small><strong>{loans.filter(l => l.kind === "item" && !itemReturned(l)).length}</strong></article><article><small>Items returned</small><strong>{loans.filter(l => l.kind === "item" && itemReturned(l)).length}</strong></article></div><h2>Borrowing history</h2>{history(loans)}<h2>Account settings</h2>{account}</section>}
   </div>
-  {nudge && <Modal title="Diplomatic communications." onClose={() => setNudge(null)}><label htmlFor="nudge-tone">Tone</label><select id="nudge-tone" value={tone} onChange={e => { setTone(e.target.value); setMessage(reminderFor(person(nudge.friend_id), nudge, e.target.value)); setCopyStatus(""); }}>{reminderTones.map(t => <option key={t}>{t}</option>)}</select><label htmlFor="nudge-message">Reminder</label><textarea id="nudge-message" rows={6} value={message} onChange={e => { setMessage(e.target.value); setCopyStatus(""); }}/><button className="primary-action" onClick={copy}>Copy reminder ↗</button><p role="status">{copyStatus}</p><small>Nothing is sent automatically. You control the group chat.</small></Modal>}
+  {nudge && <Modal title={demo ? "Diplomatic communications." : "Email reminder"} busy={nudgeBusy} onClose={() => { setNudge(null); setNudgeBusy(false); }}>
+   {demo ? <><label htmlFor="nudge-tone">Tone</label><select id="nudge-tone" value={tone} onChange={e => { setTone(e.target.value); setMessage(reminderFor(person(nudge.friend_id), nudge, e.target.value)); setCopyStatus(""); }}>{reminderTones.map(t => <option key={t}>{t}</option>)}</select><label htmlFor="nudge-message">Reminder</label><textarea id="nudge-message" rows={6} value={message} onChange={e => { setMessage(e.target.value); setCopyStatus(""); }}/><button className="primary-action" onClick={copy}>Copy reminder ↗</button><p role="status">{copyStatus}</p><small>Offline demo: clipboard only. Sign in and open Tracker to preview and approve a real email.</small></> :
+    <EmailReminder key={nudge.friend_id} friend={person(nudge.friend_id)}
+     eligible={loans.some(loan => loan.friend_id === nudge.friend_id && loan.status === "open" && (totalOutstanding(loan) > 0 || (loan.kind === "item" && !itemReturned(loan))))}
+     onBusyChange={setNudgeBusy} />}
+  </Modal>}
   {recording && <Modal title="Record repayment" onClose={() => !busy && setRecording(false)}><form onSubmit={recordRepayment}><label htmlFor="repayment-loan">Active IOU&apos;s</label><select id="repayment-loan" name="loan" required>{loans.filter(l=>l.kind==="money"&&l.status==="open").map(l=><option key={l.id} value={l.id}>{person(l.friend_id).display_name} – {l.description} ({money(totalOutstanding(l))} remaining)</option>)}</select><label htmlFor="repayment-amount">Amount (USD)</label><input id="repayment-amount" name="amount" inputMode="decimal" required placeholder="0.00"/>{error && <p role="alert">{error}</p>}<button disabled={busy || !loans.some(l=>l.kind==="money"&&l.status==="open")} className="primary-action">{busy?"Recording…":"Record payment"}</button></form></Modal>}
   {adding && <Modal title="Add to your circle" onClose={() => !busy && setAdding(false)}><AddFriendForm onSubmit={addFriend} busy={busy} error={error} friendSaved={!!savedFriend.current} locked={!!draft.current}/></Modal>}
  </div>;

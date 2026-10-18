@@ -185,6 +185,9 @@ def mutate(
         for field in ("repayment_type", "repayment_other"):
             if payload.get(field) is None:
                 payload.pop(field, None)
+    if operation.startswith("reminder-preview:") and payload.get("template_id", 1) == 1:
+        # Existing tone-only preview receipts remain replayable with the default template.
+        payload.pop("template_id", None)
     digest = hashlib.sha256(
         json.dumps(
             {"operation": operation, "body": payload},
