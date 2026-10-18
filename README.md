@@ -22,8 +22,10 @@ See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md),
 
 The authenticated **Tracker** link (`#tracker`) adds friend/loan creation, returns,
 and charge-aware settlement without replacing the existing account/statistics pages.
-Apply reviewed `0008_repayment_preferences` first. Tracker nudges are clipboard-only;
-Gmail approval remains a separate backend flow. See [merge/contract notes](docs/DAILY_INTEREST_MERGE.md).
+Apply reviewed `0008_repayment_preferences` first. Live Tracker nudges now provide
+recipient permission, server preview, explicit approval, and real Gmail submission.
+Offline demos stay clipboard-only; email remains disabled by default. See the
+[live email demo steps](docs/REMINDERS.md#live-email-demo-through-tracker). See [merge/contract notes](docs/DAILY_INTEREST_MERGE.md).
 
 ## Stack
 

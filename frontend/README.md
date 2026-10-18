@@ -1,5 +1,21 @@
 # IOU frontend
 
+## Real email reminders
+
+On the signed-in `#tracker` page, **Nudge** opens recipient permission → preset tone →
+server-generated read-only preview → explicit approval → **Send this email**. This
+offers three templates per tone (nine total), automatically filled by the backend
+with names, money owed, and item counts. It uses real Gmail when configured/enabled;
+no email is sent just by
+opening the dialog or enabling a setting. Pending/uncertain results only offer status
+checks, never automatic re-submission. Recent attempt history and backend policy errors
+are shown. The public/offline demo and standalone Statistics drafts stay copy-only.
+
+See [setup, allowlists, quiet hours, and live demo](../docs/REMINDERS.md#live-email-demo-through-tracker).
+No Gmail secret or refresh token belongs in `VITE_*` or client code. No schema change
+or Gemini key is required by this frontend connection.
+
+
 Use the [terminal design system](../docs/DESIGN_SYSTEM.md) when styling additional
 pages. It documents the shared React theme, font assets, components, and animation rules.
 

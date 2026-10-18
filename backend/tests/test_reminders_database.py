@@ -131,6 +131,30 @@ def test_same_key_pending_replay_other_send_blocked_and_network_has_no_locks(liv
     assert len(pg.mail.sent) == 1
 
 
+def test_selected_template_replay_is_immutable_on_postgresql(live):
+    pg = live
+    friend, _, original = prepare(pg)
+    key = uuid4()
+    choice = {"tone": "friendly", "template_id": 3}
+    result = post(pg, f"/friends/{friend['id']}/reminder-previews", choice, key)
+    assert result.status_code == 201, result.text
+    assert result.json()["body"] != original["body"]
+    assert "$50.00" in result.json()["body"]
+    assert (
+        post(pg, f"/friends/{friend['id']}/reminder-previews", choice, key).json() == result.json()
+    )
+    assert (
+        post(
+            pg,
+            f"/friends/{friend['id']}/reminder-previews",
+            {"tone": "friendly", "template_id": 2},
+            key,
+        ).status_code
+        == 409
+    )
+    assert not pg.mail.sent
+
+
 def test_settlement_during_token_exchange_cancels_before_submit(live):
     pg = live
     _, loan, row = prepare(pg)
