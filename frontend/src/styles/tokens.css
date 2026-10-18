@@ -31,3 +31,29 @@
 	--radius-control: 6px;
 	--radius-panel: 9px;
 }
+
+/* Shared account, status, and feedback treatments. */
+:root {
+ --separator: #dce8d7;
+ --strong-line: #a2c5a9;
+ --green-hover: #13764c;
+ --primary-ink: #ffffff;
+ --yellow-detail: #856214;
+ --avatar-bg: #e8efd8;
+ --warning-bg: #fff5dc;
+ --warning-border: #ead7a3;
+ --warning-ink: #856214;
+ --error-bg: #ffe7e1;
+ --error-line: #f5c6ba;
+ --error-ink: #a93436;
+ --error-hover: #ffdbd3;
+ --positive-bg: #e8efd8;
+ --focus-ring: #19835717;
+}
+:root {
+ --brand-gradient: linear-gradient(180deg, #489c77, #147a50);
+ --primary-gradient: linear-gradient(180deg, #439d77, #147b51 75%);
+ --avatar-bg: linear-gradient(150deg, #ffe6a0, #f7cb63);
+ --avatar-line: #f1d38a;
+ --avatar-ink: #4b390a;
+}
