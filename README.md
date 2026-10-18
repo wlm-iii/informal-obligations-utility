@@ -34,6 +34,9 @@ Offline demos stay clipboard-only; email remains disabled by default. See the
 - PostgreSQL 17 + SQLAlchemy 2 + Psycopg + Alembic
 - npm lockfile, pinned Python requirements, optional Nix flake dev shell
 
+For a varied, sender-owned authenticated demo dataset, see
+[the opt-in demo seeder](docs/DEMO_SEED.md). It sends no email and preserves existing data.
+
 ## Quick start
 
 ### Windows (PowerShell, no WSL or Nix required)
