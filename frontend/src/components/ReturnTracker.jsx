@@ -4,13 +4,13 @@ import "./ReturnTracker.css";
 
 
 
-export default function ReturnTracker() {
+export default function ReturnTracker({ previewLoans, compact }) {
  const [summary, setSummary] = useState(null);
  const [error, setError] = useState("");
  const [revision, setRevision] = useState(0);
  useEffect(() => {
   const controller = new AbortController();
-  loadLoans(controller.signal).then(loans => {
+  (previewLoans ? Promise.resolve(previewLoans) : loadLoans(controller.signal)).then(loans => {
    if (!controller.signal.aborted) { setSummary(summarizeLoans(loans)); setError(""); }
   }).catch(error => {
    if (!controller.signal.aborted) { setSummary(null); setError(error.message); }
@@ -18,7 +18,7 @@ export default function ReturnTracker() {
   const refresh = () => { setSummary(null); setRevision(value => value + 1); };
   window.addEventListener("focus", refresh);
   return () => { controller.abort(); window.removeEventListener("focus", refresh); };
- }, [revision]);
+ }, [revision, previewLoans]);
  function refresh() { setSummary(null); setError(""); setRevision(value => value + 1); }
  if (!summary) return <section className="return-overview" aria-label="Return tracker"><p role="status">{error || "Loading your lending overview…"}</p>{error && <button onClick={refresh}>Retry lending data</button>}</section>;
  const total = summary.outstanding + summary.returned;
@@ -28,10 +28,10 @@ export default function ReturnTracker() {
   { label: "Still lent out", count: summary.outstanding, color: "#D0A215" },
   { label: "Returned to you", count: summary.returned, color: "#879A39" },
  ];
- return <section className="return-overview" aria-labelledby="return-heading">
-  <header className="return-heading"><div><p className="return-eyebrow">YOUR LENDING, AT A GLANCE</p><h2 id="return-heading">THE RETURN BREAKDOWN.</h2><p>A clearer picture of what is still out, and what made it back.</p></div><button className="return-sample" onClick={refresh}>Refresh data</button></header>
+ return <section className="return-overview" aria-label="Item return progress">
+  {!compact && <header className="return-heading"><h2 id="return-heading">Your lending, at a glance</h2><button className="return-sample" onClick={refresh}>Refresh data</button></header>}
   <section className="return-panel" aria-labelledby="return-chart-heading">
-   <h3 id="return-chart-heading">Items lent vs. returned</h3><p className="return-description">The share of all items you have lent out that are still out or returned to you.</p>
+   <h3 id="return-chart-heading">Still lent out vs. returned to you</h3><p className="return-description">The share of all items you have lent out that are still out or returned to you.</p>
    <div className="return-chart-area">
     <div className="return-chart-wrap"><svg viewBox="0 0 240 240" role="img" aria-labelledby="return-chart-title"><title id="return-chart-title">{total ? 100 - returnedPercent : 0}% still lent out; {returnedPercent}% returned to you.</title>
      <g transform="rotate(-90 120 120)"><circle cx="120" cy="120" r="90" fill="none" stroke={total ? "#879A39" : "#343331"} strokeWidth="28"/><circle cx="120" cy="120" r="90" fill="none" stroke="#D0A215" strokeWidth="28" strokeDasharray={`${(total ? summary.outstanding / total : 0) * circumference} ${circumference}`}/></g>
