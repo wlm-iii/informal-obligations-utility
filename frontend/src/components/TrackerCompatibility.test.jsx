@@ -1,15 +1,21 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import Dashboard from "./Dashboard";
 vi.mock("../services/dashboard", async original => ({...await original(),ledgerRequest:vi.fn(),loadFriends:vi.fn()}));
 vi.mock("../services/loans", async original => ({...await original(),loadLoans:vi.fn()}));
 import { ledgerRequest, loadFriends } from "../services/dashboard";
 import { loadLoans } from "../services/loans";
+vi.mock("../services/reminders",()=>({getReminderPreferences:vi.fn(),listReminders:vi.fn(),
+ saveReminderPermission:vi.fn(),createReminderPreview:vi.fn(),sendReminderPreview:vi.fn(),getReminder:vi.fn()}));
+import * as reminders from "../services/reminders";
 const friend={id:"f",display_name:"Alex",email:"alex@example.com"};
 const money={id:"m",friend_id:"f",kind:"money",description:"Lunch",status:"open",due_date:"2099-01-01",lent_at:"2026-01-01",principal_cents:10000,outstanding_cents:10000,interest_cents:500,fees_cents:200,total_outstanding_cents:10700,interest_rate_bps:125,interest_period:"weekly"};
-beforeEach(()=>{vi.resetAllMocks();loadFriends.mockResolvedValue([friend]);HTMLDialogElement.prototype.showModal=function(){this.setAttribute("open","");};});
+beforeEach(()=>{vi.resetAllMocks();loadFriends.mockResolvedValue([friend]);
+ reminders.getReminderPreferences.mockResolvedValue({friend_id:"f",recipient_email:friend.email,permission_confirmed:true,opted_out:false});
+ reminders.listReminders.mockResolvedValue([]);
+ HTMLDialogElement.prototype.showModal=function(){this.setAttribute("open","");};});
 afterEach(cleanup);
 it("pays the server total including charges, not principal-only outstanding",async()=>{
  loadLoans.mockResolvedValue([money]);
@@ -33,12 +39,46 @@ it("pays fees on an already returned item instead of issuing a duplicate return"
  expect(ledgerRequest.mock.calls[0][0]).toBe("/loans/i/fee-payments");
  expect(ledgerRequest.mock.calls[0][1].body).toEqual({amount_cents:200});
 });
-it("filters voids and offers only the existing three polite clipboard tones",async()=>{
+it("prevents closing the real-email modal during a single explicit submission",async()=>{
+ loadLoans.mockResolvedValue([money]);
+ const preview={id:"p",friend_id:"f",recipient_email:friend.email,tone:"friendly",subject:"IOU reminder",body:"Hello. Stop: https://api.example/unsubscribe",status:"preview",expires_at:new Date(Date.now()+600000).toISOString(),created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+ reminders.createReminderPreview.mockResolvedValue(preview);
+ let finish;
+ reminders.sendReminderPreview.mockImplementation(()=>new Promise(resolve=>{finish=resolve;}));
+ render(<Dashboard/>);
+ fireEvent.click(await screen.findByRole("button",{name:"Nudge ↗"}));
+ await screen.findByRole("checkbox",{name:/I confirm this recipient agreed/});
+ fireEvent.click(screen.getByRole("button",{name:"Generate email preview"}));
+ await screen.findByLabelText("Email body");
+ fireEvent.click(screen.getByRole("checkbox",{name:/I approve this exact/}));
+ fireEvent.click(screen.getByRole("button",{name:"Send this email"}));
+ const dialog=screen.getByRole("dialog",{name:"Email reminder"});
+ expect(within(dialog).getByRole("button",{name:"Close dialog"})).toBeDisabled();
+ fireEvent(dialog,new Event("cancel",{bubbles:true,cancelable:true}));
+ expect(screen.getByRole("dialog",{name:"Email reminder"})).toBeInTheDocument();
+ await act(async()=>finish({...preview,status:"sent",attempted_at:new Date().toISOString()}));
+ expect(within(dialog).getByRole("button",{name:"Close dialog"})).toBeEnabled();
+ expect(reminders.sendReminderPreview).toHaveBeenCalledTimes(1);
+});
+it("keeps public/offline demos copy-only with no email API requests",()=>{
+ render(<Dashboard demo={{friends:[friend],loans:[money]}}/>);
+ fireEvent.click(screen.getByRole("button",{name:"Nudge ↗"}));
+ expect(screen.getByRole("button",{name:"Copy reminder ↗"})).toBeInTheDocument();
+ expect(screen.queryByRole("button",{name:"Send this email"})).not.toBeInTheDocument();
+ expect(reminders.getReminderPreferences).not.toHaveBeenCalled();
+ expect(reminders.sendReminderPreview).not.toHaveBeenCalled();
+});
+it("filters voids and opens the real-email flow with only three polite tones",async()=>{
  loadLoans.mockResolvedValue([money,{...money,id:"v",status:"voided",description:"Voided debt"}]);
  render(<Dashboard/>);
  fireEvent.click(await screen.findByRole("button",{name:"Nudge ↗"}));
  const dialog=screen.getByRole("dialog");
- expect(within(dialog).getAllByRole("option").map(option=>option.textContent)).toEqual(["Friendly","Direct","Playful"]);
+ await within(dialog).findByRole("checkbox",{name:/I confirm this recipient agreed/});
+ expect(Array.from(within(dialog).getByLabelText("Message tone").options).map(option=>option.textContent)).toEqual(["Friendly","Playful","Direct but polite"]);
+ expect(within(dialog).getByLabelText("Message template").options).toHaveLength(3);
+ expect(within(dialog).getByRole("button",{name:"Generate email preview"})).toBeInTheDocument();
+ expect(within(dialog).queryByRole("button",{name:"Copy reminder ↗"})).not.toBeInTheDocument();
+ expect(reminders.sendReminderPreview).not.toHaveBeenCalled();
  expect(screen.queryByText("Voided debt")).not.toBeInTheDocument();
  expect(ledgerRequest).not.toHaveBeenCalled();
 });

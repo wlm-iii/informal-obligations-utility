@@ -68,8 +68,11 @@ OAuth, recipient permission, global unsubscribe/cooldown, durable claims, delive
 history, stale-preview/final eligibility checks, and conservative uncertain outcomes.
 Only currently owing contacts qualify; no arbitrary text or autonomous sending.
 Default email mode is disabled and live recipients are restricted to the sender.
-See [reminder setup and the local self-email demo](REMINDERS.md). Hosted migration,
-real Gmail acceptance, and frontend integration remain explicit steps.
+See [reminder setup and the live demo](REMINDERS.md). Hosted migration and full
+hosted Gmail acceptance remain explicit release steps. Signed-in Tracker now
+connects to this API for consent, immutable previews, explicit sending, and status/history;
+public/offline demos remain copy-only. A single approved transport test was received,
+but automated UI tests never send real email.
 
 Level 5.1 will add optional minimal-context Gemini drafting behind the same approval
 flow, with template fallback. No inbox reading or user-by-user Gmail authorization.

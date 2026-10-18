@@ -1,5 +1,9 @@
 # Tracker PR compatibility merge
 
+These notes describe the original compatibility merge. Subsequent work connects
+signed-in Tracker nudges to real approved email; public/offline demos remain
+clipboard-only. See [current reminder flow](REMINDERS.md#live-email-demo-through-tracker).
+
 The incoming `codex/iou-tracker-daily-interest` branch forked from the Level 1 ledger
 (`fec7545`), before current main's Levels 2–5 and terminal/account UI. This merge
 preserves current main wherever contracts differ; it does not introduce a second

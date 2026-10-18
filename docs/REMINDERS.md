@@ -1,6 +1,7 @@
 # Level 5.0 — manually approved template email (Gmail API)
 
-Backend only. One centrally authorized Gmail account sends for IOU; users never
+The signed-in Tracker connects to the manual reminder backend. One centrally
+authorized Gmail account sends for IOU; users never
 choose providers or authorize Gmail in their login. No inbox reading, Gmail SDK,
 Gemini, scheduling, or payments. Google currently offers standard Gmail API use at
 no extra cost within quotas; a few demo emails are well below those quotas. Account
@@ -56,6 +57,57 @@ only after reviewed live acceptance to remove that restriction. The recipient st
 needs consent and a current obligation. Standard API sends enforce 09:00–18:00 in
 the owner's current timezone (recipient timezone is not stored). Environment-only
 quiet-hour overrides are for consenting test scenarios, never autonomous chasing.
+
+## Live email demo through Tracker
+
+1. Set `EMAIL_MODE=gmail` with the existing sender credentials/signing key and restart
+   the backend. No frontend provider keys or Gmail permissions on user login are needed.
+2. Sign in at `http://localhost:5173/#tracker`. Use a contact with outstanding money,
+   charges, or an unreturned item. For a controlled localhost demo, use the authorized
+   Gmail sender's own inbox and a clearly labelled fictional IOU you create yourself.
+   Records use the configured database; the UI does not silently seed test data.
+3. Click **Nudge**. Opening the dialog only reads permission and delivery history.
+4. Confirm recipient permission and choose Friendly, Playful, or Direct but polite.
+   Each tone has **three message templates** (nine total). Choose a template, then
+   click **Generate email preview**. The backend automatically fills the contact and
+   lender names, current total money owed, and unreturned-item count. This saves the attestation if necessary and creates
+   a server preview; it does not send. Existing recipient opt-out cannot be overridden.
+5. Review the exact To, subject, read-only body/unsubscribe footer, and expiry. Check
+   the separate approval checkbox, then click **Send this email** for one real submission.
+6. The result distinguishes Gmail acceptance, definite failure, cancellation, pending,
+   and uncertain delivery. Check Inbox/Spam. **Check delivery status** uses GET only;
+   an interrupted/uncertain send is never automatically retried. Do not create another
+   send to investigate an uncertain result. An expired/changed preview needs fresh approval.
+
+The dialog prevents duplicate clicks and closing while submission is pending. If the
+page/navigation disconnects, closing does not guarantee cancellation; backend durable
+claims/history remain authoritative. Recent attempts/24-hour cooldown are shown, and
+permission/address changes force review again. The backend always rechecks current
+eligibility, consent, quiet hours, configured recipients, and opt-out before dispatch.
+
+A real email demo is supported, not simulated. However, the **public/offline demo stays
+clipboard-only** and cannot call email APIs. Existing standalone Statistics clipboard
+drafts are unchanged; use Tracker or Tracker → Progress → Draft reminder for real email.
+No Gemini drafting is included.
+
+### If the live demo is blocked
+
+- **Email disabled:** use `EMAIL_MODE=gmail` and restart the backend; editing `.env`
+  alone does not refresh the cached configuration.
+- **Demo allowlist:** the sender's own inbox is allowed by default. Other consenting
+  test recipients require `GMAIL_RECIPIENT_ALLOWLIST=["address@example.com"]` (or a
+  separately reviewed wider release). Never add a recipient without permission.
+- **Public unsubscribe URL:** non-self recipients need a reachable public HTTPS
+  `REMINDER_PUBLIC_BASE_URL`. Localhost is suitable only for self-testing on that computer.
+- **Quiet hours:** regular API sends use 09:00–18:00 in the owner's profile timezone.
+  For an explicitly consenting demo, the operator may set
+  `REMINDER_QUIET_HOURS_ENABLED=false` and restart. The UI never bypasses this check.
+- **Cooldown:** a sent or uncertain reminder blocks that address for 24 hours, across
+  duplicate contacts and owners. Enabling email does not reset it or send anything.
+
+All network mutation errors are surfaced; no automatic send retries occur. A 202 or
+Gmail `sent` record is acceptance, not proof of inbox delivery. Do not paste client
+secrets, refresh tokens, or signing keys into frontend environment variables or UI.
 
 ## Fast local self-email demo (no frontend/JWT setup)
 
@@ -131,7 +183,8 @@ not accepted. Tones are `friendly`, `playful`, `direct` (direct remains polite).
    `{"recipient_email":"friend@example.com","permission_confirmed":true}`.
    This is the lender's explicit attestation that the recipient agreed to reminders;
    owing someone alone is not consent. Use false to revoke that sender's permission.
-3. `POST /friends/{id}/reminder-previews` with `{"tone":"friendly"}`.
+3. `POST /friends/{id}/reminder-previews` with `{"tone":"friendly","template_id":2}`.
+   `template_id` is a strict integer 1–3 and defaults to 1 for older tone-only clients.
    Returns immutable recipient, subject, complete body/footer, ID, and 10-minute expiry.
 4. Show that exact preview. `POST /reminders/{id}/send` with
    `{"approved":true,"recipient_email":"friend@example.com"}` and a new key.
@@ -160,6 +213,13 @@ still qualifies. A returned item with unpaid fees qualifies only for those fees.
 Fully settled/returned and voided obligations do not qualify. Other owners' contacts,
 missing email, archived contacts, expired previews, unconfirmed permission, and opted-out
 recipients cannot be sent reminders.
+
+Each of the three tones has three distinct, short templates (nine total). The
+chosen template is rendered on the server, not from client-supplied amounts or names.
+The selected ID is preview input only; the immutable subject/body already preserve
+exactly what was approved, so no new database column or migration is needed. Default
+variant 1 retains old tone-only receipt hashes; changing variants requires a new key.
+Changing tone/template clears the displayed preview and approval in the UI.
 
 The short template uses owner/contact names, current total USD owed, and unreturned
 item count. It does not send notes, proof images, scores, other lenders' history, or
@@ -236,7 +296,8 @@ PostgreSQL adds concurrent pending replays, blocked duplicate sends, mutation du
 OAuth, owner-lock release during provider I/O, schema drift/ACLs, and guarded rollback.
 
 Level 5.1 can add optional Gemini drafting behind the same immutable-preview approval
-flow. Frontend reminder controls, schedules, webhooks, automatic retries, inbox access,
-public production hardening, and Gmail outcome reconciliation are not implemented.
+flow. Tracker reminder controls are implemented with mocked client/API regression
+tests. Schedules, webhooks, automatic retries, inbox access, public production hardening,
+and Gmail outcome reconciliation are not implemented.
 After the demo, revoke the sender grant, delete its separate OAuth client, and remove
 stored credentials. Leave the Supabase login client alone.
