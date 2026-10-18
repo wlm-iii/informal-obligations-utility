@@ -131,8 +131,15 @@ def test_send_failure_classification_and_no_retry(monkeypatch, envelope, code, e
     assert len(opener.calls) == 1 and "private" not in str(error.value)
 
 
-@pytest.mark.parametrize("body", [b"[]", b"not json", b"{}", b'{"id":123}', b"x" * 70000])
-def test_malformed_acceptance_is_uncertain(monkeypatch, envelope, body):
+@pytest.mark.parametrize(
+    "body",
+    [b"[]", b"not json", b"{}", b'{"id":123}', b"x" * 70000],
+    ids=["json-array", "invalid-json", "missing-id", "non-string-id", "oversized-response"],
+)
+def test_malformed_acceptance_is_uncertain(monkeypatch, envelope, body, request):
+    # Pytest exports this ID via PYTEST_CURRENT_TEST. A raw 70KB parameter exceeds
+    # Windows' environment-variable limit before the actual test can run.
+    assert len(request.node.callspec.id) < 64
     opener = Opener(body)
     monkeypatch.setattr(gmail, "build_opener", lambda *_: opener)
     with pytest.raises(gmail.Uncertain):
