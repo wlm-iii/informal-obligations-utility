@@ -108,6 +108,16 @@ body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
 .home-dashboard .iou-operations button:disabled{opacity:.55;cursor:wait}
 .home-dashboard .payment-history>.borrowing-records{margin-top:0}
 .home-dashboard .payment-history>section+section{margin-top:28px}
+/* Left-aligned award artwork with compact, raised title groups. */
+.home-dashboard .hall{border:1px solid #83A38A}
+.home-dashboard .hall>h2{border-bottom-color:#83A38A}
+.home-dashboard .hall li{grid-template-columns:64px minmax(0,1fr) auto;column-gap:12px;row-gap:4px;align-content:center}
+.home-dashboard .hall .hall-art{grid-column:1;grid-row:1/3;align-self:center;justify-self:center}
+.home-dashboard .hall-name,.home-dashboard .hall h3{grid-column:2}
+.home-dashboard .hall h3{align-self:start;position:relative;top:-4px}
+.home-dashboard .hall-credit{grid-column:3;grid-row:1/3;text-align:right;justify-self:end}
+@media(max-width:1000px){.home-dashboard .hall li{grid-template-columns:42px minmax(0,1fr) auto;column-gap:6px}.home-dashboard .hall h3{font-size:17px}.home-dashboard .hall-credit{max-width:70px}.home-dashboard .hall-credit strong{display:block;margin-left:0}}
+@media(max-width:600px){.home-dashboard .hall-columns{grid-template-columns:1fr}.home-dashboard .hall li{min-height:120px}}
 @media(max-width:700px){.home-dashboard .ledger-row .iou-operations{align-items:flex-start}.home-dashboard .ledger-row .iou-operations button{margin-left:42px}}
 @media(min-width:701px) and (max-width:1100px){.home-dashboard .ledger-labels,.home-dashboard .ledger-row{grid-template-columns:minmax(130px,1.5fr) 100px 80px 85px 60px;gap:10px}.home-dashboard .loan-balance strong{font-size:20px}.home-dashboard .ledger-rows{padding:0 12px}.home-dashboard .ledger-row button:not(.person-link){padding:7px 4px}}
 @media(max-width:700px){.home-dashboard .ledger-labels{display:none}.home-dashboard .ledger-row{grid-template-columns:1fr;gap:14px}.home-dashboard .loan-balance,.home-dashboard .iou-due,.home-dashboard .iou-interest{padding-left:42px}.home-dashboard .iou-due:before,.home-dashboard .iou-interest:before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.06em;color:#54796D;margin-bottom:6px}.home-dashboard .ledger-row>div:last-child{text-align:left}.home-dashboard .ledger-row>div:last-child button{margin-left:42px}.home-dashboard .ledger-heading input{width:100%}}
