@@ -1,8 +1,11 @@
 # Level 1 — private friends and basic borrowing API
 
-This slice is **backend-only**. The existing frontend still shows sign-in/profile
-editing; friends/loans screens can consume these contracts next. No images, fees,
-interest calculations, scores, reminders, or shared social network are implemented.
+This page documents the baseline ledger. The current authenticated frontend also
+has an additive `#tracker` view; see [tracker compatibility notes](DAILY_INTEREST_MERGE.md). [Level 2](HISTORY_PROOF.md) now extends it with corrections,
+voids, proof images, and signed cursors. [Level 3](CHARGES_SCORES.md) adds optional
+periodic charges, waivers, and fictional scores. [Level 5.0](REMINDERS.md) adds manually
+approved email; tracker clipboard drafts do not invoke it. A shared social network
+is not implemented.
 
 ## Setup and release
 
@@ -25,6 +28,12 @@ Every operation derives the owner from the verified token. There is no writable
 Missing and other owners' records both return 404. Private responses are `no-store`.
 First ledger creation automatically provisions a profile; calling `/me` first is
 not required.
+
+Current head `0008_repayment_preferences` adds optional `repayment_type` and
+`repayment_other` metadata to creation/read responses. `other` requires details;
+other choices reject details. These preferences never convert loan kind, waive
+principal, alter rates, or change settlement actions. Existing loans default to null.
+Apply the linear head, not the incoming PR's retired `0004_iou_preferences` fork.
 
 ## Contacts
 
@@ -90,7 +99,7 @@ Item example:
 - Description is trimmed, nonempty, at most 500 characters; notes max 2,000.
 - Currency is USD only (default USD for money). Amounts are **integer cents**,
   1–1,000,000,000,000 inclusive. Floats, numeric strings, and booleans are rejected.
-- Item loans represent exactly one item and reject money/currency fields. No
+- Item loans represent exactly one item and reject principal/interest/currency inputs. No
   reference valuations, quantities, loss/damage, or partial item returns yet.
 - `lent_at` defaults to server time. Supplied timestamps require an explicit offset
   and are normalized to UTC. Future lending/settlement timestamps are rejected.
@@ -98,8 +107,9 @@ Item example:
   The loan snapshots the timezone and the following midnight as `overdue_at` in UTC.
   The due date is inclusive; overdue starts at that boundary, including DST changes.
   Later profile timezone edits never rewrite an existing loan's boundary.
-- No loan PATCH/DELETE exists. Financial edits, corrections, cancellation/voiding,
-  and waivers need an explicit history-preserving Level 2 workflow.
+- No loan PATCH/DELETE exists. Use the explicit [Level 2 correction/void
+  workflows](HISTORY_PROOF.md) rather than editing historical financial fields.
+  Original loan terms still require void/recreate. Level 3 adds charge waivers.
 
 ## Repayments and item returns
 
@@ -123,14 +133,14 @@ are rejected.
 Settlement returns `{ "event": ..., "loan": ... }`. The event includes its ID,
 loan ID, action, amount (null for returns), note, and effective/recorded timestamps.
 Loan state includes principal/currency, repaid/outstanding cents, due date/timezone,
-`overdue_at`, `status` (`open`/`completed`), `overdue`, `returned_at`, and
-`completed_at`. Item monetary fields are null, not an estimated cash debt. Interest
-and fees are always zero. Completed loans are never currently overdue.
+`overdue_at`, `status` (`open`/`completed`/`voided`), `overdue`, `returned_at`, and
+`completed_at`. Item principal fields are null, not an estimated cash debt. Charges
+default to zero; optional Level 3 terms introduce separate fee/interest/total fields.
+An item return may leave charges unpaid; see its separate borrowing/settlement states.
 
-Money balances derive from repayment records, not editable balance fields. Full
-repayment completes the loan; completion time is the latest effective payment time,
-including when entries were recorded out of order. Item return completes the item
-loan. A new request that overpays, repeats an already completed loan, or applies the
+Money balances derive from active (not reversed) repayment records, not editable balance fields. Full
+repayment of principal and agreed charges completes the loan. Item return completes
+the borrowing interval; any assessed fees must be paid/waived for financial completion. A new request that overpays, repeats an already completed loan, or applies the
 wrong action to a loan kind returns 409 without recording an event.
 
 ## Retry and concurrency contract
@@ -177,20 +187,20 @@ must go through this service.
 List/history envelope:
 
 ```json
-{"items": [], "limit": 25, "offset": 0, "has_more": false}
+{"items": [], "limit": 25, "offset": 0, "has_more": false, "next_cursor": null}
 ```
 
 `limit` defaults to 25 (1–100); `offset` defaults to 0 (0–100,000). Lists sort by
 creation time descending, then ID. Loan filters: `friend_id`, `kind=money|item`,
-`status=open|completed`, and `overdue=true|false`. Archived friends' existing loans
+`status=open|completed|voided`, and `overdue=true|false`. Archived friends' existing loans
 remain visible. A supplied foreign/missing friend filter returns 404.
 
 History sorts by effective time descending, then recorded time and event ID. Entries
 have action `lent`, `repayment`, or `return`; include amount/note/timestamps; and
 embed **current** loan state. A lending entry uses the original loan ID and amount.
 Backdated events appear in effective-time order. This is a basic ledger timeline,
-not yet the correction/audit system planned for Level 2. Offset pagination is stable
-for unchanged data; concurrent inserts may shift pages. Cursor pagination is deferred.
+extended by [Level 2's audit actions and cursor mode](HISTORY_PROOF.md). Offset
+pagination remains available; concurrent inserts may shift offset pages.
 
 ## Security, testing, and launch limits
 
@@ -199,7 +209,9 @@ including when Supabase default privileges would otherwise grant access. Never
 expose `iou_app` in the Data API. Use separate migration/runtime credentials for
 production. A runtime role needs SELECT/INSERT on loans, events, and receipts,
 and SELECT/INSERT/UPDATE on friends/profiles; not schema CREATE, record DELETE, or
-UPDATE on immutable lending/event records. SQLAlchemy does not inherit browser RLS.
+UPDATE on immutable lending/event financial fields. Level 2 additionally needs
+SELECT/INSERT on audit, SELECT/INSERT/UPDATE on evidence, and only UPDATE(reversed_at)
+on settlement events; see its setup guide. SQLAlchemy does not inherit browser RLS.
 
 `check` covers contract validation, both loan lifecycles, owner isolation, archival,
 retry snapshots, rollback on failure, pagination, backdating, and timezone boundaries.
@@ -210,36 +222,3 @@ clean up synthetic owners/ledger records. Do not run against production/shared d
 Before release, review/apply the migration and perform a real authenticated API
 smoke test against the intended environment. Hosted migration, browser-based lending
 UI, and production launch hardening are separate from these local automated results.
-# IOU creation preferences
-
-The dashboard add form creates a friend followed by a money or item IOU. It requires
-name, email, type, amount or item name, due date, and repayment type. Other repayment
-types require a description. If saving the IOU fails after the friend is saved,
-retry reuses that friend and the IOU idempotency key.
-
-Loan creation and read responses support `repayment_type` (`item`, `money`, or
-`other`), `repayment_other` (required only for `other`), and integer
-`interest_percent` (0–1000, default 0). Existing API clients may omit these fields.
-The selected percentage is a **daily simple rate** on original principal, accruing
-on each calendar day after the due date in the IOU's saved timezone. Total interest
-is rounded once to the nearest cent, half up. There is no compounding. Outstanding
-balance includes principal plus accrued interest minus all recorded repayments.
-Partial payments do not reduce the daily interest basis. Once the balance is fully
-paid, interest freezes at the final repayment's effective date. Interest-bearing
-repayments must be recorded in chronological order. Item IOUs and repayment by
-item require a zero interest rate and hide the slider. Legacy item rates are ignored.
-The frontend demo uses the same calculation and refreshes once a minute; authenticated
-balances come from the backend. Status/overdue filters include unpaid interest.
-
-Apply migration `0004_iou_preferences` before running the updated backend:
-`py -3.12 scripts/dev.py migrate` (Windows) or `python3 scripts/dev.py migrate`.
-
-Avatar accents use the active (`status=open`) IOU count, counting both money and
-items: 0 cyan, 1 blue, 2 purple, 3 yellow, 4 orange, 5+ red. Closed records do not
-affect the color. Accent colors are based on [Flexoki](https://stephango.com/flexoki).
-
-The dashboard lists active IOUs only. Settle records the full outstanding money
-balance (including accrued interest) through the repayment API, or records an item
-return through the return API. On success the UI opens History and keeps the completed
-record there. Failed requests retain the active row and reuse the settlement
-idempotency key on retry. Friend profiles and their other active IOUs remain available.

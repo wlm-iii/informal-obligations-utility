@@ -83,6 +83,7 @@ body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
 .home-dashboard .iou-terms{color:#5E409D;font-size:10px;display:block;margin-top:6px;overflow-wrap:anywhere}
 .dash-modal{max-height:calc(100dvh - 32px);overflow-y:auto;width:min(520px,calc(100vw - 32px));box-sizing:border-box;background:#FFFCF0;color:#102D2C}
 .add-iou-form{display:flex;flex-direction:column;gap:8px}
+.add-iou-form fieldset{border:0;padding:0;margin:0;min-width:0;display:grid;gap:8px}
 .add-iou-form label{margin-top:8px;display:flex;justify-content:space-between}
 .add-iou-form .form-intro{color:#54796D;font-size:12px;line-height:1.6}
 .add-iou-form input,.add-iou-form select{box-sizing:border-box;width:100%;min-height:42px}

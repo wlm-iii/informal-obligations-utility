@@ -8,6 +8,7 @@
 		"build": "vite build",
 		"lint": "eslint .",
 		"test": "vitest run",
+		"test:login": "vitest run src/components/MarketChart.test.jsx src/components/TerminalLogin.test.jsx",
 		"preview": "vite preview",
 		"build:preview": "node scripts/build-preview.mjs"
 	},

@@ -3,9 +3,14 @@
 **Informal Obligations Utility** · Draft v0.1 · Decisions below are provisional.
 
 This primarily describes intended behavior. Google sign-in/private profiles and
-Level 1's zero-charge backend lending ledger are implemented; see [auth setup](AUTH.md),
-[ledger contracts](LEDGER.md), and the [backend roadmap](BACKEND_ROADMAP.md).
-Interest, fees, scores, reminders, and frontend lending screens remain future work.
+the backend ledger, audited corrections/voids, private proof workflows,
+signed cursors, periodic charges, waivers, fictional scores, dashboard APIs, and
+Level 5.0 template-based manual Gmail reminders are implemented;
+see [auth setup](AUTH.md), [ledger contracts](LEDGER.md), [Level 3](CHARGES_SCORES.md),
+[dashboard metrics](DASHBOARD.md),
+[Level 2 safety/setup](HISTORY_PROOF.md), and the [backend roadmap](BACKEND_ROADMAP.md).
+Hosted provider setup/acceptance, Gemini drafting, scheduled reminders, and frontend API integration
+remain separate work.
 The ledger contracts specify the narrower behavior that actually ships today.
 
 ## Product and audience
@@ -49,7 +54,7 @@ are money actually owed, and do not mix original principal with fees in summarie
 | Owner | ID, login identity, timezone; owns every friend/obligation |
 | Friend | ID, owner ID, display name, optional email, reminder preferences, archived time |
 | Loan | ID, owner/friend IDs, kind, description, lent/due dates, terms snapshot, status |
-| Money terms | Currency, original principal, annual simple rate, grace days, late fee/cap |
+| Money terms | Currency, original principal, simple rate/period, grace days, late fee/cap |
 | Item terms | Item description, quantity, optional reference value, optional fixed late fee |
 | Repayment | Loan ID, amount, effective timestamp, recorded timestamp, optional note |
 | Activity | Owner/loan IDs, event type, effective/recorded timestamps, safe event details |
@@ -60,61 +65,46 @@ trust a client-supplied owner ID. Keep history private to the owner. Archive fri
 with history rather than silently deleting related transactions. Domain migrations
 arrive with their feature PRs; this document is not a committed database schema.
 
-## Calculation contract — proposed MVP defaults
+## Calculation contract — implemented Level 3
 
-Agree on these before implementing calculators and UI independently.
+The user-facing choice is an optional rate **per selected term**, plus an independently
+optional one-time late fee. The earlier annual-only proposal is superseded by
+[the complete implemented contract](CHARGES_SCORES.md).
 
-- Single currency: USD initially. Store payments/principal in integer cents and
-  rates in an exact decimal or integer basis-point representation. Never use float.
-- Interest and fees default to **zero** and require explicit opt-in per loan.
-- Money interest is **simple annual interest**, not compounding. It accrues from
-  the lending date on outstanding principal, with an actual-days/365 denominator.
-  Repayments split accrual into intervals; they do not retroactively reduce earlier interest.
-- Lending/repayment events use the owner's calendar dates for accrual boundaries:
-  start inclusive, end exclusive. A payment changes principal from its effective date;
-  same-day events are ordered by effective timestamp, then stable event ID.
-- Round the total calculated interest to cents using decimal half-up rounding,
-  not each intermediate multiplication. Preserve sufficient internal precision.
-- Payment allocation: fixed late fees first, accrued unpaid interest second,
-  principal last. Never charge interest on interest or on fees.
-- Overpayment is rejected for now. Settlement means principal and all agreed charges
-  are cleared; no accrual occurs after settlement. Voiding also stops accrual and
-  preserves an audit event rather than erasing history.
-- A due date is inclusive through the end of that day in the owner's configured
-  timezone. Overdue starts on the next calendar day. Grace defaults to zero days;
-  with N grace days the fixed late fee is assessed on due date + N + 1.
-- The fixed late fee is assessed **once**, not daily, and has a recorded applied event
-  or equivalent idempotent derivation. No fee-on-fee or compounding.
-- The terms snapshot includes an explicit maximum total charge amount (interest +
-  late fees) when either is enabled. Exact UI limits/rate presets need team agreement.
-- Item loans have no percentage interest. Optional fixed late fee follows the same
-  overdue/grace rule. Returning the item closes the borrowing interval; unpaid fees
-  remain visible separately until paid or waived.
-- Snapshot rates, fees, caps, and timezone on the loan. Later preference changes must
-  not silently rewrite historical obligations. Terms changes require an explicit event.
-- Store timestamps in UTC and retain the timezone needed for calendar-date rules.
-  Keep both effective time and recorded time for backdated events.
+- USD integer cents and integer rate basis points; no float money math.
+- Daily/weekly/biweekly/monthly/quarterly/yearly fixed periods of 1/7/14/30/90/365
+  calendar days. Rates are not silently annualized. Zero/omitted rates and fees are off.
+- Simple, prorated interest on remaining principal from lending; no compounding or
+  interest on charges. Calendar boundaries use the snapshotted timezone, not elapsed hours.
+- Round cumulative interest half-up while retaining fractional cents across intervals.
+- Fees first, interest second, principal last; reject overpayment at effective time.
+- Inclusive due date, next-day overdue flag, optional grace before a one-time fee.
+  Interest continues during grace. Fee eligibility is derived without a cron job.
+- Default combined gross-charge cap is automatic when charges are enabled; optional
+  overrides are supported. Paid/waived charges don't restore lifetime cap headroom.
+- Item loans have no percentage interest. Return and payment/waiver of item fees are
+  separate states. Charge waivers never forgive principal or represent cash received.
+- Terms, rule version, timezone, and original allocation snapshots are immutable.
+  Existing loans remain version 0 and zero-charge. New loans use calculation version 1.
+- Effective timestamp, per-loan allocation order, then UUID determine financial order;
+  corrections retain the original slot. Reject changes that would rewrite later allocations.
+- Effective/recorded times, reasons, reversals, and replacement links preserve history.
+  Settlement/voiding stop further charges. No real payment integration is planned.
 
-Example acceptance fixtures:
-
-- $100 at 36.5% simple annual interest for 10 days = $1.00 interest.
-- $100 at that rate for 5 days, followed by a payment of $50.50 allocating $0.50
-  interest and $50 principal, then 5 more days = $0.25 new interest, $50 principal.
-- A $5 fixed late fee assessed twice by retries still totals $5.
-- A zero-rate loan returned/repaid on time has no charges and no overdue penalty.
-
-Backdating, waivers, cancellations, and rounding edge cases need explicit tests.
-Do not mutate historical repayment records without a correction/audit event.
+Examples: $100 at 10% weekly earns $10 after seven days; 10% monthly earns $5 after
+15 days. A $5 late fee remains $5 across refreshes/retries. Existing zero-charge
+repayments remain principal-only after migration.
 
 ## Fake credit scores
 
 Clearly display **“Fictional IOU score — for fun, not a real credit score.”**
 
-Proposed v1: range 300–850, base 600, +25 per on-time completed obligation,
+Implemented v1: range 300–850, base 600, +25 per on-time completed obligation,
 −40 per late completed obligation, −20 per currently overdue obligation, clamped
-to the range. Show “not enough history” until at least three obligations have been
+to the range. Return null / “not enough history” until at least three obligations have
 completed. Exclude voided records; a late completion is not also counted as currently
-overdue. Apply the loan's recorded grace period consistently.
+overdue. Apply the recorded grace boundary. Item timeliness uses return time even
+when fees remain unpaid; money timeliness uses full settlement time.
 
 Each score shows its version and a breakdown of the contributing counts/events.
 Compute from recorded history; money amount, sensitive traits, email engagement,
@@ -124,10 +114,12 @@ ranked publicly. The scoring rule is a product choice to revisit, not financial 
 ## Reminder behavior and delivery
 
 - Start with preview/manual send; scheduled delivery is a later MVP slice.
-- Development defaults to `EMAIL_MODE=disabled`, which sends nothing. Only that
-  mode is supported by the foundation. A future preview/sink must not contact recipients.
+- Development defaults to `EMAIL_MODE=disabled`, which sends nothing. Level 5.0
+  optionally supports a central Gmail API sender; credentials alone never enable mail.
+  See [implemented reminder contracts](REMINDERS.md); previews never call Google.
 - Explicitly confirm the recipient and have the lender confirm permission to contact.
-- Use a small curated template set; no need for AI-generated messages initially.
+- Select a preset friendly/playful/direct-but-polite tone and approve the exact short
+  preview. Current facts must still match at submission. Gemini drafting is Level 5.1.
 - Friendly/example tone: “Your hoodie has filed a missing-person report.” Avoid threats,
   humiliation, public CC lists, or language suggesting actual legal/credit consequences.
 - At most one reminder per friend per 24 hours across all loans; manual sends count
@@ -144,23 +136,32 @@ ranked publicly. The scoring rule is a product choice to revisit, not financial 
   guaranteed; provider acceptance and database failures require reconciliation.
 - Serverless deployment needs an external scheduler; a web process alone is not one.
 
-## API outline (not implemented)
+## Provisional full-product API outline
 
 Browser URLs use `/api`; local FastAPI route paths omit that mount prefix.
+This is a product sketch, not the shipped route list: see ledger/Level 2 contracts
+for implemented routes. In particular, arbitrary loan PATCH is not supported.
 
 ```text
 GET/POST        /api/friends
 GET/PATCH       /api/friends/{id}
 GET             /api/friends/{id}/history
 GET             /api/friends/{id}/score
+GET             /api/dashboard/summary
+GET             /api/dashboard/obligations
+GET             /api/dashboard/rankings
+GET             /api/dashboard/trends
 GET/POST        /api/loans
 GET/PATCH       /api/loans/{id}
 POST            /api/loans/{id}/repayments
 POST            /api/loans/{id}/return
 POST            /api/loans/{id}/void
 GET             /api/loans/{id}/activity
-POST            /api/loans/{id}/reminder-preview
-POST            /api/loans/{id}/reminders
+GET/PUT         /api/friends/{id}/reminder-preferences
+POST            /api/friends/{id}/reminder-previews
+POST            /api/reminders/{id}/send
+GET             /api/reminders/{id}
+GET/POST        /api/reminders/unsubscribe
 GET             /api/reminders
 ```
 
@@ -194,7 +195,8 @@ parallelize frontend/backend safely. Do not let both branches invent the same mo
 
 ## Open decisions
 
-- Team confirmation of interest timing, allocations, charge caps, and score formula.
+- Charge/score rules are now implemented and versioned; future changes must preserve
+  existing loan terms/allocations and require explicit versioning.
 - Auth choice: Supabase Google sign-in is implemented; email/password UI is deferred.
   Hosted acceptance and the decision to expose anything beyond fake demo data remain open.
 - Email provider, how permission is collected, and unsubscribe/reconciliation design.
@@ -204,7 +206,8 @@ parallelize frontend/backend safely. Do not let both branches invent the same mo
 
 ## Stretch / non-goals
 
-Stretch: item photos, template choices, charts, CSV export, mobile polish.
+Item/proof photos now have a Level 2 backend workflow (hosted setup still required).
+Stretch: template choices, charts, CSV export, mobile polish.
 Not MVP: payment collection, bank links, actual credit reporting, debt collection,
 public shame leaderboards, multi-currency conversion, compound interest, Redis/Celery,
 or borrowers needing accounts just to receive a reminder.

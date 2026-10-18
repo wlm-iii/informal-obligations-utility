@@ -5,7 +5,12 @@ require Nix.** Windows uses PowerShell; no WSL, Bash, Make, Docker, virtual-envi
 activation, or PowerShell execution-policy change is needed. Use fake data only.
 The app supports Google sign-in/private profiles and a backend lending ledger; the
 frontend still has account UI only. Follow [auth setup](AUTH.md) to configure login
-and hosted PostgreSQL and [ledger contracts](LEDGER.md) to exercise the new API.
+and hosted PostgreSQL, [ledger contracts](LEDGER.md) for lending, and
+[Level 2 setup](HISTORY_PROOF.md) for audited corrections, private proof, and cursors.
+[Level 3](CHARGES_SCORES.md) covers optional periodic charges, waivers, and scores.
+[Level 4](DASHBOARD.md) defines dashboard metrics, rankings, and chart date filters.
+[Level 5.0](REMINDERS.md) covers manual Gmail reminders, private credentials, and a
+local-only preview/self-email demo. No real email runs in automated tests.
 
 ## Default setup (without Nix)
 
@@ -163,7 +168,14 @@ backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
 On Linux/macOS the virtual environment's Python is `backend/.venv/bin/python`.
 The initial `0001_baseline` is empty; `0002_profiles` creates private
 `iou_app.profiles` storage; `0003_ledger` adds private friends, loans, settlement
-events, and retry receipts. These migrations revoke browser-role access. Alembic autogeneration
+events, and retry receipts; `0004_history_proof` adds audit/evidence storage and
+reversal metadata; `0005_charges_scores` backfills zero-charge legacy terms and
+principal-only allocations, adds optional periodic terms, and tracks settlement.
+`0006_event_action_width` widens the action column for Level 3 item fee payments;
+its rollback is guarded against truncating financial history. Dashboard APIs have
+no additional schema requirements.
+Downgrades are guarded once new feature data exists. These
+migrations revoke browser-role access. Alembic autogeneration
 only inspects the application schema, not Supabase-managed tables. `DATABASE_URL` applies to both the app
 and Alembic. Never generate migrations against production or rely on API startup
 to mutate the schema.
@@ -209,7 +221,15 @@ installs. Review audit findings; do not apply blanket `npm audit fix --force` up
 | `SUPABASE_URL` | Server-side project origin; missing means protected routes fail closed |
 | `DATABASE_POOL_MODE` | `session` by default; `transaction` disables client pooling/prepared statements |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Public frontend config in `frontend/.env.local` |
-| `EMAIL_MODE` | Only `disabled` is supported; other values fail validation |
+| `CURSOR_SIGNING_KEY` | Optional server-only random secret, at least 32 bytes; stable across workers |
+| `SUPABASE_STORAGE_KEY` | Optional server-only secret/service_role key for private evidence |
+| `EVIDENCE_BUCKET` | `iou-evidence`; must be private, PNG/JPEG only |
+| `EVIDENCE_SIGNED_URL_SECONDS` | 60 by default; 30–300 allowed |
+| `EMAIL_MODE` | `disabled` by default; `gmail` requires complete sender/signing configuration |
+| `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `GMAIL_SENDER_EMAIL` | Backend-only central sender; never VITE variables |
+| `REMINDER_SIGNING_KEY`, `REMINDER_PUBLIC_BASE_URL` | Stable secret and backend base for public unsubscribe |
+| `GMAIL_RECIPIENT_ALLOWLIST`, `GMAIL_ALLOW_EXTERNAL_RECIPIENTS` | Self-only default; explicit consenting demo recipients / wider release gate |
+| `REMINDER_QUIET_HOURS_ENABLED` | Default true; 09:00–18:00 in owner timezone |
 | `PORT` | Docker runtime port, defaults to 8000; local backend task uses 8000 |
 
 There is no mail provider configuration, job scheduler, or delivery code yet. Do not put database or email credentials in frontend `VITE_*` variables.

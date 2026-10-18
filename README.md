@@ -6,10 +6,24 @@ A hackathon app for tracking money and items friends borrow, recording repayment
 and returns, calculating optional fees/interest, sending playful reminders, and
 assigning clearly fictional credit scores.
 
-**Status:** Google sign-in/profiles and the Level 1 backend ledger are implemented:
-private friends, money/item loans, repayments/returns, and history. The frontend
-still has account UI only; lending screens, reminders, and scores are not implemented.
-Use fake demo data. See [auth setup](docs/AUTH.md) and [ledger API](docs/LEDGER.md).
+**Status:** The backend supports Google sign-in/profiles, private lending, audited
+corrections/voids, private proof-image workflows, and signed cursor pagination.
+The backend also supports optional periodic interest/late fees, charge waivers,
+explained fictional reliability scores, and private dashboard APIs for summaries,
+obligations, rankings, and trends. Level 5.0 adds preset-tone, manually approved
+Gmail reminders with consent, unsubscribe, and duplicate protection; real email is
+disabled by default. Hosted acceptance and frontend API integration remain separate.
+Use fake demo data.
+See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md),
+[Level 2 setup and safety](docs/HISTORY_PROOF.md),
+[Level 3 charges and scores](docs/CHARGES_SCORES.md), and
+[Level 4 dashboard metrics](docs/DASHBOARD.md), and
+[Level 5.0 setup and self-email demo](docs/REMINDERS.md).
+
+The authenticated **Tracker** link (`#tracker`) adds friend/loan creation, returns,
+and charge-aware settlement without replacing the existing account/statistics pages.
+Apply reviewed `0008_repayment_preferences` first. Tracker nudges are clipboard-only;
+Gmail approval remains a separate backend flow. See [merge/contract notes](docs/DAILY_INTEREST_MERGE.md).
 
 ## Stack
 
@@ -91,7 +105,12 @@ Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.m
 
 - [Backend feature roadmap](docs/BACKEND_ROADMAP.md)
 - [Google sign-in and private profiles](docs/AUTH.md)
+- [Terminal design system: colors, fonts, components, and page styling](docs/DESIGN_SYSTEM.md)
 - [Level 1 ledger API and migration](docs/LEDGER.md)
+- [Level 2 corrections, proof images, and cursors](docs/HISTORY_PROOF.md)
+- [Level 3 periodic charges, waivers, and fictional scores](docs/CHARGES_SCORES.md)
+- [Level 4 dashboard APIs and metric definitions](docs/DASHBOARD.md)
+- [Level 5.0 manual Gmail reminders and local self-test](docs/REMINDERS.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)

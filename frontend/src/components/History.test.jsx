@@ -20,7 +20,7 @@ it("matches the reference's eight payment rows, dates, amounts, and recorded sta
 });
 it("records a preview payment and updates Progress and History together",async()=>{
  HTMLDialogElement.prototype.showModal=function(){this.setAttribute("open","");};
- render(<Dashboard demo={{...demo,loans:referenceLoans.map(loan=>({...loan,interest_percent:0}))}}/>);
+ render(<Dashboard demo={{...demo,loans:referenceLoans.map(loan=>({...loan,interest_rate_bps:0}))}}/>);
  fireEvent.click(screen.getByRole("button",{name:"Progress",exact:true}));
  expect(screen.getByText("68% of recorded balance repaid")).toBeInTheDocument();
  fireEvent.click(screen.getByRole("button",{name:"Record repayment"}));

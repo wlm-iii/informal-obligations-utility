@@ -7,25 +7,25 @@ const boards = [
     "entries": [
       {
         "name": "Alex",
-        "score": 940,
+        "score": 740,
         "title": "Walking ATM",
         "art": "fame-art atm"
       },
       {
         "name": "Jordan",
-        "score": 980,
+        "score": 825,
         "title": "Credit Royalty",
         "art": "fame-art royalty"
       },
       {
         "name": "Sam",
-        "score": 910,
+        "score": 710,
         "title": "Speedrun Champion",
         "art": "fame-art speedrun"
       },
       {
         "name": "Taylor",
-        "score": 965,
+        "score": 790,
         "title": "Certified Green Flag",
         "art": "fame-art greenflag"
       }
@@ -71,9 +71,9 @@ export default function Leaderboards() {
    <ol>{rankEntries(board.entries, Boolean(index)).map(entry => <li key={entry.title}>
     <span className={`hall-art ${index ? "shame-art" : "fame-art"} ${entry.art}`} role="img" aria-label={`${entry.title} illustration`} />
     <span className="hall-name">{entry.name}</span><h3>{entry.title}</h3>
-    <span className="hall-credit">Credit score <strong>{entry.score}</strong></span>
+    <span className="hall-credit">Fictional score <strong>{entry.score}</strong></span>
    </li>)}</ol>
   </section>)}</div>
-  <p className="hall-disclaimer">Illustrative sample names and scores. Awards and qualification rules are a design preview; no private ledger data is connected.</p>
+  <p className="hall-disclaimer">Illustrative sample names and scores. Awards and qualification rules are a design preview; no private ledger data is connected. Fictional IOU score — for fun, not a real credit score.</p>
  </section>;
 }

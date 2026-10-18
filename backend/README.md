@@ -4,7 +4,22 @@ Python 3.12 + FastAPI, with SQLAlchemy/Psycopg and Alembic scaffolding for Postg
 Google sign-in token verification, private profiles, and the Level 1 ledger API are
 implemented. Follow [auth setup](../docs/AUTH.md) and [ledger contracts](../docs/LEDGER.md)
 for configuration, migrations, idempotency headers, and endpoint examples. No new
-API keys are needed for lending.
+API keys are needed for basic lending. Level 2 adds audited corrections/voids,
+private proof images, durable cleanup, and signed cursors; see
+[setup and safety](../docs/HISTORY_PROOF.md). Storage and cursor mode need optional
+server-only configuration; existing auth/offset APIs do not. Level 3 adds optional
+periodic charges, immutable allocations, waivers, and private fictional scores with
+no new API keys; see [the charge/score contract](../docs/CHARGES_SCORES.md).
+Level 4 adds read-only `/dashboard/summary`, `/dashboard/obligations`,
+`/dashboard/rankings`, and `/dashboard/trends`; see [metrics/filters](../docs/DASHBOARD.md).
+Apply `0006_event_action_width` to fix Level 3 item fee-payment storage on PostgreSQL.
+Level 5.0 adds template-only, explicitly approved Gmail API reminders. Apply reviewed
+`0007_manual_reminders` and follow [configuration and local self-test](../docs/REMINDERS.md).
+`EMAIL_MODE=disabled` is still the default; no Gemini or automatic sending is included.
+
+The tracker adds optional repayment preference metadata via `0008_repayment_preferences`,
+linearly after `0007`. Rates/allocations remain the existing Level 3 contract; the
+retired `0004_iou_preferences` fork must not be applied. See [compatibility notes](../docs/DAILY_INTEREST_MERGE.md).
 
 From the repository root:
 
@@ -21,8 +36,10 @@ Nix is optional; see the [setup instructions](../docs/DEVELOPMENT.md).
 
 `auth.py` verifies Supabase tokens; `profiles.py` owns `GET/PATCH /me` and the
 private `iou_app.profiles` table. `ledger/` owns contacts, loans, settlement events,
-and retry receipts in the same private schema. Ownership comes only from verified
-JWT subjects. Ledger creation/settlement requires UUID `Idempotency-Key` headers.
+and retry receipts in the same private schema. `evidence/` validates images, talks
+to private Supabase Storage, and provides a dry-run-first cleanup command. Ownership
+comes only from verified JWT subjects. Ledger creation/settlement requires UUID `Idempotency-Key` headers. Charges are
+bookkeeping only: no real payment processing is implemented.
 
 The app is `backend/src/iou/api.py`; API docs are at <http://127.0.0.1:8000/docs>.
 `src/api.py` is a compatibility entry point. `src/main.py` mounts the API and built

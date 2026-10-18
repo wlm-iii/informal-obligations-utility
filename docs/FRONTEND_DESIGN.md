@@ -1,11 +1,16 @@
 # Hall of Fame & Hall of Shame — design reference
 
+This is an illustrative design reference, not the authoritative score/rate contract.
+The compatibility merge preserves main's login, account, theme tokens, bundled fonts,
+and 300–850 fictional score rules. Tracker uses backend periodic balances, not daily
+post-due math. See [integration decisions](DAILY_INTEREST_MERGE.md).
+
 ## Typography
 
 All page text uses **Iosevka**, including headings, navigation, usernames, award names, scores, and footer text. The fallback is `monospace`.
 
-- Regular: weight 400, `frontend/public/assets/iosevka-400.woff2`
-- Bold: weight 700, `frontend/public/assets/iosevka-700.woff2`
+- Regular: weight 400, `frontend/src/assets/fonts/Iosevka-400.woff2`
+- Bold: weight 700, `frontend/src/assets/fonts/Iosevka-700.woff2`
 - Fonts are bundled locally and loaded with `@font-face` and `font-display: swap`; no external font request is needed when viewing the page.
 - Source: https://github.com/be5invis/Iosevka
 - Distribution: https://www.npmjs.com/package/@fontsource/iosevka

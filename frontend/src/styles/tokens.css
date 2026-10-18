@@ -1,0 +1,59 @@
+@font-face {
+	font-family: "IOU Iosevka";
+	src: url("../assets/fonts/Iosevka-400.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "IOU Iosevka";
+	src: url("../assets/fonts/Iosevka-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+:root {
+	color-scheme: light;
+	--bg: #f1f7ed;
+	--panel: #fcfef9;
+	--surface: #e5f0df;
+	--line: #d6e5d2;
+	--ink: #15261f;
+	--muted: #536c60;
+	--bright: #15261f;
+	--supporting: #425e52;
+	--green: #198357;
+	--red: #bb413f;
+	--yellow: #bd871b;
+	--amber: var(--green);
+	--mono: "IOU Iosevka", Iosevka, Consolas, monospace;
+	--sans: var(--mono);
+	--radius-control: 6px;
+	--radius-panel: 9px;
+}
+
+/* Shared account, status, and feedback treatments. */
+:root {
+ --separator: #dce8d7;
+ --strong-line: #a2c5a9;
+ --green-hover: #13764c;
+ --primary-ink: #ffffff;
+ --yellow-detail: #856214;
+ --avatar-bg: #e8efd8;
+ --warning-bg: #fff5dc;
+ --warning-border: #ead7a3;
+ --warning-ink: #856214;
+ --error-bg: #ffe7e1;
+ --error-line: #f5c6ba;
+ --error-ink: #a93436;
+ --error-hover: #ffdbd3;
+ --positive-bg: #e8efd8;
+ --focus-ring: #19835717;
+}
+:root {
+ --brand-gradient: linear-gradient(180deg, #489c77, #147a50);
+ --primary-gradient: linear-gradient(180deg, #439d77, #147b51 75%);
+ --avatar-bg: linear-gradient(150deg, #ffe6a0, #f7cb63);
+ --avatar-line: #f1d38a;
+ --avatar-ink: #4b390a;
+}

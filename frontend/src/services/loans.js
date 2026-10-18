@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { itemReturned } from "./interest";
 
 // Read every page: the ledger endpoint defaults to just 25 records.
 export async function loadLoans(signal) {
@@ -20,11 +21,12 @@ export async function loadLoans(signal) {
 }
 
 export function summarizeLoans(loans) {
- const items = loans.filter(loan => loan.kind === "item");
- const returned = items.filter(loan => loan.status === "completed").length;
+ const active = loans.filter(loan => loan.status !== "voided");
+ const items = active.filter(loan => loan.kind === "item");
+ const returned = items.filter(itemReturned).length;
  return {
   outstanding: items.length - returned, returned,
-  unpaid: loans.filter(loan => loan.status === "open").length,
-  repaid: loans.filter(loan => loan.status === "completed").length,
+  unpaid: active.filter(loan => loan.status === "open").length,
+  repaid: active.filter(loan => loan.status === "completed").length,
  };
 }

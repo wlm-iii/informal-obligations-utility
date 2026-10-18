@@ -18,8 +18,10 @@ from sqlalchemy.orm import Session
 from iou.api import app
 from iou.auth import Identity, get_current_user
 from iou.database import get_engine, get_session
-from iou.ledger.models import Friend, Loan, LoanEvent, MutationReceipt
+from iou.evidence.models import Evidence
+from iou.ledger.models import Audit, Friend, Loan, LoanEvent, MutationReceipt
 from iou.profiles import Profile, get_or_create_profile
+from iou.reminders.models import Permission, Recipient, Reminder
 
 pytestmark = pytest.mark.database
 
@@ -45,8 +47,26 @@ def pg():
         app.dependency_overrides.clear()
         ids = [u.id for u in users]
         with Session(engine) as session:
-            for model in (LoanEvent, MutationReceipt, Loan, Friend):
+            hashes = list(
+                session.scalars(select(Reminder.recipient_hash).where(Reminder.owner_id.in_(ids)))
+            )
+            for model in (
+                Reminder,
+                Permission,
+                Audit,
+                Evidence,
+                LoanEvent,
+                MutationReceipt,
+                Loan,
+                Friend,
+            ):
                 session.execute(delete(model).where(model.owner_id.in_(ids)))
+            session.execute(
+                delete(Recipient).where(
+                    Recipient.id.in_(hashes),
+                    ~select(Reminder.id).where(Reminder.recipient_hash == Recipient.id).exists(),
+                )
+            )
             session.execute(delete(Profile).where(Profile.id.in_(ids)))
             session.commit()
         engine.dispose()
@@ -281,6 +301,9 @@ def test_database_rejects_invalid_events_and_duplicate_returns(pg):
         "loan_kind": "money",
         "action": "repayment",
         "amount_cents": 100,
+        "principal_applied_cents": 100,
+        "interest_applied_cents": 0,
+        "fees_applied_cents": 0,
         "effective_at": now,
         "recorded_at": now,
     }
@@ -311,6 +334,9 @@ def test_database_rejects_invalid_events_and_duplicate_returns(pg):
                     "loan_kind": "item",
                     "action": "return",
                     "amount_cents": None,
+                    "principal_applied_cents": None,
+                    "interest_applied_cents": None,
+                    "fees_applied_cents": None,
                 }
             )
         )
