@@ -17,6 +17,10 @@ Level 5.0 adds template-only, explicitly approved Gmail API reminders. Apply rev
 `0007_manual_reminders` and follow [configuration and local self-test](../docs/REMINDERS.md).
 `EMAIL_MODE=disabled` is still the default; no Gemini or automatic sending is included.
 
+The tracker adds optional repayment preference metadata via `0008_repayment_preferences`,
+linearly after `0007`. Rates/allocations remain the existing Level 3 contract; the
+retired `0004_iou_preferences` fork must not be applied. See [compatibility notes](../docs/DAILY_INTEREST_MERGE.md).
+
 From the repository root:
 
 ```powershell

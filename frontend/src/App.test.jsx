@@ -139,6 +139,20 @@ describe("Level 0 account flow", () => {
 		expect(window.location.search).toBe("");
 	});
 
+    it("opens the tracker without replacing the existing account flow", async()=>{
+        auth.getSession.mockResolvedValue({data:{session},error:null});
+        fetch.mockImplementation(async url=>({ok:true,status:200,json:async()=>url === "/api/me" ? profile : {items:[],has_more:false}}));
+        render(<App/>);
+        expect(await screen.findByLabelText("Display name")).toHaveValue("Person");
+        window.location.hash="#tracker";
+        fireEvent(window,new HashChangeEvent("hashchange"));
+        expect(await screen.findByRole("heading",{name:/IOU Tracker/})).toBeInTheDocument();
+        expect(screen.getByRole("navigation",{name:"Workspace"})).toBeInTheDocument();
+        window.location.hash="#details";
+        fireEvent(window,new HashChangeEvent("hashchange"));
+        expect(await screen.findByLabelText("Display name")).toHaveValue("Person");
+    });
+
 	it("can retry loading a profile after a backend outage", async () => {
 		auth.getSession.mockResolvedValue({ data: { session }, error: null });
 		fetch.mockResolvedValueOnce({ ok: false, status: 503 });

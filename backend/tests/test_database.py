@@ -32,7 +32,7 @@ def test_postgres_and_migrations():
         command.check(config)
         with engine.connect() as connection:
             assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
-                "0007_manual_reminders"
+                "0008_repayment_preferences"
             )
             tables = (
                 "profiles",

@@ -62,6 +62,13 @@ class Loan(Base):
         ),
         CheckConstraint("kind IN ('money', 'item')", name="ck_loan_kind"),
         CheckConstraint(
+            "(repayment_type IS NULL AND repayment_other IS NULL) OR "
+            "(repayment_type IN ('item','money') AND repayment_other IS NULL) OR "
+            "(repayment_type = 'other' AND repayment_other IS NOT NULL "
+            "AND length(trim(repayment_other)) BETWEEN 1 AND 500)",
+            name="ck_loan_repayment_preference",
+        ),
+        CheckConstraint(
             "interest_rate_bps BETWEEN 0 AND 10000 AND grace_days BETWEEN 0 AND 365 "
             "AND interest_period IN ('daily','weekly','biweekly','monthly','quarterly','yearly') "
             f"AND late_fee_cents BETWEEN 0 AND {MAX_CENTS} "
@@ -88,6 +95,9 @@ class Loan(Base):
     kind: Mapped[str] = mapped_column(String(10))
     description: Mapped[str] = mapped_column(String(500))
     notes: Mapped[str | None] = mapped_column(String(2000))
+    # Informal preference metadata only; never changes settlement/allocation rules.
+    repayment_type: Mapped[str | None] = mapped_column(String(10))
+    repayment_other: Mapped[str | None] = mapped_column(String(500))
     principal_cents: Mapped[int | None] = mapped_column(BigInteger)
     currency: Mapped[str | None] = mapped_column(String(3))
     lent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

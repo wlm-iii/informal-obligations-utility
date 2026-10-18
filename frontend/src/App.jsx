@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+const Dashboard = lazy(() => import("./components/Dashboard"));
 import "./App.css";
 import TerminalLogin from "./components/TerminalLogin";
 import { supabase } from "./services/supabase";
@@ -153,6 +154,21 @@ function Account({ session }) {
 	);
 }
 
+function Tracker({ session }) {
+ const [profile, setProfile] = useState(null);
+ const [error, setError] = useState("");
+ useEffect(() => {
+  const controller = new AbortController();
+  profileRequest("GET", undefined, controller.signal).then(result => {
+   if (!controller.signal.aborted) setProfile(result);
+  }).catch(failure => { if (!controller.signal.aborted) setError(failure.message); });
+  return () => controller.abort();
+ }, [session.access_token]);
+ return <Suspense fallback={<p role="status">Loading tracker…</p>}>
+  <Dashboard profile={profile} accountError={error} account={<a href="#details">Open existing account settings</a>} />
+ </Suspense>;
+}
+
 function App() {
 	const [page, setPage] = useState(window.location.hash);
 	useEffect(() => {
@@ -182,11 +198,13 @@ function App() {
 				</a>
 				<span className="brand-caption">Friendship Finance</span>
 				<span className="topbar-label">PERSONAL TERMINAL / ACCOUNT</span>
+                {session && <nav aria-label="Workspace"><a href="#details">Account</a> · <a href="#statistics">Statistics</a> · <a href="#tracker">Tracker</a></nav>}
 			</header>
 			<section aria-label="Account">
 				{loading ? (
 					<p role="status">Restoring your session.</p>
 				) : session ? (
+                    page === "#tracker" ? <Tracker key={session.user.id} session={session} /> :
 					page === "#statistics" ? (
 						<Statistics key={session.user.id} />
 					) : (

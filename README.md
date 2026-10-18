@@ -20,6 +20,11 @@ See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md),
 [Level 4 dashboard metrics](docs/DASHBOARD.md), and
 [Level 5.0 setup and self-email demo](docs/REMINDERS.md).
 
+The authenticated **Tracker** link (`#tracker`) adds friend/loan creation, returns,
+and charge-aware settlement without replacing the existing account/statistics pages.
+Apply reviewed `0008_repayment_preferences` first. Tracker nudges are clipboard-only;
+Gmail approval remains a separate backend flow. See [merge/contract notes](docs/DAILY_INTEREST_MERGE.md).
+
 ## Stack
 
 - React 19 + Vite 7, JavaScript/JSX

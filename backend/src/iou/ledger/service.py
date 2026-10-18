@@ -103,6 +103,8 @@ def loan_read(row, at: datetime) -> LoanRead:
         kind=loan.kind,
         description=loan.description,
         notes=loan.notes,
+        repayment_type=loan.repayment_type,
+        repayment_other=loan.repayment_other,
         lent_at=loan.lent_at,
         due_date=loan.due_date,
         timezone=loan.timezone,
@@ -177,9 +179,15 @@ def mutate(
     # Serialize all ledger writes for this owner. This coordinates archive/create and
     # concurrent payments, including across workers. There is no network I/O under the lock.
     owner = lock_owner(session, user)
+    payload = body.model_dump(mode="json")
+    if operation == "create-loan":
+        # Preserve pre-preference receipt hashes when no metadata was requested.
+        for field in ("repayment_type", "repayment_other"):
+            if payload.get(field) is None:
+                payload.pop(field, None)
     digest = hashlib.sha256(
         json.dumps(
-            {"operation": operation, "body": body.model_dump(mode="json")},
+            {"operation": operation, "body": payload},
             sort_keys=True,
             separators=(",", ":"),
         ).encode()
@@ -189,7 +197,7 @@ def mutate(
         compatible = {digest}
         # Old creation receipts predate optional term fields. A default zero-charge
         # retry may replay them, but adding any new term must still conflict.
-        payload = body.model_dump(mode="json")
+        payload = payload.copy()
         if operation == "create-loan" and all(
             payload.get(name, default) == default
             for name, default in {
@@ -307,6 +315,8 @@ def create_loan(
         kind=body.kind,
         description=body.description,
         notes=body.notes,
+        repayment_type=body.repayment_type,
+        repayment_other=body.repayment_other,
         lent_at=lent,
         due_date=body.due_date,
         timezone=owner.timezone,

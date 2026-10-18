@@ -4,7 +4,15 @@ from datetime import UTC, date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from iou.ledger.models import MAX_CENTS
 
@@ -93,6 +101,17 @@ class LoanInput(Input):
     grace_days: Annotated[int, Field(strict=True, ge=0, le=365)] = 0
     charge_cap_cents: Annotated[int, Field(strict=True, ge=0, le=MAX_CENTS)] | None = None
 
+    repayment_type: Literal["item", "money", "other"] | None = None
+    repayment_other: Annotated[str, Field(min_length=1, max_length=500)] | None = None
+
+    @model_validator(mode="after")
+    def repayment_details(self):
+        if self.repayment_type == "other" and not self.repayment_other:
+            raise ValueError("Describe the other repayment preference.")
+        if self.repayment_type != "other" and self.repayment_other is not None:
+            raise ValueError("Details require the other repayment preference.")
+        return self
+
 
 class MoneyLoanCreate(LoanInput):
     kind: Literal["money"]
@@ -127,6 +146,8 @@ class WaiverCreate(SettlementInput):
 
 
 class LoanRead(ReadModel):
+    repayment_type: Literal["item", "money", "other"] | None = None
+    repayment_other: str | None = None
     id: UUID
     friend_id: UUID
     kind: Literal["money", "item"]

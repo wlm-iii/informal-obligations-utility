@@ -1,11 +1,11 @@
 # Level 1 — private friends and basic borrowing API
 
-This slice is **backend-only**. The existing frontend still shows sign-in/profile
-editing; friends/loans screens can consume these contracts next. This page documents
-the baseline ledger. [Level 2](HISTORY_PROOF.md) now extends it with corrections,
+This page documents the baseline ledger. The current authenticated frontend also
+has an additive `#tracker` view; see [tracker compatibility notes](DAILY_INTEREST_MERGE.md). [Level 2](HISTORY_PROOF.md) now extends it with corrections,
 voids, proof images, and signed cursors. [Level 3](CHARGES_SCORES.md) adds optional
-periodic charges, waivers, and fictional scores. Reminders and a shared social
-network are not implemented.
+periodic charges, waivers, and fictional scores. [Level 5.0](REMINDERS.md) adds manually
+approved email; tracker clipboard drafts do not invoke it. A shared social network
+is not implemented.
 
 ## Setup and release
 
@@ -28,6 +28,12 @@ Every operation derives the owner from the verified token. There is no writable
 Missing and other owners' records both return 404. Private responses are `no-store`.
 First ledger creation automatically provisions a profile; calling `/me` first is
 not required.
+
+Current head `0008_repayment_preferences` adds optional `repayment_type` and
+`repayment_other` metadata to creation/read responses. `other` requires details;
+other choices reject details. These preferences never convert loan kind, waive
+principal, alter rates, or change settlement actions. Existing loans default to null.
+Apply the linear head, not the incoming PR's retired `0004_iou_preferences` fork.
 
 ## Contacts
 

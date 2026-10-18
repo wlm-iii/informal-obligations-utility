@@ -9,7 +9,8 @@
 		"lint": "eslint .",
 		"test": "vitest run",
 		"test:login": "vitest run src/components/MarketChart.test.jsx src/components/TerminalLogin.test.jsx",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"build:preview": "node scripts/build-preview.mjs"
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.118.0",
