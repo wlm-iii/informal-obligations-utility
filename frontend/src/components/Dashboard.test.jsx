@@ -15,12 +15,12 @@ beforeEach(() => {
  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: vi.fn().mockResolvedValue() } });
 });
 afterEach(cleanup);
-it.each([["Boba acquisition", "Repaid"], ["Blue hoodie", "Returned"]])("settles %s, opens History and removes it from the dashboard", async (description, status) => {
+it.each([["Boba acquisition", "paid/returned"], ["Blue hoodie", "paid/returned"]])("settles %s, opens History and removes it from the dashboard", async (description, status) => {
  render(<Dashboard demo={demo}/>);
  const row = screen.getAllByText(new RegExp(description))[0].closest("article");
  fireEvent.click(within(row).getByRole("button",{name:"Settle",exact:true}));
  expect(screen.getByRole("button",{name:"History",exact:true})).toHaveAttribute("aria-current","page");
- const historyRow = screen.getAllByRole("row").find(row => row.textContent.includes(description) && row.textContent.includes(status));
+ const historyRow = within(screen.getByRole("table",{name:"Borrowing history"})).getAllByRole("row").find(row => row.textContent.includes(description === "Boba acquisition" ? "$18.50" : description) && row.textContent.includes(status));
  expect(historyRow).toBeTruthy();
  fireEvent.click(screen.getByRole("button",{name:"Dashboard",exact:true}));
  expect(screen.queryByText(new RegExp(description))).not.toBeInTheDocument();
@@ -160,8 +160,8 @@ it("adds a friend through the plus button and shows open and returned history", 
  expect(screen.getByText("Repay: Dinner")).toBeInTheDocument();
  expect(screen.getAllByText("Camera").length).toBeGreaterThan(0);
  fireEvent.click(screen.getByRole("button", { name: "History", exact: true }));
- expect(screen.getByText("Returned", { selector: ".recorded-badge" })).toBeInTheDocument();
- expect(screen.getAllByText("Not returned / open", { selector: ".recorded-badge" })).toHaveLength(4);
+ expect(screen.getByText("paid/returned", { selector: ".recorded-badge" })).toBeInTheDocument();
+ expect(screen.getAllByText("unpaid/missing", { selector: ".recorded-badge" })).toHaveLength(4);
 });
 it("opens the sample progress chart and ranks from the same navigation", async () => {
  render(<Dashboard demo={demo}/>);
