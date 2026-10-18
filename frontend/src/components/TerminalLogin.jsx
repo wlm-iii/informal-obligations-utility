@@ -3,6 +3,7 @@ import { supabase } from "../services/supabase";
 import { loginRequest } from "../services/login";
 import MarketChart from "./MarketChart";
 import logo from "../assets/iou-logo.png";
+import funnyCoin from "../assets/funny-coin.svg";
 import InfoDialog from "./InfoDialog";
 import "../styles/terminal.css";
 
@@ -14,7 +15,7 @@ const panels = {
 };
 
 function Coin() {
-	return <svg className="coin" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#8e6b01" stroke="#dfb431" /><circle cx="32" cy="32" r="25" fill="#d0a215" stroke="#664d01" /><circle cx="32" cy="32" r="21" stroke="#eccb60" strokeWidth=".8" /><path d="M24 14h16M24 50h16M14 24v16M50 24v16" stroke="#664d01" /><text x="32" y="36" textAnchor="middle" fill="#3a2d04" fontSize="12" fontWeight="700">IOU</text></svg>;
+	return <img className="coin" src={funnyCoin} alt="" aria-hidden="true" width="76" height="76" />;
 }
 
 function BackgroundPattern({ pattern, paused }) {
