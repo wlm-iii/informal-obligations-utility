@@ -123,7 +123,7 @@ it("lands on the debt ledger after Google login and switches through the main ta
  auth.getSession.mockResolvedValue({ data: { session }, error: null });
  fetch.mockImplementation(async url => ({ ok: true, status: 200, json: async () => url === "/api/me" ? profile : { items: [], has_more: false } }));
  render(<App />);
- expect(await screen.findByRole("heading", { name: /The debt ledger/ })).toBeInTheDocument();
+ expect(await screen.findByRole("heading", { name: /IOU Tracker/ })).toBeInTheDocument();
  const nav = screen.getByRole("navigation", { name: "Main navigation" });
  expect(screen.getByRole("button", { name: "IOU dashboard" })).toBeInTheDocument();
  expect(within(nav).getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");

@@ -4,7 +4,15 @@ from datetime import UTC, date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from iou.ledger.models import MAX_CENTS
 
@@ -82,6 +90,21 @@ class LoanInput(Input):
     notes: Notes | None = None
     lent_at: AwareDatetime | None = None
     due_date: date
+    repayment_type: Literal["item", "money", "other"] | None = None
+    repayment_other: Annotated[str, Field(min_length=1, max_length=500)] | None = None
+    interest_percent: Annotated[int, Field(strict=True, ge=0, le=1000)] = 0
+
+    @model_validator(mode="after")
+    def repayment_details(self):
+        if self.repayment_type == "other" and not self.repayment_other:
+            raise ValueError("Describe the other repayment method.")
+        if self.repayment_type != "other" and self.repayment_other is not None:
+            raise ValueError("Repayment details are only valid for other repayment methods.")
+        if (
+            self.repayment_type == "item" or getattr(self, "kind", None) == "item"
+        ) and self.interest_percent:
+            raise ValueError("Item IOUs and item repayments cannot charge interest.")
+        return self
 
 
 class MoneyLoanCreate(LoanInput):
@@ -107,6 +130,9 @@ class RepaymentCreate(SettlementInput):
 
 
 class LoanRead(ReadModel):
+    repayment_type: Literal["item", "money", "other"] | None = None
+    repayment_other: str | None = None
+    interest_percent: int = 0
     id: UUID
     friend_id: UUID
     kind: Literal["money", "item"]
@@ -121,7 +147,8 @@ class LoanRead(ReadModel):
     currency: Literal["USD"] | None
     repaid_cents: int | None
     outstanding_cents: int | None
-    interest_cents: Literal[0] = 0
+    interest_cents: int = 0
+    interest_days: int = 0
     fees_cents: Literal[0] = 0
     returned_at: datetime | None
     completed_at: datetime | None

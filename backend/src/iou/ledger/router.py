@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, Header, Query, Response
-from sqlalchemy import or_, select
+from sqlalchemy import select
 
 from iou.auth import CurrentUser
 from iou.ledger import service
@@ -138,28 +138,41 @@ def loans(
 ):
     at = service.now_utc()
     query = service.loan_query(user.id)
-    complete = query.selected_columns.is_complete
     if friend_id is not None:
         service.friend_for_owner(session, user.id, friend_id)
         query = query.where(Loan.friend_id == friend_id)
     if kind is not None:
         query = query.where(Loan.kind == kind)
-    if status is not None:
-        query = query.where(complete == (status == "completed"))
-    if overdue is not None:
-        query = query.where(
-            or_(complete, Loan.overdue_at > at)
-            if not overdue
-            else (~complete & (Loan.overdue_at <= at))
-        )
-    rows = session.execute(
-        query.order_by(Loan.created_at.desc(), Loan.id.desc()).offset(offset).limit(limit + 1)
-    ).all()
+    query = query.order_by(Loan.created_at.desc(), Loan.id.desc())
+    if status is None and overdue is None:
+        rows = session.execute(query.offset(offset).limit(limit + 1)).all()
+        records = [service.loan_read(row, at) for row in rows]
+    else:
+        # Interest can keep a fully principal-paid IOU open. Apply the same
+        # authoritative calculation before status filtering and pagination.
+        records = []
+        skipped = 0
+        result = session.execute(query.execution_options(yield_per=100))
+        try:
+            for row in result:
+                record = service.loan_read(row, at)
+                if status is not None and record.status != status:
+                    continue
+                if overdue is not None and record.overdue != overdue:
+                    continue
+                if skipped < offset:
+                    skipped += 1
+                    continue
+                records.append(record)
+                if len(records) > limit:
+                    break
+        finally:
+            result.close()
     return Page[LoanRead](
-        items=[service.loan_read(row, at) for row in rows[:limit]],
+        items=records[:limit],
         limit=limit,
         offset=offset,
-        has_more=len(rows) > limit,
+        has_more=len(records) > limit,
     )
 
 

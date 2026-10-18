@@ -1,4 +1,5 @@
 /* Shared reference styling: pale paper, flat surfaces, precise ledger typography. */
+/* Avatar accents follow Steph Ango's Flexoki palette: https://stephango.com/flexoki */
 body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
 .home-dashboard{width:min(1440px,calc(100vw - 40px));height:calc(100vh - 40px);min-height:560px;aspect-ratio:auto;margin:20px auto;grid-template-columns:190px minmax(0,1fr);grid-template-rows:72px minmax(0,1fr);background:#F1F7EC;border:1px solid #D1E1CB;box-shadow:none;border-radius:6px;color:#102D2C}
 .home-dashboard .dash-top,.home-dashboard .friend-sidebar{background:#FBFDF7;border-color:#D1E1CB}
@@ -76,3 +77,30 @@ body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
 .home-dashboard .payment-history .recorded-badge{font-size:10px}
 @media(max-width:900px){.home-dashboard{grid-template-columns:150px minmax(0,1fr)}.home-dashboard .dash-main{padding:18px}.home-dashboard .repayment-stats article{padding:20px 14px}.home-dashboard .repayment-stats strong{font-size:26px}.home-dashboard .progress-summary-line{flex-wrap:wrap;gap:10px}.home-dashboard .trend-heading{flex-wrap:wrap}.home-dashboard .ledger-heading{padding:20px 16px}}
 @media(max-width:600px){.home-dashboard{width:calc(100vw - 16px);margin:8px auto;height:calc(100vh - 16px);grid-template-columns:104px minmax(0,1fr);min-height:500px}.home-dashboard .dash-main{padding:12px}.home-dashboard .dash-tabs button{font-size:11px;padding:9px}.home-dashboard .repayment-stats{grid-template-columns:1fr}.home-dashboard .repayment-stats article+article{border-left:0;border-top:1px solid #D1E1CB}.home-dashboard .progress-summary-line strong{font-size:15px}.home-dashboard .progress-heading{align-items:start;gap:12px}.home-dashboard .progress-heading h1{font-size:16px}.home-dashboard .friend-stats{grid-template-columns:1fr}.home-dashboard .friend-sidebar nav button{font-size:12px}.home-dashboard .progress-actions button{padding:11px 12px}.home-dashboard .progress-summary,.home-dashboard .trend-panel,.home-dashboard .payment-history{padding:18px 14px!important}}
+.home-dashboard .friend-avatar,.home-dashboard .friend-sidebar nav button .friend-avatar,.home-dashboard .counterparty .friend-avatar{background:var(--avatar-bg,#DDF1E4);color:var(--avatar-ink,#24837B);border-color:var(--avatar-ink,#24837B);border-radius:10px}
+.home-dashboard .record-count{background:#E2D9F1;color:#5E409D;border-color:#C4B9E0}
+.home-dashboard .dash-main .tiny-label{color:#24837B}
+.home-dashboard .iou-terms{color:#5E409D;font-size:10px;display:block;margin-top:6px;overflow-wrap:anywhere}
+.dash-modal{max-height:calc(100dvh - 32px);overflow-y:auto;width:min(520px,calc(100vw - 32px));box-sizing:border-box;background:#FFFCF0;color:#102D2C}
+.add-iou-form{display:flex;flex-direction:column;gap:8px}
+.add-iou-form label{margin-top:8px;display:flex;justify-content:space-between}
+.add-iou-form .form-intro{color:#54796D;font-size:12px;line-height:1.6}
+.add-iou-form input,.add-iou-form select{box-sizing:border-box;width:100%;min-height:42px}
+.add-iou-form input:focus-visible,.add-iou-form select:focus-visible{outline:2px solid #24837B;outline-offset:2px}
+.amount-input{display:flex;align-items:center;border:1px solid #A8C8A2;border-radius:4px;background:#FBFDF7;padding-left:12px;gap:4px}
+.amount-input input{border:0;background:transparent;min-width:0}
+.add-iou-form input[type=range]{accent-color:#24837B;padding:0;cursor:pointer}
+.add-iou-form output{color:#5E409D;font-weight:700}
+.range-labels{display:flex;justify-content:space-between;color:#54796D;font-size:11px}
+.add-iou-form .interest-note{font-size:11px;color:#54796D;line-height:1.5}
+.dash-modal .primary-action:disabled,.dash-modal .primary-action:disabled:hover{background:#DDE2B2;color:#536907;border-color:#BEC97E;opacity:.65;cursor:not-allowed}
+.dash-modal .primary-action:not(:disabled){background:#24837B;color:#FFFCF0;border-color:#1C635C}
+.dash-modal .primary-action:not(:disabled):hover{background:#1C635C}
+.home-dashboard .tracker-tagline{font-size:11px;color:#54796D;line-height:1.6;margin:12px 0 0}
+.home-dashboard .ledger-labels,.home-dashboard .ledger-row{grid-template-columns:minmax(150px,1.6fr) minmax(110px,1fr) 95px minmax(100px,.8fr) 75px;gap:16px}
+.home-dashboard .iou-due{font-size:11px;color:#54796D}
+.home-dashboard .iou-interest strong{font-weight:400;font-size:18px;color:#BC5215;display:block}
+.home-dashboard .iou-interest small{display:block;font-size:10px;line-height:1.5;color:#54796D;margin-top:8px}
+.home-dashboard .ledger-heading>div{min-width:0}
+@media(min-width:701px) and (max-width:1100px){.home-dashboard .ledger-labels,.home-dashboard .ledger-row{grid-template-columns:minmax(130px,1.5fr) 100px 80px 85px 60px;gap:10px}.home-dashboard .loan-balance strong{font-size:20px}.home-dashboard .ledger-rows{padding:0 12px}.home-dashboard .ledger-row button:not(.person-link){padding:7px 4px}}
+@media(max-width:700px){.home-dashboard .ledger-labels{display:none}.home-dashboard .ledger-row{grid-template-columns:1fr;gap:14px}.home-dashboard .loan-balance,.home-dashboard .iou-due,.home-dashboard .iou-interest{padding-left:42px}.home-dashboard .iou-due:before,.home-dashboard .iou-interest:before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.06em;color:#54796D;margin-bottom:6px}.home-dashboard .ledger-row>div:last-child{text-align:left}.home-dashboard .ledger-row>div:last-child button{margin-left:42px}.home-dashboard .ledger-heading input{width:100%}}

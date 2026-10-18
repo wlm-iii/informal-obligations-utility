@@ -210,3 +210,30 @@ clean up synthetic owners/ledger records. Do not run against production/shared d
 Before release, review/apply the migration and perform a real authenticated API
 smoke test against the intended environment. Hosted migration, browser-based lending
 UI, and production launch hardening are separate from these local automated results.
+# IOU creation preferences
+
+The dashboard add form creates a friend followed by a money or item IOU. It requires
+name, email, type, amount or item name, due date, and repayment type. Other repayment
+types require a description. If saving the IOU fails after the friend is saved,
+retry reuses that friend and the IOU idempotency key.
+
+Loan creation and read responses support `repayment_type` (`item`, `money`, or
+`other`), `repayment_other` (required only for `other`), and integer
+`interest_percent` (0–1000, default 0). Existing API clients may omit these fields.
+The selected percentage is a **daily simple rate** on original principal, accruing
+on each calendar day after the due date in the IOU's saved timezone. Total interest
+is rounded once to the nearest cent, half up. There is no compounding. Outstanding
+balance includes principal plus accrued interest minus all recorded repayments.
+Partial payments do not reduce the daily interest basis. Once the balance is fully
+paid, interest freezes at the final repayment's effective date. Interest-bearing
+repayments must be recorded in chronological order. Item IOUs and repayment by
+item require a zero interest rate and hide the slider. Legacy item rates are ignored.
+The frontend demo uses the same calculation and refreshes once a minute; authenticated
+balances come from the backend. Status/overdue filters include unpaid interest.
+
+Apply migration `0004_iou_preferences` before running the updated backend:
+`py -3.12 scripts/dev.py migrate` (Windows) or `python3 scripts/dev.py migrate`.
+
+Avatar accents use the active (`status=open`) IOU count, counting both money and
+items: 0 cyan, 1 blue, 2 purple, 3 yellow, 4 orange, 5+ red. Closed records do not
+affect the color. Accent colors are based on [Flexoki](https://stephango.com/flexoki).

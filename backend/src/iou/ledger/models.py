@@ -59,6 +59,14 @@ class Loan(Base):
             "OR (kind = 'item' AND principal_cents IS NULL AND currency IS NULL)",
             name="ck_loan_terms",
         ),
+        CheckConstraint("interest_percent BETWEEN 0 AND 1000", name="ck_loan_interest_percent"),
+        CheckConstraint(
+            "(repayment_type IS NULL AND repayment_other IS NULL) OR "
+            "(repayment_type IN ('item', 'money') AND repayment_other IS NULL) OR "
+            "(repayment_type = 'other' AND repayment_other IS NOT NULL "
+            "AND length(trim(repayment_other)) BETWEEN 1 AND 500)",
+            name="ck_loan_repayment_preference",
+        ),
         CheckConstraint("kind IN ('money', 'item')", name="ck_loan_kind"),
         CheckConstraint("length(trim(description)) BETWEEN 1 AND 500", name="ck_loan_description"),
         CheckConstraint("overdue_at > lent_at", name="ck_loan_due_boundary"),
@@ -73,6 +81,9 @@ class Loan(Base):
     kind: Mapped[str] = mapped_column(String(10))
     description: Mapped[str] = mapped_column(String(500))
     notes: Mapped[str | None] = mapped_column(String(2000))
+    repayment_type: Mapped[str | None] = mapped_column(String(10))
+    repayment_other: Mapped[str | None] = mapped_column(String(500))
+    interest_percent: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     principal_cents: Mapped[int | None] = mapped_column(BigInteger)
     currency: Mapped[str | None] = mapped_column(String(3))
     lent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

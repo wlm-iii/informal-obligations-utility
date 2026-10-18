@@ -84,14 +84,30 @@ def loan_read(row, at: datetime) -> LoanRead:
     loan = row[0]
     money = loan.kind == "money"
     paid = int(row.paid_cents) if money else None
-    complete = bool(row.is_complete)
+
+    def accrued(when):
+        days = max(0, (utc(when).astimezone(ZoneInfo(loan.timezone)).date() - loan.due_date).days)
+        enabled = money and loan.repayment_type != "item" and loan.interest_percent > 0
+        return (
+            ((loan.principal_cents * loan.interest_percent * days + 50) // 100, days)
+            if enabled
+            else (0, 0)
+        )
+
+    # Freeze accrual once all principal and interest have been paid.
+    last_interest, _ = accrued(row.last_payment) if row.last_payment else (0, 0)
+    complete = (paid >= loan.principal_cents + last_interest) if money else bool(row.is_complete)
     completed_at = (row.last_payment if money else row.returned_at) if complete else None
+    interest, days = accrued(completed_at if complete and money else at)
     return LoanRead(
         id=loan.id,
         friend_id=loan.friend_id,
         kind=loan.kind,
         description=loan.description,
         notes=loan.notes,
+        repayment_type=loan.repayment_type,
+        repayment_other=loan.repayment_other,
+        interest_percent=loan.interest_percent,
         lent_at=loan.lent_at,
         due_date=loan.due_date,
         timezone=loan.timezone,
@@ -100,7 +116,9 @@ def loan_read(row, at: datetime) -> LoanRead:
         principal_cents=loan.principal_cents,
         currency=loan.currency,
         repaid_cents=paid,
-        outstanding_cents=loan.principal_cents - paid if money else None,
+        outstanding_cents=max(0, loan.principal_cents + interest - paid) if money else None,
+        interest_cents=interest,
+        interest_days=days,
         returned_at=row.returned_at,
         completed_at=completed_at,
         status="completed" if complete else "open",
@@ -223,6 +241,9 @@ def create_loan(
         kind=body.kind,
         description=body.description,
         notes=body.notes,
+        repayment_type=body.repayment_type,
+        repayment_other=body.repayment_other,
+        interest_percent=body.interest_percent,
         lent_at=lent,
         due_date=body.due_date,
         timezone=owner.timezone,
@@ -250,12 +271,17 @@ def settle(
     if loan.status == "completed":
         raise HTTPException(409, "This loan is already completed.")
     amount = body.amount_cents if isinstance(body, RepaymentCreate) else None
-    if amount is not None and amount > loan.outstanding_cents:
-        raise HTTPException(409, "Repayment exceeds the outstanding principal.")
     now = now_utc()
     effective = utc(body.effective_at) if body.effective_at is not None else now
     if effective < utc(loan.lent_at) or effective > now:
         raise HTTPException(422, "Effective time must be between lending time and now.")
+    if amount is not None:
+        row = session.execute(loan_query(owner).where(Loan.id == loan_id)).one()
+        if loan.interest_percent and row.last_payment and effective < utc(row.last_payment):
+            raise HTTPException(422, "Interest-bearing repayments must be recorded in date order.")
+        balance = loan_read(row, effective).outstanding_cents
+        if amount > balance:
+            raise HTTPException(409, "Repayment exceeds the outstanding balance.")
     event = LoanEvent(
         id=uuid4(),
         owner_id=owner,

@@ -42,6 +42,6 @@ export default function ReturnTracker({ previewLoans, compact }) {
    <p className="return-chart-foot">{total} items lent in total · {summary.returned} returned + {summary.outstanding} still lent out.</p>
   </section>
   <div className="return-cards"><article><h3>UNPAID DEBTS</h3><strong>{summary.unpaid}</strong><p>Still on your tab</p></article><article><h3>REPAID DEBTS</h3><strong>{summary.repaid}</strong><p>Faith restored</p></article></div>
-  <p className="return-note">Based on your private ledger. The chart counts item loans only; debt cards count all open or completed loans. Each item loan is counted as one item.</p>
+  <p className="return-note">Based on your private ledger. The chart counts item IOU&apos;s only; debt cards count all open or completed IOU&apos;s. Each item IOU is counted as one item.</p>
  </section>;
 }

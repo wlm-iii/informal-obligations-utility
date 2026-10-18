@@ -1,13 +1,20 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 vi.mock("./supabase", () => ({ supabase: { auth: { getSession: vi.fn() } } }));
 import { supabase } from "./supabase";
-import { ledgerRequest, loadFriends, reminderFor } from "./dashboard";
+import { ledgerRequest, loadFriends, reminderFor, reminderTones } from "./dashboard";
 beforeEach(() => {
  vi.resetAllMocks();
  supabase.auth.getSession.mockResolvedValue({ data: { session: { access_token: "private-token" } } });
  vi.stubGlobal("fetch", vi.fn());
 });
 afterEach(() => vi.unstubAllGlobals());
+it("offers distinct reminder voices for money and items", () => {
+ for (const kind of ["money", "item"]) {
+  const messages = reminderTones.map(tone => reminderFor({display_name:"Taylor"}, {kind,description:"Camera",outstanding_cents:1250,due_date:"2099-12-01"},tone));
+  expect(new Set(messages).size).toBe(reminderTones.length);
+  for (const message of messages) { expect(message).toContain("Taylor"); expect(message).toContain("Camera"); }
+ }
+});
 it("loads every friend page including archived names with authentication and no caching", async () => {
  fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [{ id: "1" }], has_more: true }) }).mockResolvedValueOnce({ ok: true, json: async () => ({ items: [{ id: "2" }], has_more: false }) });
  const signal = new AbortController().signal;
