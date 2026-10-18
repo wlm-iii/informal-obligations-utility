@@ -15,6 +15,32 @@ beforeEach(() => {
  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: vi.fn().mockResolvedValue() } });
 });
 afterEach(cleanup);
+it.each([["Boba acquisition", "Repaid"], ["Blue hoodie", "Returned"]])("settles %s, opens History and removes it from the dashboard", async (description, status) => {
+ render(<Dashboard demo={demo}/>);
+ const row = screen.getAllByText(new RegExp(description))[0].closest("article");
+ fireEvent.click(within(row).getByRole("button",{name:"Settle",exact:true}));
+ expect(screen.getByRole("button",{name:"History",exact:true})).toHaveAttribute("aria-current","page");
+ const historyRow = screen.getAllByRole("row").find(row => row.textContent.includes(description) && row.textContent.includes(status));
+ expect(historyRow).toBeTruthy();
+ fireEvent.click(screen.getByRole("button",{name:"Dashboard",exact:true}));
+ expect(screen.queryByText(new RegExp(description))).not.toBeInTheDocument();
+ expect(screen.getAllByRole("button",{name:"Settle",exact:true})).toHaveLength(2);
+});
+
+it("keeps an IOU visible after a failed settlement and retries with the same key", async () => {
+ loadFriends.mockResolvedValue(demoFriends); loadLoans.mockResolvedValue(demoLoans);
+ ledgerRequest.mockRejectedValueOnce(new Error("Unable to save settlement")).mockResolvedValueOnce({loan:{...demoLoans[0],status:"completed",outstanding_cents:0,repaid_cents:1850}});
+ render(<Dashboard/>);
+ const settle = (await screen.findAllByRole("button",{name:"Settle",exact:true}))[0];
+ fireEvent.click(settle);
+ expect(await screen.findByRole("alert")).toHaveTextContent("Unable to save settlement");
+ expect(screen.getByRole("button",{name:"Dashboard",exact:true})).toHaveAttribute("aria-current","page");
+ fireEvent.click(settle);
+ await screen.findByRole("heading",{name:"Past payments"});
+ expect(ledgerRequest.mock.calls[0][0]).toBe("/loans/1/repayments");
+ expect(ledgerRequest.mock.calls[0][1].body).toEqual({amount_cents:1850});
+ expect(ledgerRequest.mock.calls[1][1].key).toBe(ledgerRequest.mock.calls[0][1].key);
+});
 it("hides and clears daily interest when repayment changes to item", () => {
  render(<Dashboard demo={demo}/>);
  fireEvent.click(screen.getByRole("button",{name:"Add friend",exact:true}));

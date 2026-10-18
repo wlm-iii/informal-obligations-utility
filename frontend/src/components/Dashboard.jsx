@@ -39,6 +39,9 @@ export default function Dashboard({ account, profile, demo, accountError }) {
  const [copyStatus, setCopyStatus] = useState("");
  const [adding, setAdding] = useState(false);
  const [busy, setBusy] = useState(false);
+ const [settling, setSettling] = useState(null);
+ const settlementLock = useRef(false);
+ const settlementKeys = useRef(new Map());
  const friendKey = useRef(null);
  const loanKey = useRef(null);
  const savedFriend = useRef(null);
@@ -78,6 +81,27 @@ export default function Dashboard({ account, profile, demo, accountError }) {
   } catch (e) { setError(`${e.message}${savedFriend.current ? " Your friend was saved; retry to finish adding their IOU." : ""}`); }
   finally { submitting.current = false; setBusy(false); }
  }
+ async function settleLoan(loan) {
+  if (settlementLock.current) return;
+  settlementLock.current = true; setSettling(loan.id); setError("");
+  if (!settlementKeys.current.has(loan.id)) settlementKeys.current.set(loan.id, crypto.randomUUID());
+  try {
+   const at = new Date().toISOString();
+   let settled;
+   if (demo) {
+    settled = { ...loan, status:"completed", overdue:false, completed_at:at, ...(loan.kind === "money" ? {repaid_cents:(loan.repaid_cents || 0) + loan.outstanding_cents, outstanding_cents:0} : {returned_at:at}) };
+    if (loan.kind === "money") setPayments(previous => [...previous, {id:crypto.randomUUID(),loan_id:loan.id,description:loan.description,action:"repayment",amount_cents:loan.outstanding_cents,effective_at:at}]);
+   } else {
+    const result = await ledgerRequest(`/loans/${loan.id}/${loan.kind === "item" ? "return" : "repayments"}`, { body:loan.kind === "item" ? {} : {amount_cents:loan.outstanding_cents}, key:settlementKeys.current.get(loan.id) });
+    settled = result.loan;
+   }
+   setLoans(previous => previous.map(record => record.id === loan.id ? settled : record));
+   settlementKeys.current.delete(loan.id);
+   if (settled.status === "completed") navigate("History");
+   else setError("The balance changed. Review the remaining amount and settle again.");
+  } catch (e) { setError(e.message); }
+  finally { settlementLock.current = false; setSettling(null); }
+ }
  async function recordRepayment(event) {
   event.preventDefault(); const form = new FormData(event.currentTarget); const loan = loans.find(l => l.id === form.get("loan"));
   const text = String(form.get("amount"));
@@ -93,7 +117,8 @@ export default function Dashboard({ account, profile, demo, accountError }) {
    setRecording(false);
   } catch(e){setError(e.message);} finally{setBusy(false);}
  }
- const filtered = loans.filter(loan => `${person(loan.friend_id).display_name} ${loan.description}`.toLowerCase().includes(search.toLowerCase()));
+ const activeLoans = loans.filter(loan => loan.status === "open");
+ const filtered = activeLoans.filter(loan => `${person(loan.friend_id).display_name} ${loan.description}`.toLowerCase().includes(search.toLowerCase()));
  const ownLoans = selected ? loans.filter(loan => loan.friend_id === selected.id) : loans;
  function history(records) {
   return <div className="history-list">{[...records].sort((a,b) => String(b.lent_at).localeCompare(String(a.lent_at))).map(loan => <article key={loan.id}><span className={`status-pill ${loan.status}`}>{loan.status === "completed" ? (loan.kind === "item" ? "Returned" : "Repaid") : "Not returned / open"}</span><h3>{loan.description}</h3><p>{person(loan.friend_id).display_name} · Borrowed {String(loan.lent_at).slice(0,10)} · Due {loan.due_date}</p>{loan.completed_at || loan.returned_at ? <p>Completed {String(loan.completed_at || loan.returned_at).slice(0,10)}</p> : null}</article>)}{!records.length && <p>No borrowing history yet.</p>}</div>;
@@ -104,7 +129,7 @@ export default function Dashboard({ account, profile, demo, accountError }) {
   <div className="dash-main"><nav className="dash-tabs" aria-label="Main navigation">{["Dashboard", "Progress", "Ranks", "History"].map(tab => <button key={tab} aria-current={view === tab ? "page" : undefined} onClick={() => navigate(tab)}>{tab}</button>)}</nav>
    {loading && <p role="status">Loading your ledger…</p>}
    {error && !adding && <div role="alert">{error}<button onClick={() => setRevision(v => v + 1)}>Retry ledger</button></div>}
-   {view === "Dashboard" && <section aria-label="IOU Tracker"><div className="ledger-heading"><div><p className="tiny-label">Friendship Tabs</p><h1>IOU Tracker<span className="record-count">{loans.length}</span></h1><p className="tracker-tagline">Hold your friends accountable. Don’t let it slide. Get repaid.</p></div><input aria-label="Search counterparty" placeholder="Search counterparty…" value={search} onChange={e => setSearch(e.target.value)}/></div><div className="ledger-labels"><span>COUNTERPARTY / MEMO</span><span>ITEM / AMOUNT OWED</span><span>DUE DATE</span><span>INTEREST</span><span>OPERATIONS</span></div><div className="ledger-rows">{filtered.map(loan => <article className={`ledger-row ${loan.overdue && loan.status === "open" ? "is-overdue" : ""}`} key={loan.id}><div className="counterparty"><span className="friend-avatar" style={avatarStyle(loan.friend_id)}>{person(loan.friend_id).display_name[0]}</span><div><button className="person-link" onClick={() => { setSelected(person(loan.friend_id)); setView("Profile"); }}>{person(loan.friend_id).display_name}</button><p>{loan.description}</p><small className={loan.overdue ? "overdue" : ""}>{loan.status === "completed" ? "✓ Position closed" : loan.overdue ? "Overdue · the plot thickens" : "Still lent out"} · {loan.due_date}</small></div></div><div className="loan-balance"><strong>{loan.kind === "money" ? money(loan.outstanding_cents) : loan.status === "completed" ? "Returned" : "1 item"}</strong><small>{loan.kind === "money" ? `${money(loan.repaid_cents)} repaid · ${money(loan.principal_cents)} original` : loan.description}</small>{loan.repayment_type && <small className="iou-terms">Repay: {loan.repayment_type === "other" ? loan.repayment_other : loan.repayment_type}</small>}</div><div className="iou-due" data-label="Due date"><time dateTime={loan.due_date}>{loan.due_date}</time></div><div className="iou-interest" data-label="Interest"><strong>{loan.kind === "item" || loan.repayment_type === "item" ? "—" : money(loan.interest_cents)}</strong><small>{loan.kind === "item" || loan.repayment_type === "item" ? "No interest" : `${loan.interest_percent || 0}% / day · ${loan.interest_days || 0} days`}</small></div><div>{loan.status === "open" && <button onClick={() => openNudge(loan)}>Nudge ↗</button>}</div></article>)}</div>{!loading && !error && !filtered.length && <p className="empty-ledger">{search ? "No matching Active IOU's." : "Your ledger is clear. Add a friend to start your circle."}</p>}<footer className="ledger-footer">USD DENOMINATED. EMOTIONALLY COMPLICATED.<span>{loans.length} records · private to you</span></footer></section>}
+   {view === "Dashboard" && <section aria-label="IOU Tracker"><div className="ledger-heading"><div><p className="tiny-label">Friendship Tabs</p><h1>IOU Tracker<span className="record-count">{activeLoans.length}</span></h1><p className="tracker-tagline">Hold your friends accountable. Don’t let it slide. Get repaid.</p></div><input aria-label="Search counterparty" placeholder="Search counterparty…" value={search} onChange={e => setSearch(e.target.value)}/></div><div className="ledger-labels"><span>COUNTERPARTY / MEMO</span><span>ITEM / AMOUNT OWED</span><span>DUE DATE</span><span>INTEREST</span><span>OPERATIONS</span></div><div className="ledger-rows">{filtered.map(loan => <article className={`ledger-row ${loan.overdue && loan.status === "open" ? "is-overdue" : ""}`} key={loan.id}><div className="counterparty"><span className="friend-avatar" style={avatarStyle(loan.friend_id)}>{person(loan.friend_id).display_name[0]}</span><div><button className="person-link" onClick={() => { setSelected(person(loan.friend_id)); setView("Profile"); }}>{person(loan.friend_id).display_name}</button><p>{loan.description}</p><small className={loan.overdue ? "overdue" : ""}>{loan.status === "completed" ? "✓ Position closed" : loan.overdue ? "Overdue · the plot thickens" : "Still lent out"} · {loan.due_date}</small></div></div><div className="loan-balance"><strong>{loan.kind === "money" ? money(loan.outstanding_cents) : loan.status === "completed" ? "Returned" : "1 item"}</strong><small>{loan.kind === "money" ? `${money(loan.repaid_cents)} repaid · ${money(loan.principal_cents)} original` : loan.description}</small>{loan.repayment_type && <small className="iou-terms">Repay: {loan.repayment_type === "other" ? loan.repayment_other : loan.repayment_type}</small>}</div><div className="iou-due" data-label="Due date"><time dateTime={loan.due_date}>{loan.due_date}</time></div><div className="iou-interest" data-label="Interest"><strong>{loan.kind === "item" || loan.repayment_type === "item" ? "—" : money(loan.interest_cents)}</strong><small>{loan.kind === "item" || loan.repayment_type === "item" ? "No interest" : `${loan.interest_percent || 0}% / day · ${loan.interest_days || 0} days`}</small></div><div className="iou-operations"><button disabled={settling !== null} onClick={() => openNudge(loan)}>Nudge ↗</button><button className="settle-iou" disabled={settling !== null} onClick={() => settleLoan(loan)}>{settling === loan.id ? "Settling…" : "Settle"}</button></div></article>)}</div>{!loading && !error && !filtered.length && <p className="empty-ledger">{search ? "No matching Active IOU's." : "Your ledger is clear. Add a friend to start your circle."}</p>}<footer className="ledger-footer">USD DENOMINATED. EMOTIONALLY COMPLICATED.<span>{activeLoans.length} active records · private to you</span></footer></section>}
    {view === "Progress" && <Progress loans={loans} friends={friends} demo={demo ? { ...demo, payments } : undefined} onRefresh={() => setRevision(v => v + 1)} onRecord={() => { repaymentKey.current = crypto.randomUUID(); setError(""); setRecording(true); }} onNudge={() => { const loan = loans.find(l => l.status === "open"); if (loan) openNudge(loan); else setError("No Active IOU's to remind anyone about."); }}/>}
    {view === "Ranks" && <Leaderboards/>}
    {view === "History" && <History friends={friends} loans={loans} demo={demo ? { ...demo, payments } : undefined}/>}

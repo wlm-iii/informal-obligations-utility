@@ -102,5 +102,9 @@ body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
 .home-dashboard .iou-interest strong{font-weight:400;font-size:18px;color:#BC5215;display:block}
 .home-dashboard .iou-interest small{display:block;font-size:10px;line-height:1.5;color:#54796D;margin-top:8px}
 .home-dashboard .ledger-heading>div{min-width:0}
+.home-dashboard .iou-operations{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.home-dashboard .ledger-row .settle-iou{background:#24837B;color:#FFFCF0;border-color:#1C635C}
+.home-dashboard .iou-operations button:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){.home-dashboard .ledger-row .iou-operations{align-items:flex-start}.home-dashboard .ledger-row .iou-operations button{margin-left:42px}}
 @media(min-width:701px) and (max-width:1100px){.home-dashboard .ledger-labels,.home-dashboard .ledger-row{grid-template-columns:minmax(130px,1.5fr) 100px 80px 85px 60px;gap:10px}.home-dashboard .loan-balance strong{font-size:20px}.home-dashboard .ledger-rows{padding:0 12px}.home-dashboard .ledger-row button:not(.person-link){padding:7px 4px}}
 @media(max-width:700px){.home-dashboard .ledger-labels{display:none}.home-dashboard .ledger-row{grid-template-columns:1fr;gap:14px}.home-dashboard .loan-balance,.home-dashboard .iou-due,.home-dashboard .iou-interest{padding-left:42px}.home-dashboard .iou-due:before,.home-dashboard .iou-interest:before{content:attr(data-label);display:block;font-size:9px;letter-spacing:.06em;color:#54796D;margin-bottom:6px}.home-dashboard .ledger-row>div:last-child{text-align:left}.home-dashboard .ledger-row>div:last-child button{margin-left:42px}.home-dashboard .ledger-heading input{width:100%}}

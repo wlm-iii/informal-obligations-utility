@@ -237,3 +237,9 @@ Apply migration `0004_iou_preferences` before running the updated backend:
 Avatar accents use the active (`status=open`) IOU count, counting both money and
 items: 0 cyan, 1 blue, 2 purple, 3 yellow, 4 orange, 5+ red. Closed records do not
 affect the color. Accent colors are based on [Flexoki](https://stephango.com/flexoki).
+
+The dashboard lists active IOUs only. Settle records the full outstanding money
+balance (including accrued interest) through the repayment API, or records an item
+return through the return API. On success the UI opens History and keeps the completed
+record there. Failed requests retain the active row and reuse the settlement
+idempotency key on retry. Friend profiles and their other active IOUs remain available.
