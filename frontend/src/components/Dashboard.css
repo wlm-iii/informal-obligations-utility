@@ -6,3 +6,98 @@
 .account-link{font-size:14px}.friend-sidebar>.tiny-label{font-size:12px}.friend-sidebar nav button{font-size:14px}.friend-sidebar small{font-size:11px}.sidebar-footer{font-size:12px}
 @media(max-width:900px){.account-link{font-size:13px}.friend-sidebar nav button{font-size:13px}.friend-sidebar small{font-size:10px}.friend-sidebar>.tiny-label,.sidebar-footer{font-size:11px}}
 @media(max-width:600px){.account-link{font-size:12px}.friend-sidebar nav button{font-size:12px}.friend-sidebar>.tiny-label,.sidebar-footer{font-size:10px}}
+
+/* Mint backgrounds with the original dark surfaces and Flexoki accents. */
+body:has(.home-dashboard){background:#A8D5BA}
+.home-dashboard,.dash-main{background:#A8D5BA}
+.dash-main>.dash-tabs{background:#1C1B1A;padding:12px;border:1px solid #343331;border-radius:5px}
+.dash-main>section{background:#100F0F;color:#CECDC3;padding:24px;border:1px solid #343331;border-radius:5px}
+.dash-main>.return-overview{padding:24px;background-color:#100F0F}
+.dash-main>.demo-banner{background:#1C1B1A}
+@media(max-width:600px){.dash-main>section,.dash-main>.return-overview{padding:14px}.dash-main>.dash-tabs{padding:8px}}
+
+/* Light friendship-finance palette inspired by the supplied reference. */
+body:has(.home-dashboard){background:#F1F7ED;color:#152A22;color-scheme:light}
+.home-dashboard{--ink:#152A22;--green:#198356;--muted:#567168;--line:#D8E6D8;background:#F1F7ED;color:var(--ink);border-color:var(--line);box-shadow:0 12px 36px #17634114}
+.dash-main{background:#F1F7ED}
+.dash-top,.friend-sidebar{background:#E7F1E3;border-color:var(--line)}
+.dash-logo{color:var(--ink)}.dash-logo span{color:var(--green)}
+.home-dashboard button{background:#FAFDF7;color:#245A45;border-color:#C8DDCD}
+.home-dashboard button:hover{border-color:#198356;background:#E3F0E1}
+.home-dashboard button:focus-visible{outline-color:#198356}
+.home-dashboard .dash-logo,.home-dashboard .person-link{background:transparent;border-color:transparent;color:var(--ink)}
+.home-dashboard .add-friend{background:#198356;color:#FFFFFF;border-color:#198356}
+.home-dashboard .account-link{background:#FAFDF7;color:#245A45}
+.friend-sidebar nav button{background:transparent;border-color:transparent;color:#244737}
+.friend-sidebar nav button:hover,.friend-sidebar nav .selected{background:#D5E9D6;border-color:#BCD8C1}
+.friend-sidebar small,.friend-sidebar>.tiny-label,.tiny-label,.muted,.history-list p{color:#567168}
+.friend-avatar{background:#E2EFDC;border-color:#BDD6BF;color:#198356}
+.dash-main>.dash-tabs{background:#FAFDF7;border-color:#D8E6D8;box-shadow:0 3px 12px #1763410A}
+.dash-tabs button{color:#567168;background:transparent;border-color:transparent}
+.dash-tabs button[aria-current=page]{background:#198356;color:#FFFFFF;border-color:#198356}
+.dash-main>section,.dash-main>.return-overview{background:#FCFEF9;color:#152A22;border-color:#D8E6D8;box-shadow:0 6px 18px #1763410C}
+.dash-main>.demo-banner{background:#E7F1E3;color:#426550;border-color:#CBDDC9}
+.ledger-heading input{background:#E7F1E3;color:#152A22;border-color:#C8DDCD}
+.ledger-heading input::placeholder{color:#678174}
+.record-count{color:#567168;border-color:#C8DDCD}
+.ledger-labels,.ledger-row,.history-list article{border-color:#D8E6D8}
+.ledger-labels,.counterparty p,.loan-balance small,.ledger-footer{color:#567168}
+.ledger-row:nth-child(odd){background:#F0F7EC}
+.counterparty small{color:#198356}.counterparty .overdue{color:#A96A19}
+.friend-stats article{background:#EAF3E5;border-color:#D1E2CC}.friend-stats small{color:#567168}
+.status-pill{background:#FFF1CE;color:#91621B;border-color:#E8D9AE}
+.status-pill.completed{background:#DDEEDC;color:#198356;border-color:#BCD8C1}
+.dash-modal{background:#FCFEF9;color:#152A22;border-color:#C8DDCD;box-shadow:0 16px 48px #175E3529;color-scheme:light}
+.dash-modal::backdrop{background:#163A2A66}
+.dash-modal input,.dash-modal textarea,.dash-modal select{background:#E7F1E3;color:#152A22;border-color:#BCD8C1}
+.dash-modal .close-modal{background:#E7F1E3;color:#245A45;border-color:#BCD8C1}
+.dash-modal .primary-action{background:#198356;color:#FFFFFF;border-color:#198356}
+.dash-modal small{color:#567168}
+.home-dashboard [role=alert],.dash-modal [role=alert]{color:#A03932}
+/* Apply the same light surfaces to Progress and Ranks. */
+.home-dashboard .return-overview{--return-green:#198356;--return-muted:#567168;--return-border:#D8E6D8;color:#152A22;background-color:#FCFEF9;background-image:none}
+.home-dashboard .return-overview:before{display:none}
+.home-dashboard .return-panel{background:#F4F9EF;border-color:#D8E6D8}
+.home-dashboard .return-panel:before{opacity:.35}
+.home-dashboard .return-cards article{background:#E7F1E3;border-color:#C8DDCD}
+.home-dashboard .return-cards h3{color:#567168}.home-dashboard .return-cards p{color:#A03932}.home-dashboard .return-cards article:last-child p{color:#198356}
+.home-dashboard .return-sample{color:#245A45}
+.home-dashboard .hall{background:#F4F9EF;border-color:#D8E6D8}.home-dashboard .hall>h2,.home-dashboard .hall li{border-color:#D8E6D8}
+.home-dashboard .hall>h2,.home-dashboard .hall h3{color:#198356}.home-dashboard .hall.shame>h2,.home-dashboard .hall.shame h3{color:#B34B42}
+.home-dashboard .hall-name,.home-dashboard .hall-credit,.home-dashboard .hall-disclaimer,.home-dashboard .hall li:before{color:#567168}
+.home-dashboard .hall-credit strong{color:#152A22}.home-dashboard .hall li:first-child:before{color:#A96A19}.home-dashboard .hall-art{border-color:#C8DDCD}
+.home-dashboard .profile-form input{background:#E7F1E3;color:#152A22;border-color:#BCD8C1}
+
+/* Warm sunshine and coral accents on the mint foundation. */
+.home-dashboard .add-friend{background:#F5CD68;color:#594115;border-color:#DDB24D;box-shadow:0 3px 8px #C99B2926}
+.home-dashboard .add-friend:hover{background:#F9DD96;border-color:#C99B29}
+.home-dashboard .record-count{background:#FFF0BC;color:#775316;border-color:#E9D18B}
+.friend-sidebar nav button:nth-child(4n+1) .friend-avatar,.counterparty .friend-avatar{background:#FFE8A1;color:#775316;border-color:#E9D18B}
+.friend-sidebar nav button:nth-child(4n+2) .friend-avatar{background:#F9D6CF;color:#9F443B;border-color:#E9B6AC}
+.friend-sidebar nav button:nth-child(4n+3) .friend-avatar{background:#DDEEDC;color:#246445;border-color:#BDD7BE}
+.home-dashboard .ledger-row.is-overdue{background:#FFF1E9;border-left:3px solid #D57562;padding-left:12px}
+.home-dashboard .counterparty .overdue{display:inline-block;background:#FADCD4;color:#A23F35;padding:5px 8px;border-radius:4px}
+.home-dashboard .ledger-row button:not(.person-link){background:#FFF0BC;color:#775316;border-color:#E6CC83}
+.home-dashboard .ledger-row.is-overdue button:not(.person-link){background:#FADCD4;color:#9F443B;border-color:#E9B6AC}
+.home-dashboard .ledger-row button:not(.person-link):hover{background:#F8DB8A}
+.home-dashboard .ledger-row.is-overdue button:not(.person-link):hover{background:#F5C4B9}
+.home-dashboard .account-link{border-bottom:3px solid #E6BC58}
+.home-dashboard .friend-stats article:nth-child(3n+1){background:#FFF3CD;border-color:#E9D496}
+.home-dashboard .friend-stats article:nth-child(3n+2){background:#FCE5DD;border-color:#ECC4B8}
+.home-dashboard .friend-stats article:nth-child(3n){background:#E7F1E3;border-color:#CBDDC9}
+.home-dashboard .friend-stats article:nth-child(3n+1) strong{color:#805C1B}
+.home-dashboard .friend-stats article:nth-child(3n+2) strong{color:#A94D42}
+.home-dashboard .return-cards article:first-child{background:#FCE5DD;border-color:#ECC4B8}
+.home-dashboard .return-cards article:first-child strong{color:#A94D42}
+.home-dashboard .hall.fame>h2{background:#FFF3CD;border-bottom-color:#E9D496}
+.home-dashboard .hall.shame>h2{background:#FCE5DD;border-bottom-color:#ECC4B8}
+.home-dashboard .hall li:first-child:before{background:#F5CD68;color:#594115;padding:3px;border-radius:3px;left:-4px}
+.home-dashboard .demo-banner{border-left:3px solid #E6BC58}
+.dash-modal .close-modal{background:#FCE5DD;color:#A94D42;border-color:#ECC4B8}
+
+/* Roomier bold navigation and a slightly deeper mint backdrop. */
+body:has(.home-dashboard),.home-dashboard,.dash-main{background:#DFECDD}
+.dash-main>.dash-tabs{justify-content:space-between;gap:18px}
+.dash-tabs button{flex:1;font-weight:700;padding:12px 16px;text-align:center}
+@media(max-width:900px){.dash-main>.dash-tabs{gap:10px}.dash-tabs button{padding:11px 10px}}
+@media(max-width:600px){.dash-main>.dash-tabs{gap:8px}.dash-tabs button{flex:1 1 calc(50% - 8px);padding:10px 8px}}

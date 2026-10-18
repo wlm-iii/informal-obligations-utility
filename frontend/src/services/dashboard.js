@@ -30,3 +30,18 @@ export function reminderFor(friend, loan, tone) {
  if (tone === "Playful") return `Hey ${friend.display_name}! Your side quest is still open: ${subject}. Any chance you can wrap it up soon? Thank you!`;
  return `Hey ${friend.display_name}! Little bestie reminder about ${subject}. Whenever you get a chance, could you help me out? Thank you 💙`;
 }
+
+export async function loadLedgerHistory(friends, signal) {
+ const pages = await Promise.all(friends.map(async friend => {
+  const events = [];
+  for (let offset = 0; offset <= 100000; offset += 100) {
+   const page = await ledgerRequest(`/friends/${friend.id}/history?limit=100&offset=${offset}`, { signal });
+   if (!Array.isArray(page.items)) throw new Error("Payment history is unavailable.");
+   events.push(...page.items);
+   if (!page.has_more) return events;
+  }
+  throw new Error("Payment history is too large to display completely.");
+ }));
+ return pages.flat();
+}
+export const utcDate = value => new Intl.DateTimeFormat("en-US", { month:"short", day:"numeric", year:"numeric", timeZone:"UTC" }).format(new Date(value));

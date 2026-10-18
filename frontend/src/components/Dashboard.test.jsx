@@ -49,13 +49,13 @@ it("adds a friend through the plus button and shows open and returned history", 
  fireEvent.click(within(dialog).getByRole("button", { name: "Add friend" }));
  expect(await screen.findByRole("button", { name: /Taylor/ })).toBeInTheDocument();
  fireEvent.click(screen.getByRole("button", { name: "History", exact: true }));
- expect(screen.getByText("Returned", { selector: ".status-pill" })).toBeInTheDocument();
- expect(screen.getAllByText("Not returned / open", { selector: ".status-pill" })).toHaveLength(3);
+ expect(screen.getByText("Returned", { selector: ".recorded-badge" })).toBeInTheDocument();
+ expect(screen.getAllByText("Not returned / open", { selector: ".recorded-badge" })).toHaveLength(3);
 });
 it("opens the sample progress chart and ranks from the same navigation", async () => {
  render(<Dashboard demo={demo}/>);
  fireEvent.click(screen.getByRole("button", { name: "Progress", exact: true }));
- expect(await screen.findByRole("img")).toHaveAccessibleName("50% still lent out; 50% returned to you.");
+ expect(await screen.findByRole("heading",{name:"Cumulative repayments"})).toBeInTheDocument();
  fireEvent.click(screen.getByRole("button", { name: "Ranks", exact: true }));
  expect(screen.getByRole("region", { name: "Hall of Fame" })).toBeInTheDocument();
  expect(screen.getByRole("region", { name: "Hall of Shame" })).toBeInTheDocument();

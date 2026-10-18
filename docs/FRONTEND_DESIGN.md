@@ -81,3 +81,36 @@ The own-account page uses the same identity header, avatar, stats cards, and bor
 ### Account summary totals
 
 The own-account summary shows active friend count, money outstanding, money repaid (including partial repayments), items still out, and items returned. Money is summed in integer USD cents; each item loan counts as one item. Borrowing history remains below these cards. These are totals from the owner’s lending ledger, not personal asset ownership or unsupported borrower-side debts.
+
+## Mint background
+
+The page and dashboard content background use mint green `#A8D5BA`. The original Flexoki green `#879A39` and hover `#A0AF54` accents are restored. Header, sidebar, navigation surfaces, and content panels retain their dark Flexoki colors for readable contrast.
+
+## Current light dashboard palette
+
+The supplied landing-page reference supersedes the dark dashboard surfaces: pale mint `#F1F7ED` page background, sage `#E7F1E3` header/sidebar and inputs, ivory `#FCFEF9` content/modal panels, deep green `#198356` actions, dark forest `#152A22` primary text, muted green `#567168` secondary text, and `#D8E6D8` dividers. Overdue badges use warm amber; Shame titles use muted red. The original chart segment colors and illustration artwork remain. Iosevka, 4:3 framing, navigation and interactions remain. The sidebar slogan has been removed.
+
+### Sunshine and coral accents
+
+Warm yellow `#F5CD68` and pale yellow `#FFF3CD` highlight the add button, record count, nudge actions, Fame heading, and selected statistic cards. Soft coral `#FCE5DD` and red-brown `#A94D42` accent overdue loans, unpaid totals, Shame headings, and statistic cards. Overdue rows retain explicit text alongside their colored border. The mint base and green primary navigation remain.
+
+### Navigation spacing and deeper mint
+
+Main tabs distribute evenly across their bar with bold titles and larger gaps. The mint page/content backdrop is now `#DFECDD`. The interactive-preview banner is removed; preview records remain demonstration data, and the Ranks sample-data disclosure remains.
+
+### Centered award icons
+
+The new transparent award-icons-v2.png sheet replaces the reference screenshot windows. Eight equal cells match the supplied new logo designs. CSS uses a 400% by 200% sheet with centered 64px / 42px frames. Rankings remain unchanged. Artwork was recreated with the built-in image generation tool.
+
+
+### Progress reference layout
+
+The Progress headline contains only Your lending, at a glance and Refresh data. A repayment progress bar and three summary cells precede the cumulative USD repayment chart, with 30D, 90D and ALL date filters. Live history loads every page per friend from the authenticated ledger history endpoint; the trend uses actual repayment effective dates. The original item-return chart remains below. No repayment events are invented when history is empty or unavailable. The same Iosevka, ivory panels, mint backdrop and green/red totals align this view with the rest of the dashboard.
+
+## Screenshot-aligned reference revision
+
+The latest references supersede the previous fixed 4:3 shell and playful card treatments. The shell now fills available height, with flat pale-paper `#FBFDF7` surfaces, mint `#F1F7EC` background, thin `#D1E1CB` dividers, compact Iosevka typography, and restrained green/red data values. `ReferenceTheme.css` is the final shared visual layer across Dashboard, Progress, Ranks, History, friend profiles, and Account.
+
+Progress contains the single requested headline and refresh button, repayment bar, Record repayment / Draft reminder controls, three summary cells, and cumulative repayment area/line graph with date filters. The previous item pie chart is removed from this view. Record repayment validates USD decimal input, enforces the outstanding balance, and writes through the existing idempotent repayment endpoint; in preview mode it updates memory only. Nudge remains copy-only.
+
+History uses the supplied Past payments table layout: UTC date, loan description, USD amount, and Recorded status, newest first. A second table below retains borrowed-item and open/returned records. Actual payment history is loaded from paginated authenticated friend history endpoints. The reference preview has the eight supplied payments totaling $260 and a $385 loan with $125 outstanding; no live data is replaced.

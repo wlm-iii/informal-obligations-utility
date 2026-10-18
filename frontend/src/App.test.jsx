@@ -128,9 +128,9 @@ it("lands on the debt ledger after Google login and switches through the main ta
  expect(screen.getByRole("button", { name: "IOU dashboard" })).toBeInTheDocument();
  expect(within(nav).getByRole("button", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
  fireEvent.click(within(nav).getByRole("button", { name: "Progress" }));
- expect(await screen.findByRole("heading", { name: "Still lent out vs. returned to you" })).toBeInTheDocument();
+ expect(await screen.findByRole("heading", { name: "Cumulative repayments" })).toBeInTheDocument();
  fireEvent.click(within(nav).getByRole("button", { name: "Ranks" }));
  expect(screen.getByRole("heading", { name: "THE LEADERBOARDS." })).toBeInTheDocument();
  fireEvent.click(within(nav).getByRole("button", { name: "History" }));
- expect(screen.getByRole("heading", { name: "Borrowed. Returned. Remembered." })).toBeInTheDocument();
+ expect(screen.getByRole("heading", { name: "Past payments" })).toBeInTheDocument();
 });

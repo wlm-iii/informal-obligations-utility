@@ -1,0 +1,78 @@
+/* Shared reference styling: pale paper, flat surfaces, precise ledger typography. */
+body:has(.home-dashboard){background:#F1F7EC;color:#102D2C}
+.home-dashboard{width:min(1440px,calc(100vw - 40px));height:calc(100vh - 40px);min-height:560px;aspect-ratio:auto;margin:20px auto;grid-template-columns:190px minmax(0,1fr);grid-template-rows:72px minmax(0,1fr);background:#F1F7EC;border:1px solid #D1E1CB;box-shadow:none;border-radius:6px;color:#102D2C}
+.home-dashboard .dash-top,.home-dashboard .friend-sidebar{background:#FBFDF7;border-color:#D1E1CB}
+.home-dashboard .dash-main{background:#F1F7EC;padding:20px 24px}
+.home-dashboard .dash-main>section{padding:0;background:transparent;border:0;box-shadow:none;color:#102D2C}
+.home-dashboard .dash-main>.dash-tabs{background:#FBFDF7;border:1px solid #D1E1CB;padding:7px;margin-bottom:22px;box-shadow:none;border-radius:5px;gap:10px}
+.home-dashboard .dash-tabs button{font-size:12px;font-weight:400;border:0;border-radius:3px;padding:12px 16px;background:transparent;color:#456D65}
+.home-dashboard .dash-tabs button[aria-current=page]{background:#E5EFDD;color:#126849;border:0}
+.home-dashboard button{border:1px solid #A8C8A2;border-radius:4px;background:#E5EFDD;color:#205B4E;box-shadow:none}
+.home-dashboard button:hover{background:#DAE9D0;border-color:#83B391}
+.home-dashboard .dash-logo{background:transparent;border:0;color:#102D2C}
+.home-dashboard .add-friend{background:#E5EFDD;border-color:#BED3B4;color:#128352}
+.home-dashboard .account-link{border:1px solid #D1E1CB;background:#FBFDF7;color:#426C61;font-size:12px}
+.home-dashboard .friend-sidebar nav button{background:transparent;border-color:transparent;color:#183F36;font-size:13px}
+.home-dashboard .friend-sidebar nav button:hover,.home-dashboard .friend-sidebar nav .selected{background:#E5EFDD;border-color:#D1E1CB}
+.home-dashboard .friend-avatar,.home-dashboard .friend-sidebar nav button .friend-avatar,.home-dashboard .counterparty .friend-avatar{background:#E5EFDD;border-color:#BED3B4;color:#148352;border-radius:3px;box-shadow:none}
+.home-dashboard .friend-sidebar>.tiny-label{font-size:10px;font-weight:400;color:#54796D}
+.home-dashboard .friend-sidebar small{font-size:10px;color:#54796D}
+.home-dashboard .dash-main h1{font-size:20px;font-weight:400;letter-spacing:0}
+.home-dashboard .ledger-heading{padding:22px 20px;background:#FBFDF7;border:1px solid #D1E1CB;border-bottom:0;border-radius:5px 5px 0 0}
+.home-dashboard .ledger-heading h1{margin:10px 0 0;font-size:22px}
+.home-dashboard .ledger-heading input{background:#FBFDF7;border-color:#D1E1CB;border-radius:3px;font-size:11px}
+.home-dashboard .record-count{background:#E5EFDD;border-color:#D1E1CB;color:#477468}
+.home-dashboard .ledger-labels{padding:15px 20px;background:#FBFDF7;border:1px solid #D1E1CB;font-size:10px;font-weight:400;letter-spacing:0}
+.home-dashboard .ledger-rows{border:1px solid #D1E1CB;border-top:0;background:#FBFDF7;border-radius:0 0 5px 5px;padding:0 20px}
+.home-dashboard .ledger-row,.home-dashboard .ledger-row:nth-child(odd),.home-dashboard .ledger-row.is-overdue{background:transparent;border-left:0;border-bottom:1px solid #D1E1CB;padding:26px 0}
+.home-dashboard .ledger-row:last-child{border-bottom:0}
+.home-dashboard .person-link{border:0;background:transparent;color:#102D2C;font-weight:400;font-size:15px}
+.home-dashboard .counterparty p{font-size:11px;color:#54796D}
+.home-dashboard .counterparty small{font-size:10px;color:#198356}
+.home-dashboard .counterparty .overdue{background:transparent;color:#B32F33;padding:0;border:0}
+.home-dashboard .loan-balance strong{font-weight:400;font-size:25px}
+.home-dashboard .ledger-row button:not(.person-link),.home-dashboard .ledger-row.is-overdue button:not(.person-link){background:#E5EFDD;border-color:#BED3B4;color:#205B4E;font-size:11px}
+.home-dashboard .empty-ledger{background:#FBFDF7;padding:30px 20px;margin:0}
+.home-dashboard .ledger-footer{font-size:9px;color:#54796D;padding:20px 0}
+.home-dashboard .friend-stats{gap:0;border:1px solid #D1E1CB;border-radius:5px;overflow:hidden;background:#FBFDF7}
+.home-dashboard .friend-stats article,.home-dashboard .friend-stats article:nth-child(n){background:#FBFDF7;border:0;border-right:1px solid #D1E1CB;border-bottom:1px solid #D1E1CB;padding:22px}
+.home-dashboard .friend-stats strong,.home-dashboard .friend-stats article:nth-child(n) strong{font-weight:400;color:#148352;font-size:28px}
+.home-dashboard .profile-heading{background:#FBFDF7;border:1px solid #D1E1CB;padding:22px;border-radius:5px}
+.home-dashboard .history-list article{padding:24px 20px;background:#FBFDF7;border:1px solid #D1E1CB;border-top:0}
+.home-dashboard .history-list h3{font-weight:400}
+.home-dashboard .hall{background:#FBFDF7;border-color:#D1E1CB}
+.home-dashboard .hall>h2,.home-dashboard .hall.fame>h2,.home-dashboard .hall.shame>h2{background:transparent;border-color:#D1E1CB;font-size:20px;font-weight:400}
+.home-dashboard .hall li:first-child:before{background:transparent;padding:0;left:0;color:#A96A19}
+.home-dashboard .hall-name{font-size:14px;font-weight:400}.home-dashboard .hall h3{font-size:21px;font-weight:400;letter-spacing:0}
+.home-dashboard .leaderboards .eyebrow{font-size:9px;font-weight:400;letter-spacing:.08em}
+.home-dashboard .leaderboards h1{font-size:22px;font-weight:400}
+/* Progress layout follows the supplied reference without an extra outer card. */
+.home-dashboard .progress-heading{margin:0 0 18px;align-items:center}
+.home-dashboard .progress-heading h1{font-size:18px;font-weight:400}
+.home-dashboard .progress-heading button{font-size:10px;padding:9px 14px}
+.home-dashboard .progress-summary{background:#FBFDF7;border-color:#D1E1CB;border-radius:5px;padding:22px 20px;margin-bottom:20px}
+.home-dashboard .progress-summary-line{flex-direction:row;align-items:center}
+.progress-summary-line strong{font-size:16px;font-weight:400}
+.progress-summary-line small{font-size:10px;color:#54796D}
+.progress-actions{display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+.progress-actions button{padding:13px 18px;font-size:12px}
+.home-dashboard .progress-actions .record-payment{background:linear-gradient(#4B9F7E,#087A4B);color:#FFF;border-color:#128252;font-weight:700}
+.progress-actions small{font-size:10px;color:#54796D}
+.home-dashboard .repayment-stats{background:#FBFDF7;border-color:#D1E1CB;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px}
+.home-dashboard .repayment-stats article{padding:22px 20px}
+.home-dashboard .repayment-stats article+article{border-left:1px solid #D1E1CB}
+.home-dashboard .repayment-stats strong{font-size:30px;font-weight:400}
+.home-dashboard .repayment-stats small,.progress-kicker{font-size:9px;font-weight:400;letter-spacing:.08em}
+.home-dashboard .trend-panel{background:#FBFDF7;border-color:#D1E1CB;padding:24px 20px;margin:0}
+.home-dashboard .trend-heading{flex-wrap:nowrap;align-items:center}.home-dashboard .trend-heading h2{font-size:20px;font-weight:400}
+.home-dashboard .trend-ranges{background:#FBFDF7;border-color:#D1E1CB}
+.home-dashboard .trend-ranges button{font-weight:400;font-size:10px;border:0;background:transparent}
+.home-dashboard .trend-ranges button[aria-pressed=true]{background:#E5EFDD}
+.home-dashboard .trend-legend{margin-top:26px;margin-bottom:25px}
+.home-dashboard .repayment-trend{margin-top:0;min-height:230px}
+.home-dashboard .trend-panel footer{border-color:#D1E1CB;font-size:10px;margin-top:20px}
+.home-dashboard .payment-history{background:#FBFDF7!important;border:1px solid #D1E1CB!important;border-radius:5px;padding:22px 20px!important}
+.home-dashboard .payment-history .records-heading h1{font-size:20px;font-weight:400}
+.home-dashboard .payment-history .recorded-badge{font-size:10px}
+@media(max-width:900px){.home-dashboard{grid-template-columns:150px minmax(0,1fr)}.home-dashboard .dash-main{padding:18px}.home-dashboard .repayment-stats article{padding:20px 14px}.home-dashboard .repayment-stats strong{font-size:26px}.home-dashboard .progress-summary-line{flex-wrap:wrap;gap:10px}.home-dashboard .trend-heading{flex-wrap:wrap}.home-dashboard .ledger-heading{padding:20px 16px}}
+@media(max-width:600px){.home-dashboard{width:calc(100vw - 16px);margin:8px auto;height:calc(100vh - 16px);grid-template-columns:104px minmax(0,1fr);min-height:500px}.home-dashboard .dash-main{padding:12px}.home-dashboard .dash-tabs button{font-size:11px;padding:9px}.home-dashboard .repayment-stats{grid-template-columns:1fr}.home-dashboard .repayment-stats article+article{border-left:0;border-top:1px solid #D1E1CB}.home-dashboard .progress-summary-line strong{font-size:15px}.home-dashboard .progress-heading{align-items:start;gap:12px}.home-dashboard .progress-heading h1{font-size:16px}.home-dashboard .friend-stats{grid-template-columns:1fr}.home-dashboard .friend-sidebar nav button{font-size:12px}.home-dashboard .progress-actions button{padding:11px 12px}.home-dashboard .progress-summary,.home-dashboard .trend-panel,.home-dashboard .payment-history{padding:18px 14px!important}}

@@ -4,7 +4,7 @@ import "./ReturnTracker.css";
 
 
 
-export default function ReturnTracker({ previewLoans }) {
+export default function ReturnTracker({ previewLoans, compact }) {
  const [summary, setSummary] = useState(null);
  const [error, setError] = useState("");
  const [revision, setRevision] = useState(0);
@@ -28,8 +28,8 @@ export default function ReturnTracker({ previewLoans }) {
   { label: "Still lent out", count: summary.outstanding, color: "#D0A215" },
   { label: "Returned to you", count: summary.returned, color: "#879A39" },
  ];
- return <section className="return-overview" aria-labelledby="return-heading">
-  <header className="return-heading"><div><p className="return-eyebrow">YOUR LENDING, AT A GLANCE</p><h2 id="return-heading">THE RETURN BREAKDOWN.</h2><p>A clearer picture of what is still out, and what made it back.</p></div><button className="return-sample" onClick={refresh}>Refresh data</button></header>
+ return <section className="return-overview" aria-label="Item return progress">
+  {!compact && <header className="return-heading"><h2 id="return-heading">Your lending, at a glance</h2><button className="return-sample" onClick={refresh}>Refresh data</button></header>}
   <section className="return-panel" aria-labelledby="return-chart-heading">
    <h3 id="return-chart-heading">Still lent out vs. returned to you</h3><p className="return-description">The share of all items you have lent out that are still out or returned to you.</p>
    <div className="return-chart-area">
