@@ -32,7 +32,7 @@ def test_postgres_and_migrations():
         command.check(config)
         with engine.connect() as connection:
             assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
-                "0006_event_action_width"
+                "0007_manual_reminders"
             )
             tables = (
                 "profiles",
@@ -42,6 +42,9 @@ def test_postgres_and_migrations():
                 "mutation_receipts",
                 "evidence",
                 "ledger_audit",
+                "reminder_recipients",
+                "reminder_permissions",
+                "reminders",
             )
             assert set(tables) <= set(inspect(connection).get_table_names(schema="iou_app"))
             # PostgreSQL ACLs defend the private schema independently of HTTP authorization.

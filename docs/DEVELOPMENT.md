@@ -9,6 +9,8 @@ and hosted PostgreSQL, [ledger contracts](LEDGER.md) for lending, and
 [Level 2 setup](HISTORY_PROOF.md) for audited corrections, private proof, and cursors.
 [Level 3](CHARGES_SCORES.md) covers optional periodic charges, waivers, and scores.
 [Level 4](DASHBOARD.md) defines dashboard metrics, rankings, and chart date filters.
+[Level 5.0](REMINDERS.md) covers manual Gmail reminders, private credentials, and a
+local-only preview/self-email demo. No real email runs in automated tests.
 
 ## Default setup (without Nix)
 
@@ -223,7 +225,11 @@ installs. Review audit findings; do not apply blanket `npm audit fix --force` up
 | `SUPABASE_STORAGE_KEY` | Optional server-only secret/service_role key for private evidence |
 | `EVIDENCE_BUCKET` | `iou-evidence`; must be private, PNG/JPEG only |
 | `EVIDENCE_SIGNED_URL_SECONDS` | 60 by default; 30–300 allowed |
-| `EMAIL_MODE` | Only `disabled` is supported; other values fail validation |
+| `EMAIL_MODE` | `disabled` by default; `gmail` requires complete sender/signing configuration |
+| `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `GMAIL_SENDER_EMAIL` | Backend-only central sender; never VITE variables |
+| `REMINDER_SIGNING_KEY`, `REMINDER_PUBLIC_BASE_URL` | Stable secret and backend base for public unsubscribe |
+| `GMAIL_RECIPIENT_ALLOWLIST`, `GMAIL_ALLOW_EXTERNAL_RECIPIENTS` | Self-only default; explicit consenting demo recipients / wider release gate |
+| `REMINDER_QUIET_HOURS_ENABLED` | Default true; 09:00–18:00 in owner timezone |
 | `PORT` | Docker runtime port, defaults to 8000; local backend task uses 8000 |
 
 There is no mail provider configuration, job scheduler, or delivery code yet. Do not put database or email credentials in frontend `VITE_*` variables.

@@ -4,12 +4,12 @@
 
 This primarily describes intended behavior. Google sign-in/private profiles and
 the backend ledger, audited corrections/voids, private proof workflows,
-signed cursors, periodic charges, waivers, fictional scores, and dashboard APIs
-are implemented;
+signed cursors, periodic charges, waivers, fictional scores, dashboard APIs, and
+Level 5.0 template-based manual Gmail reminders are implemented;
 see [auth setup](AUTH.md), [ledger contracts](LEDGER.md), [Level 3](CHARGES_SCORES.md),
 [dashboard metrics](DASHBOARD.md),
 [Level 2 safety/setup](HISTORY_PROOF.md), and the [backend roadmap](BACKEND_ROADMAP.md).
-Hosted provider setup/acceptance, reminders, and frontend lending/score screens
+Hosted provider setup/acceptance, Gemini drafting, scheduled reminders, and frontend API integration
 remain separate work.
 The ledger contracts specify the narrower behavior that actually ships today.
 
@@ -114,10 +114,12 @@ ranked publicly. The scoring rule is a product choice to revisit, not financial 
 ## Reminder behavior and delivery
 
 - Start with preview/manual send; scheduled delivery is a later MVP slice.
-- Development defaults to `EMAIL_MODE=disabled`, which sends nothing. Only that
-  mode is supported by the foundation. A future preview/sink must not contact recipients.
+- Development defaults to `EMAIL_MODE=disabled`, which sends nothing. Level 5.0
+  optionally supports a central Gmail API sender; credentials alone never enable mail.
+  See [implemented reminder contracts](REMINDERS.md); previews never call Google.
 - Explicitly confirm the recipient and have the lender confirm permission to contact.
-- Use a small curated template set; no need for AI-generated messages initially.
+- Select a preset friendly/playful/direct-but-polite tone and approve the exact short
+  preview. Current facts must still match at submission. Gemini drafting is Level 5.1.
 - Friendly/example tone: “Your hoodie has filed a missing-person report.” Avoid threats,
   humiliation, public CC lists, or language suggesting actual legal/credit consequences.
 - At most one reminder per friend per 24 hours across all loans; manual sends count
@@ -155,8 +157,11 @@ POST            /api/loans/{id}/repayments
 POST            /api/loans/{id}/return
 POST            /api/loans/{id}/void
 GET             /api/loans/{id}/activity
-POST            /api/loans/{id}/reminder-preview
-POST            /api/loans/{id}/reminders
+GET/PUT         /api/friends/{id}/reminder-preferences
+POST            /api/friends/{id}/reminder-previews
+POST            /api/reminders/{id}/send
+GET             /api/reminders/{id}
+GET/POST        /api/reminders/unsubscribe
 GET             /api/reminders
 ```
 

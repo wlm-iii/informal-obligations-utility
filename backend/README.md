@@ -13,6 +13,9 @@ no new API keys; see [the charge/score contract](../docs/CHARGES_SCORES.md).
 Level 4 adds read-only `/dashboard/summary`, `/dashboard/obligations`,
 `/dashboard/rankings`, and `/dashboard/trends`; see [metrics/filters](../docs/DASHBOARD.md).
 Apply `0006_event_action_width` to fix Level 3 item fee-payment storage on PostgreSQL.
+Level 5.0 adds template-only, explicitly approved Gmail API reminders. Apply reviewed
+`0007_manual_reminders` and follow [configuration and local self-test](../docs/REMINDERS.md).
+`EMAIL_MODE=disabled` is still the default; no Gemini or automatic sending is included.
 
 From the repository root:
 

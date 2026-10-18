@@ -12,14 +12,16 @@ from iou.ledger.charge_router import router as charge_router
 from iou.ledger.correction_router import router as correction_router
 from iou.ledger.router import router as ledger_router
 from iou.profiles import router as profiles_router
+from iou.reminders.router import router as reminders_router
 
-app = FastAPI(title="Informal Obligations Utility", version="0.6.0")
+app = FastAPI(title="Informal Obligations Utility", version="0.7.0")
 app.include_router(profiles_router)
 app.include_router(ledger_router)
 app.include_router(correction_router)
 app.include_router(charge_router)
 app.include_router(dashboard_router)
 app.include_router(evidence_router)
+app.include_router(reminders_router)
 
 # Validate configuration early, without connecting to PostgreSQL or sending email.
 get_settings()
