@@ -62,11 +62,17 @@ PostgreSQL column-width bug. Dashboard UI and hosted acceptance remain separate.
 
 ## Level 5 — Manually approved reminders
 
-Editable template previews, email-provider integration, permission confirmation,
-unsubscribe, shared rate limits, delivery records, duplicate protection and final
-status rechecks. Gemini drafting is optional, minimal-context, preview-only, with a
-template fallback. No autonomous sending or Gmail access required. Done when opted-out
-contacts and duplicate sends are blocked and every send requires explicit approval.
+Level 5.0 is implemented in the backend: fixed friendly/playful/direct-but-polite
+template previews, explicit approval of recipient/message, central Gmail send-only
+OAuth, recipient permission, global unsubscribe/cooldown, durable claims, delivery
+history, stale-preview/final eligibility checks, and conservative uncertain outcomes.
+Only currently owing contacts qualify; no arbitrary text or autonomous sending.
+Default email mode is disabled and live recipients are restricted to the sender.
+See [reminder setup and the local self-email demo](REMINDERS.md). Hosted migration,
+real Gmail acceptance, and frontend integration remain explicit steps.
+
+Level 5.1 will add optional minimal-context Gemini drafting behind the same approval
+flow, with template fallback. No inbox reading or user-by-user Gmail authorization.
 
 ## Level 6 — Automation and operations
 

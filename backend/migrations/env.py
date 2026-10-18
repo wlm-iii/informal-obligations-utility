@@ -7,6 +7,7 @@ from iou.database import Base, get_engine
 from iou.evidence import models as evidence_models  # noqa: F401 -- register evidence metadata
 from iou.ledger import models  # noqa: F401 -- register ledger migration metadata
 from iou.profiles import Profile  # noqa: F401 -- register migration metadata
+from iou.reminders import models as reminder_models  # noqa: F401 -- register metadata
 
 # Import future model modules here so autogenerate sees their tables.
 target_metadata = Base.metadata

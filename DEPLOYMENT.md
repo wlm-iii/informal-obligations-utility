@@ -23,7 +23,10 @@ public release. Use fake data for demos.
 - Set server-only `SUPABASE_URL` and the frontend's `VITE_SUPABASE_URL` /
   `VITE_SUPABASE_PUBLISHABLE_KEY`. Google client secrets stay in Supabase, not the app.
 - Configure exact Google/Supabase callback origins for the hosted frontend.
-- Keep `EMAIL_MODE=disabled`; there is no delivery implementation yet.
+- Keep `EMAIL_MODE=disabled` until [Level 5.0 acceptance](docs/REMINDERS.md) passes.
+  Gmail sender OAuth credentials/signing key belong only in backend secrets. Apply
+  `0007_manual_reminders`, configure a public unsubscribe base, review runtime grants,
+  and test self-addressed delivery before widening the default recipient allowlist.
 - Review [Level 1's migration and retry contract](docs/LEDGER.md) before deploying
   the lending API. All new ledger tables remain private; no direct browser SQL access.
 - Follow [Level 2's release safety and private Storage setup](docs/HISTORY_PROOF.md):

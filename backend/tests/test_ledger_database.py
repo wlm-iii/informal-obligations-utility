@@ -21,6 +21,7 @@ from iou.database import get_engine, get_session
 from iou.evidence.models import Evidence
 from iou.ledger.models import Audit, Friend, Loan, LoanEvent, MutationReceipt
 from iou.profiles import Profile, get_or_create_profile
+from iou.reminders.models import Permission, Recipient, Reminder
 
 pytestmark = pytest.mark.database
 
@@ -46,8 +47,26 @@ def pg():
         app.dependency_overrides.clear()
         ids = [u.id for u in users]
         with Session(engine) as session:
-            for model in (Audit, Evidence, LoanEvent, MutationReceipt, Loan, Friend):
+            hashes = list(
+                session.scalars(select(Reminder.recipient_hash).where(Reminder.owner_id.in_(ids)))
+            )
+            for model in (
+                Reminder,
+                Permission,
+                Audit,
+                Evidence,
+                LoanEvent,
+                MutationReceipt,
+                Loan,
+                Friend,
+            ):
                 session.execute(delete(model).where(model.owner_id.in_(ids)))
+            session.execute(
+                delete(Recipient).where(
+                    Recipient.id.in_(hashes),
+                    ~select(Reminder.id).where(Reminder.recipient_hash == Recipient.id).exists(),
+                )
+            )
             session.execute(delete(Profile).where(Profile.id.in_(ids)))
             session.commit()
         engine.dispose()

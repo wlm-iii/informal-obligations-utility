@@ -10,12 +10,15 @@ assigning clearly fictional credit scores.
 corrections/voids, private proof-image workflows, and signed cursor pagination.
 The backend also supports optional periodic interest/late fees, charge waivers,
 explained fictional reliability scores, and private dashboard APIs for summaries,
-obligations, rankings, and trends. The frontend has terminal login/account UI only. Hosted setup/acceptance, lending screens, and reminders remain separate.
+obligations, rankings, and trends. Level 5.0 adds preset-tone, manually approved
+Gmail reminders with consent, unsubscribe, and duplicate protection; real email is
+disabled by default. Hosted acceptance and frontend API integration remain separate.
 Use fake demo data.
 See [auth setup](docs/AUTH.md), [ledger API](docs/LEDGER.md),
 [Level 2 setup and safety](docs/HISTORY_PROOF.md),
 [Level 3 charges and scores](docs/CHARGES_SCORES.md), and
-[Level 4 dashboard metrics](docs/DASHBOARD.md).
+[Level 4 dashboard metrics](docs/DASHBOARD.md), and
+[Level 5.0 setup and self-email demo](docs/REMINDERS.md).
 
 ## Stack
 
@@ -102,6 +105,7 @@ Squash merge with a conventional PR title. Read [CONTRIBUTING.md](CONTRIBUTING.m
 - [Level 2 corrections, proof images, and cursors](docs/HISTORY_PROOF.md)
 - [Level 3 periodic charges, waivers, and fictional scores](docs/CHARGES_SCORES.md)
 - [Level 4 dashboard APIs and metric definitions](docs/DASHBOARD.md)
+- [Level 5.0 manual Gmail reminders and local self-test](docs/REMINDERS.md)
 - [Product specification and provisional rules](docs/SPEC.md)
 - [Local development](docs/DEVELOPMENT.md)
 - [Deployment notes and limitations](DEPLOYMENT.md)
